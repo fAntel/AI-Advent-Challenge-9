@@ -84,6 +84,98 @@ In clarification mode, the temperature applies only to the request that
 produces the final answer. With `self-prompt`, it likewise applies to the final
 answer request rather than the intermediate prompt-generation request.
 
+## Model comparison and statistics
+
+Use `-m`/`--model` to choose either `deepseek-v4-flash` (the default) or
+`deepseek-v4-pro`. Use `-r`/`--reasoning` to select `none` (the default),
+`low`, `high`, or `max`. A reasoning value other than `none` enables thinking
+mode and sends that effort to DeepSeek.
+
+Thinking mode ignores sampling temperature, so combining an enabled reasoning
+mode with `--temperature` is rejected instead of silently accepting an
+ineffective option.
+
+Use `--stats` to print the selected configuration, cumulative API answer time,
+token usage, pricing band, and estimated cost to standard error. The model
+answer remains alone on standard output, so it can still be redirected to a
+file. Token counts come directly from the DeepSeek API response rather than
+being estimated locally.
+
+```sh
+./deepseek-asker --stats --model deepseek-v4-flash --reasoning none \
+  -p 'Explain when a Go channel should be buffered'
+./deepseek-asker --stats --model deepseek-v4-pro --reasoning none \
+  -p 'Explain when a Go channel should be buffered'
+./deepseek-asker --stats --model deepseek-v4-pro --reasoning max \
+  -p 'Explain when a Go channel should be buffered'
+```
+
+These three configurations serve as the weak, average, and strong tiers for the
+Week0 Task4 comparison. Use the identical prompt and answer controls for every
+tier. For a less timing-sensitive comparison, rotate through the tiers several
+times and compare their average results:
+
+```sh
+prompt='Explain when a Go channel should be buffered'
+trials=3
+run=1
+while [ "$run" -le "$trials" ]; do
+  ./deepseek-asker --stats -m deepseek-v4-flash -r none -p "$prompt" \
+    >"weak-$run.txt" 2>>comparison.log
+  ./deepseek-asker --stats -m deepseek-v4-pro -r none -p "$prompt" \
+    >"average-$run.txt" 2>>comparison.log
+  ./deepseek-asker --stats -m deepseek-v4-pro -r max -p "$prompt" \
+    >"strong-$run.txt" 2>>comparison.log
+  run=$((run + 1))
+done
+```
+
+DeepSeek reports prompt tokens split into cache-hit and cache-miss tokens, plus
+completion tokens. Reasoning tokens are already included in completion tokens.
+The estimate therefore uses:
+
+```text
+cost USD = (cache-hit tokens × cache-hit rate
+          + cache-miss tokens × cache-miss rate
+          + completion tokens × output rate) / 1,000,000
+```
+
+The rates below were verified against the
+[DeepSeek pricing page](https://api-docs.deepseek.com/quick_start/pricing/) on
+2026-09-06 and are expressed in USD per one million tokens:
+
+| Model | Band | Cache hit | Cache miss | Output |
+| --- | --- | ---: | ---: | ---: |
+| `deepseek-v4-flash` | Off-peak | $0.007 | $0.22 | $0.66 |
+| `deepseek-v4-flash` | Peak | $0.014 | $0.44 | $1.32 |
+| `deepseek-v4-pro` | Off-peak | $0.022 | $0.66 | $1.98 |
+| `deepseek-v4-pro` | Peak | $0.044 | $1.32 | $3.96 |
+
+Peak hours are 01:00-04:00 and 06:00-10:00 UTC, Monday through Friday; all
+other times are off-peak. The tool selects the band from each request's start
+time. Prices can change, so the reported amount is labeled as an estimate and
+the pricing page should be checked before relying on it. For `self-prompt` and
+clarification workflows, statistics aggregate every API request while excluding
+time spent waiting for user input.
+
+### Recorded Task4 comparison
+
+The committed comparison uses the Kotlin coroutine task in
+[`task4-kotlin-prompt.txt`](task4-kotlin-prompt.txt). The model answers and
+their corresponding measurements are stored in the matching `.md` and `.stats`
+files.
+
+| Tier | Configuration | Answer time | Input tokens | Output tokens | Total tokens | Estimated cost |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Weak | Flash, no reasoning | 16.855s | 185 | 2,658 | 2,843 | $0.00179498 |
+| Average | Pro, no reasoning | 26.306s | 185 | 2,527 | 2,712 | $0.00512556 |
+| Strongest successful | Pro, low reasoning | 2m 3.801s | 185 | 8,658 (7,097 reasoning) | 8,843 | $0.01718328 |
+
+All three successful calls used off-peak pricing. Pro with `high` and `max`
+reasoning was also attempted, but those calls failed with insufficient-context
+errors before producing an answer. The Pro/low response was therefore retained
+as the strongest successful result.
+
 ## Prompt approaches
 
 Use `-a`/`--approach` to select one prompt strategy. The option accepts exactly

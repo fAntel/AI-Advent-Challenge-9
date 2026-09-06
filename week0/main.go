@@ -26,11 +26,30 @@ const (
 	spinnerInterval   = 100 * time.Millisecond
 )
 
+const (
+	flashModel = "deepseek-v4-flash"
+	proModel   = "deepseek-v4-pro"
+)
+
+// DeepSeek prices in USD per 1M tokens, verified on 2026-09-06 at
+// https://api-docs.deepseek.com/quick_start/pricing/.
+var modelPricing = map[string]map[pricingBand]tokenRates{
+	flashModel: {
+		pricingOffPeak: {cacheHit: 0.007, cacheMiss: 0.22, output: 0.66},
+		pricingPeak:    {cacheHit: 0.014, cacheMiss: 0.44, output: 1.32},
+	},
+	proModel: {
+		pricingOffPeak: {cacheHit: 0.022, cacheMiss: 0.66, output: 1.98},
+		pricingPeak:    {cacheHit: 0.044, cacheMiss: 1.32, output: 3.96},
+	},
+}
+
 type dependencies struct {
 	client           httpDoer
 	endpoint         string
 	getenv           func(string) string
 	readFile         func(string) ([]byte, error)
+	now              func() time.Time
 	interactiveStdin bool
 }
 
@@ -90,6 +109,50 @@ type temperatureValue struct {
 	set   bool
 }
 
+type modelValue struct {
+	value string
+}
+
+func (m *modelValue) String() string { return m.value }
+
+func (m *modelValue) Set(value string) error {
+	switch value {
+	case flashModel, proModel:
+		m.value = value
+		return nil
+	default:
+		return fmt.Errorf("unknown model %q; valid models: %s, %s", value, flashModel, proModel)
+	}
+}
+
+type reasoningMode string
+
+const (
+	reasoningNone reasoningMode = "none"
+	reasoningLow  reasoningMode = "low"
+	reasoningHigh reasoningMode = "high"
+	reasoningMax  reasoningMode = "max"
+)
+
+const validReasoning = "none, low, high, max"
+
+type reasoningValue struct {
+	value reasoningMode
+}
+
+func (r *reasoningValue) String() string { return string(r.value) }
+
+func (r *reasoningValue) Set(value string) error {
+	mode := reasoningMode(value)
+	switch mode {
+	case reasoningNone, reasoningLow, reasoningHigh, reasoningMax:
+		r.value = mode
+		return nil
+	default:
+		return fmt.Errorf("unknown reasoning effort %q; valid values: %s", value, validReasoning)
+	}
+}
+
 func (t *temperatureValue) String() string {
 	if !t.set {
 		return ""
@@ -108,11 +171,12 @@ func (t *temperatureValue) Set(value string) error {
 }
 
 type chatRequest struct {
-	Model       string        `json:"model"`
-	Messages    []chatMessage `json:"messages"`
-	Thinking    thinkingMode  `json:"thinking"`
-	Stream      bool          `json:"stream"`
-	Temperature *float64      `json:"temperature,omitempty"`
+	Model           string        `json:"model"`
+	Messages        []chatMessage `json:"messages"`
+	Thinking        thinkingMode  `json:"thinking"`
+	ReasoningEffort string        `json:"reasoning_effort,omitempty"`
+	Stream          bool          `json:"stream"`
+	Temperature     *float64      `json:"temperature,omitempty"`
 }
 
 type chatMessage struct {
@@ -125,11 +189,52 @@ type thinkingMode struct {
 }
 
 type chatResponse struct {
+	Model   string     `json:"model"`
+	Usage   tokenUsage `json:"usage"`
 	Choices []struct {
 		Message struct {
 			Content *string `json:"content"`
 		} `json:"message"`
 	} `json:"choices"`
+}
+
+type tokenUsage struct {
+	CompletionTokens        int `json:"completion_tokens"`
+	PromptTokens            int `json:"prompt_tokens"`
+	PromptCacheHitTokens    int `json:"prompt_cache_hit_tokens"`
+	PromptCacheMissTokens   int `json:"prompt_cache_miss_tokens"`
+	TotalTokens             int `json:"total_tokens"`
+	CompletionTokensDetails struct {
+		ReasoningTokens int `json:"reasoning_tokens"`
+	} `json:"completion_tokens_details"`
+}
+
+type pricingBand string
+
+const (
+	pricingOffPeak pricingBand = "off-peak"
+	pricingPeak    pricingBand = "peak"
+)
+
+type tokenRates struct {
+	cacheHit  float64
+	cacheMiss float64
+	output    float64
+}
+
+type requestMetrics struct {
+	duration time.Duration
+	usage    tokenUsage
+	band     pricingBand
+	costUSD  float64
+}
+
+type aggregateMetrics struct {
+	requests    int
+	duration    time.Duration
+	usage       tokenUsage
+	costUSD     float64
+	pricingBand string
 }
 
 type apiErrorResponse struct {
@@ -154,6 +259,7 @@ func main() {
 		endpoint:         defaultEndpoint,
 		getenv:           os.Getenv,
 		readFile:         os.ReadFile,
+		now:              time.Now,
 		interactiveStdin: isTerminal(os.Stdin),
 	}))
 }
@@ -169,8 +275,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	var stop promptValue
 	var roles promptValue
 	approach := approachValue{value: approachNone}
+	model := modelValue{value: defaultModel}
+	reasoning := reasoningValue{value: reasoningNone}
 	var temperature temperatureValue
 	var debug bool
+	var stats bool
 	var help bool
 	fs.Var(&prompt, "p", "prompt to send (takes precedence over stdin)")
 	fs.Var(&prompt, "prompt", "prompt to send (takes precedence over stdin)")
@@ -183,10 +292,15 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	fs.Var(&approach, "a", "prompt approach: "+validApproaches)
 	fs.Var(&approach, "approach", "prompt approach: "+validApproaches)
 	fs.Var(&roles, "roles", "comma-separated roles for the multi-role approach")
+	fs.Var(&model, "m", "model: "+flashModel+" or "+proModel)
+	fs.Var(&model, "model", "model: "+flashModel+" or "+proModel)
+	fs.Var(&reasoning, "r", "reasoning effort: "+validReasoning)
+	fs.Var(&reasoning, "reasoning", "reasoning effort: "+validReasoning)
 	fs.Var(&temperature, "t", "sampling temperature from 0 to 2")
 	fs.Var(&temperature, "temperature", "sampling temperature from 0 to 2")
 	fs.BoolVar(&debug, "d", false, "print masked HTTP diagnostics to stderr")
 	fs.BoolVar(&debug, "debug", false, "print masked HTTP diagnostics to stderr")
+	fs.BoolVar(&stats, "stats", false, "print timing, token usage, and estimated cost to stderr")
 	fs.BoolVar(&help, "h", false, "show this help")
 	fs.BoolVar(&help, "help", false, "show this help")
 
@@ -215,6 +329,10 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	}
 	if roles.set && approach.value != approachMultiRole {
 		fmt.Fprintln(stderr, "error: --roles requires --approach multi-role")
+		return 2
+	}
+	if temperature.set && reasoning.value != reasoningNone {
+		fmt.Fprintln(stderr, "error: --temperature cannot be used when reasoning is enabled")
 		return 2
 	}
 	var selectedRoles []string
@@ -287,6 +405,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	if temperature.set {
 		selectedTemperature = &temperature.value
 	}
+	metrics := aggregateMetrics{}
 
 	for {
 		final := !stop.set || containsFold(messages[len(messages)-1].Content, stop.value)
@@ -298,10 +417,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 		if final && approach.value != approachSelfPrompt {
 			requestTemperature = selectedTemperature
 		}
-		answer, ok := requestAnswer(requestMessages, requestTemperature, debug, showSpinner, stderr, deps, apiKey)
+		answer, requestStats, ok := requestAnswer(requestMessages, model.value, reasoning.value, requestTemperature, debug, showSpinner, stderr, deps, apiKey)
 		if !ok {
 			return 1
 		}
+		metrics.add(requestStats)
 
 		if final {
 			if approach.value == approachSelfPrompt {
@@ -310,14 +430,18 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 					finalMessages = append(finalMessages, chatMessage{Role: "system", Content: systemMessage})
 				}
 				finalMessages = append(finalMessages, chatMessage{Role: "user", Content: answer})
-				answer, ok = requestAnswer(finalMessages, selectedTemperature, debug, showSpinner, stderr, deps, apiKey)
+				answer, requestStats, ok = requestAnswer(finalMessages, model.value, reasoning.value, selectedTemperature, debug, showSpinner, stderr, deps, apiKey)
 				if !ok {
 					return 1
 				}
+				metrics.add(requestStats)
 			}
 			if err := writeAnswer(stdout, answer); err != nil {
 				fmt.Fprintf(stderr, "error: write answer: %v\n", err)
 				return 1
+			}
+			if stats {
+				writeStats(stderr, model.value, reasoning.value, metrics)
 			}
 			return 0
 		}
@@ -457,23 +581,30 @@ func withClarificationTurnStatus(messages []chatMessage, final bool, approach ap
 	return result
 }
 
-func requestAnswer(messages []chatMessage, temperature *float64, debug, showSpinner bool, stderr io.Writer, deps dependencies, apiKey string) (string, bool) {
+func requestAnswer(messages []chatMessage, model string, reasoning reasoningMode, temperature *float64, debug, showSpinner bool, stderr io.Writer, deps dependencies, apiKey string) (string, requestMetrics, bool) {
+	thinkingType := "disabled"
+	reasoningEffort := ""
+	if reasoning != reasoningNone {
+		thinkingType = "enabled"
+		reasoningEffort = string(reasoning)
+	}
 	body, err := json.Marshal(chatRequest{
-		Model:       defaultModel,
-		Messages:    messages,
-		Thinking:    thinkingMode{Type: "disabled"},
-		Stream:      false,
-		Temperature: temperature,
+		Model:           model,
+		Messages:        messages,
+		Thinking:        thinkingMode{Type: thinkingType},
+		ReasoningEffort: reasoningEffort,
+		Stream:          false,
+		Temperature:     temperature,
 	})
 	if err != nil {
 		fmt.Fprintf(stderr, "error: encode request: %v\n", err)
-		return "", false
+		return "", requestMetrics{}, false
 	}
 
 	req, err := http.NewRequest(http.MethodPost, deps.endpoint, bytes.NewReader(body))
 	if err != nil {
 		fmt.Fprintf(stderr, "error: create request: %v\n", redact(err.Error(), apiKey))
-		return "", false
+		return "", requestMetrics{}, false
 	}
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 	req.Header.Set("Content-Type", "application/json")
@@ -487,18 +618,24 @@ func requestAnswer(messages []chatMessage, temperature *float64, debug, showSpin
 	if showSpinner {
 		stopSpinner = startSpinner(stderr)
 	}
+	now := deps.now
+	if now == nil {
+		now = time.Now
+	}
+	startedAt := now()
 	resp, err := deps.client.Do(req)
 	if err != nil {
 		stopSpinner()
 		fmt.Fprintf(stderr, "error: send request: %s\n", redact(err.Error(), apiKey))
-		return "", false
+		return "", requestMetrics{}, false
 	}
 	responseBody, readErr := io.ReadAll(resp.Body)
 	_ = resp.Body.Close()
+	finishedAt := now()
 	stopSpinner()
 	if readErr != nil {
 		fmt.Fprintf(stderr, "error: read response: %s\n", redact(readErr.Error(), apiKey))
-		return "", false
+		return "", requestMetrics{}, false
 	}
 	if debug {
 		writeDebugResponse(stderr, resp, responseBody, apiKey)
@@ -510,24 +647,87 @@ func requestAnswer(messages []chatMessage, temperature *float64, debug, showSpin
 			fmt.Fprintf(stderr, ": %s", redact(message, apiKey))
 		}
 		fmt.Fprintln(stderr)
-		return "", false
+		return "", requestMetrics{}, false
 	}
 
 	var result chatResponse
 	if err := json.Unmarshal(responseBody, &result); err != nil {
 		fmt.Fprintf(stderr, "error: decode DeepSeek response: %s\n", redact(err.Error(), apiKey))
-		return "", false
+		return "", requestMetrics{}, false
 	}
 	if len(result.Choices) == 0 || result.Choices[0].Message.Content == nil {
 		fmt.Fprintln(stderr, "error: DeepSeek response does not contain an answer")
-		return "", false
+		return "", requestMetrics{}, false
 	}
 	answer := *result.Choices[0].Message.Content
 	if answer == "" {
 		fmt.Fprintln(stderr, "error: DeepSeek returned an empty answer")
-		return "", false
+		return "", requestMetrics{}, false
 	}
-	return answer, true
+	duration := finishedAt.Sub(startedAt)
+	if duration < 0 {
+		duration = 0
+	}
+	band := pricingBandAt(startedAt)
+	requestStats := requestMetrics{
+		duration: duration,
+		usage:    result.Usage,
+		band:     band,
+		costUSD:  estimateCostUSD(model, band, result.Usage),
+	}
+	return answer, requestStats, true
+}
+
+func pricingBandAt(at time.Time) pricingBand {
+	utc := at.UTC()
+	weekday := utc.Weekday()
+	if weekday == time.Saturday || weekday == time.Sunday {
+		return pricingOffPeak
+	}
+	hour := utc.Hour()
+	if (hour >= 1 && hour < 4) || (hour >= 6 && hour < 10) {
+		return pricingPeak
+	}
+	return pricingOffPeak
+}
+
+func estimateCostUSD(model string, band pricingBand, usage tokenUsage) float64 {
+	rates := modelPricing[model][band]
+	return (float64(usage.PromptCacheHitTokens)*rates.cacheHit +
+		float64(usage.PromptCacheMissTokens)*rates.cacheMiss +
+		float64(usage.CompletionTokens)*rates.output) / 1_000_000
+}
+
+func (a *aggregateMetrics) add(request requestMetrics) {
+	a.requests++
+	a.duration += request.duration
+	a.usage.PromptTokens += request.usage.PromptTokens
+	a.usage.PromptCacheHitTokens += request.usage.PromptCacheHitTokens
+	a.usage.PromptCacheMissTokens += request.usage.PromptCacheMissTokens
+	a.usage.CompletionTokens += request.usage.CompletionTokens
+	a.usage.CompletionTokensDetails.ReasoningTokens += request.usage.CompletionTokensDetails.ReasoningTokens
+	a.usage.TotalTokens += request.usage.TotalTokens
+	a.costUSD += request.costUSD
+	if a.pricingBand == "" {
+		a.pricingBand = string(request.band)
+	} else if a.pricingBand != string(request.band) {
+		a.pricingBand = "mixed"
+	}
+}
+
+func writeStats(w io.Writer, model string, reasoning reasoningMode, metrics aggregateMetrics) {
+	fmt.Fprintln(w, "Stats:")
+	fmt.Fprintf(w, "  model: %s\n", model)
+	fmt.Fprintf(w, "  reasoning: %s\n", reasoning)
+	fmt.Fprintf(w, "  requests: %d\n", metrics.requests)
+	fmt.Fprintf(w, "  answer time: %s\n", metrics.duration.Round(time.Millisecond))
+	fmt.Fprintf(w, "  input tokens: %d (cache hit: %d, cache miss: %d)\n",
+		metrics.usage.PromptTokens, metrics.usage.PromptCacheHitTokens, metrics.usage.PromptCacheMissTokens)
+	fmt.Fprintf(w, "  output tokens: %d (reasoning: %d)\n",
+		metrics.usage.CompletionTokens, metrics.usage.CompletionTokensDetails.ReasoningTokens)
+	fmt.Fprintf(w, "  total tokens: %d\n", metrics.usage.TotalTokens)
+	fmt.Fprintf(w, "  pricing: %s\n", metrics.pricingBand)
+	fmt.Fprintf(w, "  estimated cost: $%.8f USD\n", metrics.costUSD)
 }
 
 func startSpinner(w io.Writer) func() {
@@ -621,8 +821,12 @@ Options:
                       self-prompt, or multi-role.
       --roles LIST    Comma-separated roles for multi-role (default:
                       "Business analyst, Engineer, Critic").
+  -m, --model MODEL   Model: deepseek-v4-flash (default) or deepseek-v4-pro.
+  -r, --reasoning N   Reasoning effort: none (default), low, high, or max.
   -t, --temperature N Sampling temperature from 0 to 2. If omitted, do not send
-                      a temperature value and use the API default.
+                      a temperature value and use the API default. Cannot be
+                      combined with enabled reasoning.
+      --stats         Print timing, token usage, and estimated cost to stderr.
   -d, --debug         Print masked HTTP request/response details to stderr.
   -h, --help          Show this help.
 
@@ -634,6 +838,8 @@ Examples:
   printf 'Explain goroutines briefly' | deepseek-asker
   deepseek-asker -p "Compare Go and Rust" -l "3 paragraphs"
   deepseek-asker -p "Write a surprising story" --temperature 1.3
+  deepseek-asker -p "Solve this problem" --model deepseek-v4-pro \
+    --reasoning max --stats
   deepseek-asker -p "Review this proposal" --approach multi-role
   deepseek-asker -p "Design an army palette" -a multi-role \
     --roles "Miniature painter, Lore expert, Critic"

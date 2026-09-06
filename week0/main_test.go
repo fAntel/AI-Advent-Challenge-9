@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -29,7 +30,7 @@ func TestOneShotRequestIsUnchanged(t *testing.T) {
 		t.Fatalf("request count = %d", len(client.requests))
 	}
 	request := client.requests[0]
-	if request.Model != defaultModel || request.Thinking.Type != "disabled" || request.Stream {
+	if request.Model != defaultModel || request.Thinking.Type != "disabled" || request.ReasoningEffort != "" || request.Stream {
 		t.Errorf("unexpected request settings: %+v", request)
 	}
 	if request.Temperature != nil || strings.Contains(client.bodies[0], `"temperature"`) {
@@ -41,6 +42,164 @@ func TestOneShotRequestIsUnchanged(t *testing.T) {
 	}
 	if got := client.headers[0].Get("Content-Type"); got != "application/json" {
 		t.Errorf("Content-Type = %q", got)
+	}
+}
+
+func TestModelAndReasoningFlags(t *testing.T) {
+	tests := []struct {
+		name              string
+		args              []string
+		wantModel         string
+		wantThinking      string
+		wantReasoning     string
+		wantReasoningJSON bool
+	}{
+		{name: "flash without reasoning", args: []string{"-m", flashModel, "-r", "none"}, wantModel: flashModel, wantThinking: "disabled"},
+		{name: "pro low", args: []string{"--model", proModel, "--reasoning", "low"}, wantModel: proModel, wantThinking: "enabled", wantReasoning: "low", wantReasoningJSON: true},
+		{name: "pro high", args: []string{"--model", proModel, "--reasoning", "high"}, wantModel: proModel, wantThinking: "enabled", wantReasoning: "high", wantReasoningJSON: true},
+		{name: "pro max", args: []string{"--model", proModel, "--reasoning", "max"}, wantModel: proModel, wantThinking: "enabled", wantReasoning: "max", wantReasoningJSON: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := newFakeClient(answerResponse("ok"))
+			args := append(tt.args, "-p", "question")
+			code, _, stderr := runTest(t, args, "", false, client)
+			if code != 0 || stderr != "" {
+				t.Fatalf("code=%d stderr=%q", code, stderr)
+			}
+			request := client.requests[0]
+			if request.Model != tt.wantModel || request.Thinking.Type != tt.wantThinking || request.ReasoningEffort != tt.wantReasoning {
+				t.Errorf("request settings = %+v", request)
+			}
+			if got := strings.Contains(client.bodies[0], `"reasoning_effort"`); got != tt.wantReasoningJSON {
+				t.Errorf("reasoning_effort presence = %v, want %v: %s", got, tt.wantReasoningJSON, client.bodies[0])
+			}
+		})
+	}
+}
+
+func TestStatsReportUsesAPIUsageAndPeakPricing(t *testing.T) {
+	usage := tokenUsage{
+		PromptTokens:          300,
+		PromptCacheHitTokens:  100,
+		PromptCacheMissTokens: 200,
+		CompletionTokens:      300,
+		TotalTokens:           600,
+	}
+	usage.CompletionTokensDetails.ReasoningTokens = 250
+	client := newFakeClient(answerResponseWithUsage("answer", usage))
+	started := time.Date(2026, time.September, 7, 2, 0, 0, 0, time.UTC)
+	times := []time.Time{started, started.Add(1234 * time.Millisecond)}
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"--stats", "-p", "question"}, strings.NewReader(""), &stdout, &stderr, dependencies{
+		client: client, endpoint: testEndpoint,
+		getenv: func(string) string { return testAPIKey },
+		now:    sequenceClock(times...),
+	})
+	if code != 0 || stdout.String() != "answer\n" {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	for _, want := range []string{
+		"model: deepseek-v4-flash",
+		"reasoning: none",
+		"requests: 1",
+		"answer time: 1.234s",
+		"input tokens: 300 (cache hit: 100, cache miss: 200)",
+		"output tokens: 300 (reasoning: 250)",
+		"total tokens: 600",
+		"pricing: peak",
+		"estimated cost: $0.00048540 USD",
+	} {
+		if !strings.Contains(stderr.String(), want) {
+			t.Errorf("stderr missing %q:\n%s", want, stderr.String())
+		}
+	}
+}
+
+func TestStatsAggregateMultipleRequests(t *testing.T) {
+	first := tokenUsage{PromptTokens: 10, PromptCacheMissTokens: 10, CompletionTokens: 20, TotalTokens: 30}
+	first.CompletionTokensDetails.ReasoningTokens = 5
+	second := tokenUsage{PromptTokens: 30, PromptCacheHitTokens: 20, PromptCacheMissTokens: 10, CompletionTokens: 40, TotalTokens: 70}
+	second.CompletionTokensDetails.ReasoningTokens = 15
+	client := newFakeClient(
+		answerResponseWithUsage("generated prompt", first),
+		answerResponseWithUsage("final", second),
+	)
+	start := time.Date(2026, time.September, 6, 12, 0, 0, 0, time.UTC)
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"--stats", "--model", proModel, "--reasoning", "max", "--approach", "self-prompt", "-p", "question"}, strings.NewReader(""), &stdout, &stderr, dependencies{
+		client: client, endpoint: testEndpoint,
+		getenv: func(string) string { return testAPIKey },
+		now: sequenceClock(
+			start, start.Add(time.Second),
+			start.Add(2*time.Second), start.Add(4*time.Second),
+		),
+	})
+	if code != 0 || stdout.String() != "final\n" {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	for _, want := range []string{
+		"requests: 2",
+		"answer time: 3s",
+		"input tokens: 40 (cache hit: 20, cache miss: 20)",
+		"output tokens: 60 (reasoning: 20)",
+		"total tokens: 100",
+		"pricing: off-peak",
+		"estimated cost: $0.00013244 USD",
+	} {
+		if !strings.Contains(stderr.String(), want) {
+			t.Errorf("stderr missing %q:\n%s", want, stderr.String())
+		}
+	}
+}
+
+func TestPricingBandAt(t *testing.T) {
+	tests := []struct {
+		name string
+		at   time.Time
+		want pricingBand
+	}{
+		{name: "weekday before first peak", at: time.Date(2026, 9, 7, 0, 59, 59, 0, time.UTC), want: pricingOffPeak},
+		{name: "first peak starts", at: time.Date(2026, 9, 7, 1, 0, 0, 0, time.UTC), want: pricingPeak},
+		{name: "first peak ends", at: time.Date(2026, 9, 7, 4, 0, 0, 0, time.UTC), want: pricingOffPeak},
+		{name: "second peak starts", at: time.Date(2026, 9, 7, 6, 0, 0, 0, time.UTC), want: pricingPeak},
+		{name: "second peak ends", at: time.Date(2026, 9, 7, 10, 0, 0, 0, time.UTC), want: pricingOffPeak},
+		{name: "weekend", at: time.Date(2026, 9, 6, 2, 0, 0, 0, time.UTC), want: pricingOffPeak},
+		{name: "convert to UTC", at: time.Date(2026, 9, 7, 5, 0, 0, 0, time.FixedZone("UTC+3", 3*60*60)), want: pricingPeak},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := pricingBandAt(tt.at); got != tt.want {
+				t.Errorf("pricingBandAt(%s) = %s, want %s", tt.at, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEstimateCostUSDForEveryModelAndBand(t *testing.T) {
+	usage := tokenUsage{
+		PromptCacheHitTokens:  1_000_000,
+		PromptCacheMissTokens: 1_000_000,
+		CompletionTokens:      1_000_000,
+	}
+	tests := []struct {
+		name  string
+		model string
+		band  pricingBand
+		want  float64
+	}{
+		{name: "flash off-peak", model: flashModel, band: pricingOffPeak, want: 0.887},
+		{name: "flash peak", model: flashModel, band: pricingPeak, want: 1.774},
+		{name: "pro off-peak", model: proModel, band: pricingOffPeak, want: 2.662},
+		{name: "pro peak", model: proModel, band: pricingPeak, want: 5.324},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := estimateCostUSD(tt.model, tt.band, usage); math.Abs(got-tt.want) > 1e-12 {
+				t.Errorf("estimateCostUSD(%s, %s) = %f, want %f", tt.model, tt.band, got, tt.want)
+			}
+		})
 	}
 }
 
@@ -412,6 +571,9 @@ func TestOptionValidation(t *testing.T) {
 		{name: "temperature above range", args: []string{"--temperature", "2.1"}, want: "temperature must be a number between 0 and 2"},
 		{name: "temperature NaN", args: []string{"--temperature", "NaN"}, want: "temperature must be a number between 0 and 2"},
 		{name: "temperature infinity", args: []string{"--temperature", "+Inf"}, want: "temperature must be a number between 0 and 2"},
+		{name: "unknown model", args: []string{"--model", "deepseek-v4-ultra"}, want: "valid models: deepseek-v4-flash, deepseek-v4-pro"},
+		{name: "unknown reasoning", args: []string{"--reasoning", "extreme"}, want: "valid values: none, low, high, max"},
+		{name: "temperature with reasoning", args: []string{"--temperature", "1", "--reasoning", "low"}, want: "--temperature cannot be used when reasoning is enabled"},
 		{name: "roles without multi role", args: []string{"--roles", "Painter,Critic"}, want: "--roles requires --approach multi-role"},
 		{name: "empty roles", args: []string{"--approach", "multi-role", "--roles", " \t"}, want: "roles are empty"},
 		{name: "one role", args: []string{"--approach", "multi-role", "--roles", "Painter"}, want: "requires at least two roles"},
@@ -699,7 +861,7 @@ func TestHelpDoesNotRequireAPIKey(t *testing.T) {
 	for _, arg := range []string{"-h", "--help"} {
 		t.Run(arg, func(t *testing.T) {
 			code, stdout, stderr := runTestWithKey(t, []string{arg}, "", false, newFakeClient(), "")
-			if code != 0 || !strings.Contains(stdout, "-f, --format FILE") || !strings.Contains(stdout, "-s, --stop SEQUENCE") || !strings.Contains(stdout, "-a, --approach MODE") || !strings.Contains(stdout, "--roles LIST") || !strings.Contains(stdout, "-t, --temperature N") || stderr != "" {
+			if code != 0 || !strings.Contains(stdout, "-f, --format FILE") || !strings.Contains(stdout, "-s, --stop SEQUENCE") || !strings.Contains(stdout, "-a, --approach MODE") || !strings.Contains(stdout, "--roles LIST") || !strings.Contains(stdout, "-m, --model MODEL") || !strings.Contains(stdout, "-r, --reasoning N") || !strings.Contains(stdout, "-t, --temperature N") || !strings.Contains(stdout, "--stats") || stderr != "" {
 				t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
 			}
 		})
@@ -825,13 +987,30 @@ type fakeResponse struct {
 }
 
 func answerResponse(answer string) fakeResponse {
+	return answerResponseWithUsage(answer, tokenUsage{})
+}
+
+func answerResponseWithUsage(answer string, usage tokenUsage) fakeResponse {
 	body, err := json.Marshal(map[string]any{
 		"choices": []any{map[string]any{"message": map[string]any{"content": answer}}},
+		"usage":   usage,
 	})
 	if err != nil {
 		panic(err)
 	}
 	return fakeResponse{status: http.StatusOK, body: string(body)}
+}
+
+func sequenceClock(times ...time.Time) func() time.Time {
+	index := 0
+	return func() time.Time {
+		if index >= len(times) {
+			panic("sequence clock exhausted")
+		}
+		result := times[index]
+		index++
+		return result
+	}
 }
 
 type fakeClient struct {

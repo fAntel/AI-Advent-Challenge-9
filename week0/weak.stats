@@ -1,0 +1,10 @@
+Stats:
+  model: deepseek-v4-flash
+  reasoning: none
+  requests: 1
+  answer time: 16.855s
+  input tokens: 185 (cache hit: 0, cache miss: 185)
+  output tokens: 2658 (reasoning: 0)
+  total tokens: 2843
+  pricing: off-peak
+  estimated cost: $0.00179498 USD

@@ -1,0 +1,17 @@
+Implement the following Kotlin function using kotlinx.coroutines:
+
+```Kotlin
+suspend fun <T> firstSuccessful(
+    tasks: List<suspend () -> T>
+): T
+```
+Requirements:
+1. Run all tasks concurrently.
+2. Return the first successfully completed result, regardless of list order.
+3. A failed task must not prevent another task from succeeding.
+4. Cancel all unfinished tasks after obtaining a successful result.
+5. If the list is empty, throw IllegalArgumentException.
+6. If every task fails, throw an IllegalStateException and attach every original failure as a suppressed exception.
+7. Parent cancellation must propagate normally and cancel all child tasks.
+8. Do not use GlobalScope, polling, busy loops, or blocking calls.
+9. Provide compilable Kotlin code, explain the cancellation behavior, and include unit tests using kotlinx-coroutines-test.

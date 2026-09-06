@@ -1,0 +1,10 @@
+Stats:
+  model: deepseek-v4-pro
+  reasoning: none
+  requests: 1
+  answer time: 26.306s
+  input tokens: 185 (cache hit: 0, cache miss: 185)
+  output tokens: 2527 (reasoning: 0)
+  total tokens: 2712
+  pricing: off-peak
+  estimated cost: $0.00512556 USD
