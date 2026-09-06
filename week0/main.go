@@ -49,6 +49,40 @@ func (p *promptValue) Set(value string) error {
 	return nil
 }
 
+type approachMode string
+
+const (
+	approachNone       approachMode = "none"
+	approachStepByStep approachMode = "step-by-step"
+	approachSelfPrompt approachMode = "self-prompt"
+	approachMultiRole  approachMode = "multi-role"
+)
+
+const validApproaches = "none, step-by-step, self-prompt, multi-role"
+
+var defaultMultiRoleRoles = []string{"Business analyst", "Engineer", "Critic"}
+
+type approachValue struct {
+	value approachMode
+}
+
+func (a *approachValue) String() string { return string(a.value) }
+
+func (a *approachValue) Set(value string) error {
+	if strings.TrimSpace(value) == "" {
+		return fmt.Errorf("approach is empty; valid approaches: %s", validApproaches)
+	}
+
+	mode := approachMode(value)
+	switch mode {
+	case approachNone, approachStepByStep, approachSelfPrompt, approachMultiRole:
+		a.value = mode
+		return nil
+	default:
+		return fmt.Errorf("unknown approach %q; valid approaches: %s", value, validApproaches)
+	}
+}
+
 type chatRequest struct {
 	Model    string        `json:"model"`
 	Messages []chatMessage `json:"messages"`
@@ -108,6 +142,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	var formatPath promptValue
 	var length promptValue
 	var stop promptValue
+	var roles promptValue
+	approach := approachValue{value: approachNone}
 	var debug bool
 	var help bool
 	fs.Var(&prompt, "p", "prompt to send (takes precedence over stdin)")
@@ -118,6 +154,9 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	fs.Var(&length, "length", "desired final-answer length")
 	fs.Var(&stop, "s", "sequence that ends clarification mode")
 	fs.Var(&stop, "stop", "sequence that ends clarification mode")
+	fs.Var(&approach, "a", "prompt approach: "+validApproaches)
+	fs.Var(&approach, "approach", "prompt approach: "+validApproaches)
+	fs.Var(&roles, "roles", "comma-separated roles for the multi-role approach")
 	fs.BoolVar(&debug, "d", false, "print masked HTTP diagnostics to stderr")
 	fs.BoolVar(&debug, "debug", false, "print masked HTTP diagnostics to stderr")
 	fs.BoolVar(&help, "h", false, "show this help")
@@ -145,6 +184,22 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	if stop.set && strings.TrimSpace(stop.value) == "" {
 		fmt.Fprintln(stderr, "error: stop sequence is empty")
 		return 2
+	}
+	if roles.set && approach.value != approachMultiRole {
+		fmt.Fprintln(stderr, "error: --roles requires --approach multi-role")
+		return 2
+	}
+	var selectedRoles []string
+	if approach.value == approachMultiRole {
+		selectedRoles = append([]string(nil), defaultMultiRoleRoles...)
+		if roles.set {
+			var err error
+			selectedRoles, err = parseRoles(roles.value)
+			if err != nil {
+				fmt.Fprintf(stderr, "error: %v\n", err)
+				return 2
+			}
+		}
 	}
 
 	var format string
@@ -195,7 +250,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	}
 
 	messages := make([]chatMessage, 0, 2)
-	if systemMessage := buildSystemMessage(formatPath.set, format, length, stop); systemMessage != "" {
+	if systemMessage := buildSystemMessage(formatPath.set, format, length, stop, approach.value, selectedRoles); systemMessage != "" {
 		messages = append(messages, chatMessage{Role: "system", Content: systemMessage})
 	}
 	messages = append(messages, chatMessage{Role: "user", Content: promptText})
@@ -205,7 +260,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 		final := !stop.set || containsFold(messages[len(messages)-1].Content, stop.value)
 		requestMessages := messages
 		if stop.set {
-			requestMessages = withClarificationTurnStatus(messages, final)
+			requestMessages = withClarificationTurnStatus(messages, final, approach.value)
 		}
 		answer, ok := requestAnswer(requestMessages, debug, showSpinner, stderr, deps, apiKey)
 		if !ok {
@@ -213,6 +268,17 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 		}
 
 		if final {
+			if approach.value == approachSelfPrompt {
+				finalMessages := make([]chatMessage, 0, 2)
+				if systemMessage := buildSystemMessage(formatPath.set, format, length, promptValue{}, approachNone, nil); systemMessage != "" {
+					finalMessages = append(finalMessages, chatMessage{Role: "system", Content: systemMessage})
+				}
+				finalMessages = append(finalMessages, chatMessage{Role: "user", Content: answer})
+				answer, ok = requestAnswer(finalMessages, debug, showSpinner, stderr, deps, apiKey)
+				if !ok {
+					return 1
+				}
+			}
 			if err := writeAnswer(stdout, answer); err != nil {
 				fmt.Fprintf(stderr, "error: write answer: %v\n", err)
 				return 1
@@ -235,9 +301,32 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	}
 }
 
-func buildSystemMessage(hasFormat bool, format string, length, stop promptValue) string {
-	sections := make([]string, 0, 3)
-	if hasFormat {
+func parseRoles(value string) ([]string, error) {
+	if strings.TrimSpace(value) == "" {
+		return nil, errors.New("roles are empty")
+	}
+
+	parts := strings.Split(value, ",")
+	roles := make([]string, 0, len(parts))
+	for index, part := range parts {
+		role := strings.TrimSpace(part)
+		if role == "" {
+			return nil, fmt.Errorf("role %d is empty", index+1)
+		}
+		if strings.ContainsAny(role, "\r\n") {
+			return nil, fmt.Errorf("role %d contains a line break", index+1)
+		}
+		roles = append(roles, role)
+	}
+	if len(roles) < 2 {
+		return nil, errors.New("multi-role approach requires at least two roles")
+	}
+	return roles, nil
+}
+
+func buildSystemMessage(hasFormat bool, format string, length, stop promptValue, approach approachMode, roles []string) string {
+	sections := make([]string, 0, 4)
+	if hasFormat && approach != approachSelfPrompt {
 		section := "Response requirements:\n" +
 			"Follow the answer format below exactly.\n" +
 			"Do not add commentary outside the requested format.\n\n" +
@@ -248,8 +337,11 @@ func buildSystemMessage(hasFormat bool, format string, length, stop promptValue)
 		section += "</answer-format>"
 		sections = append(sections, section)
 	}
-	if length.set {
+	if length.set && approach != approachSelfPrompt {
 		sections = append(sections, "Target final-answer length:\n"+length.value)
+	}
+	if instruction := approachInstruction(approach, roles, hasFormat); instruction != "" {
+		sections = append(sections, instruction)
 	}
 	if stop.set {
 		sections = append(sections, "Clarification protocol:\n"+
@@ -262,11 +354,50 @@ func buildSystemMessage(hasFormat bool, format string, length, stop promptValue)
 	return strings.Join(sections, "\n\n")
 }
 
+func approachInstruction(approach approachMode, roles []string, hasFormat bool) string {
+	switch approach {
+	case approachStepByStep:
+		return "Final-answer approach:\n" +
+			"Solve the request step by step and present the resulting steps clearly.\n" +
+			"Follow all final-answer requirements above."
+	case approachSelfPrompt:
+		return "Prompt-generation approach:\n" +
+			"At the prompt-generation stage, write a clear, self-contained prompt that\n" +
+			"instructs another model to solve the user's request. Incorporate all relevant\n" +
+			"information from the conversation.\n" +
+			"Return only the rewritten prompt and do not solve the request."
+	case approachMultiRole:
+		var instruction strings.Builder
+		instruction.WriteString("Multi-role final-answer approach:\n")
+		instruction.WriteString("Analyze the request independently from each of these roles:\n")
+		for index, role := range roles {
+			fmt.Fprintf(&instruction, "%d. %s\n", index+1, role)
+		}
+		if hasFormat {
+			instruction.WriteString("Within the supplied answer format, clearly attribute every answer to its role.\n")
+		} else {
+			instruction.WriteString("Use exactly these Markdown section headings, in this order:\n")
+			for _, role := range roles {
+				fmt.Fprintf(&instruction, "## %s\n", role)
+			}
+			instruction.WriteString("Under each heading, write a substantial response using 2-4 short paragraphs.\n")
+			instruction.WriteString("Separate paragraphs with blank lines; do not compress a role's entire answer into one paragraph.\n")
+			instruction.WriteString("When useful, cover the role's assessment, concrete recommendations, and risks or trade-offs.\n")
+			instruction.WriteString("Use bullets, numbered steps, or tables when they make the answer easier to scan.\n")
+			instruction.WriteString("Write each role's content only below its matching heading.\n")
+		}
+		instruction.WriteString("Do not add an unlabeled introduction, summary, or conclusion.")
+		return instruction.String()
+	default:
+		return ""
+	}
+}
+
 func containsFold(value, substring string) bool {
 	return strings.Contains(strings.ToLower(value), strings.ToLower(substring))
 }
 
-func withClarificationTurnStatus(messages []chatMessage, final bool) []chatMessage {
+func withClarificationTurnStatus(messages []chatMessage, final bool, approach approachMode) []chatMessage {
 	result := append([]chatMessage(nil), messages...)
 	if len(result) == 0 || result[0].Role != "system" {
 		return result
@@ -280,6 +411,11 @@ func withClarificationTurnStatus(messages []chatMessage, final bool) []chatMessa
 		status = "Clarification status for this turn:\n" +
 			"The stop sequence has appeared in the latest user message.\n" +
 			"Provide the final answer now using all information from the conversation."
+		if approach == approachSelfPrompt {
+			status = "Clarification status for this turn:\n" +
+				"The stop sequence has appeared in the latest user message.\n" +
+				"Produce only the self-contained solving prompt now. Do not solve the request."
+		}
 	}
 	result[0].Content += "\n\n" + status
 	return result
@@ -444,6 +580,10 @@ Options:
   -s, --stop SEQUENCE Ask one clarifying question per turn until a user line
                       contains SEQUENCE (case-insensitive), prompting for each
                       response in interactive terminals.
+  -a, --approach MODE Prompt approach: none (default), step-by-step,
+                      self-prompt, or multi-role.
+      --roles LIST    Comma-separated roles for multi-role (default:
+                      "Business analyst, Engineer, Critic").
   -d, --debug         Print masked HTTP request/response details to stderr.
   -h, --help          Show this help.
 
@@ -454,6 +594,9 @@ Examples:
   deepseek-asker --prompt "Explain goroutines briefly"
   printf 'Explain goroutines briefly' | deepseek-asker
   deepseek-asker -p "Compare Go and Rust" -l "3 paragraphs"
+  deepseek-asker -p "Review this proposal" --approach multi-role
+  deepseek-asker -p "Design an army palette" -a multi-role \
+    --roles "Miniature painter, Lore expert, Critic"
   deepseek-asker -p "Plan a trip" -f itinerary.txt -s READY
   deepseek-asker --debug -p "Hello" >answer.txt`)
 }

@@ -122,6 +122,196 @@ func TestAnswerControlSystemMessages(t *testing.T) {
 	}
 }
 
+func TestApproachSystemMessages(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+		want string
+	}{
+		{
+			name: "short step by step",
+			args: []string{"-a", "step-by-step"},
+			want: "Final-answer approach:\n" +
+				"Solve the request step by step and present the resulting steps clearly.\n" +
+				"Follow all final-answer requirements above.",
+		},
+		{
+			name: "long multi role",
+			args: []string{"--approach", "multi-role"},
+			want: "Multi-role final-answer approach:\n" +
+				"Analyze the request independently from each of these roles:\n" +
+				"1. Business analyst\n" +
+				"2. Engineer\n" +
+				"3. Critic\n" +
+				"Use exactly these Markdown section headings, in this order:\n" +
+				"## Business analyst\n" +
+				"## Engineer\n" +
+				"## Critic\n" +
+				"Under each heading, write a substantial response using 2-4 short paragraphs.\n" +
+				"Separate paragraphs with blank lines; do not compress a role's entire answer into one paragraph.\n" +
+				"When useful, cover the role's assessment, concrete recommendations, and risks or trade-offs.\n" +
+				"Use bullets, numbered steps, or tables when they make the answer easier to scan.\n" +
+				"Write each role's content only below its matching heading.\n" +
+				"Do not add an unlabeled introduction, summary, or conclusion.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := newFakeClient(answerResponse("ok"))
+			args := append(tt.args, "-p", "question")
+			code, _, stderr := runTest(t, args, "", false, client)
+			if code != 0 {
+				t.Fatalf("code=%d stderr=%q", code, stderr)
+			}
+			assertMessages(t, client.requests[0].Messages, []chatMessage{
+				{Role: "system", Content: tt.want},
+				{Role: "user", Content: "question"},
+			})
+		})
+	}
+
+	t.Run("explicit none", func(t *testing.T) {
+		client := newFakeClient(answerResponse("ok"))
+		code, _, stderr := runTest(t, []string{"--approach", "none", "-p", "question"}, "", false, client)
+		if code != 0 {
+			t.Fatalf("code=%d stderr=%q", code, stderr)
+		}
+		assertMessages(t, client.requests[0].Messages, []chatMessage{{Role: "user", Content: "question"}})
+	})
+}
+
+func TestCustomMultiRoleHeadings(t *testing.T) {
+	client := newFakeClient(answerResponse("ok"))
+	code, _, stderr := runTest(t, []string{
+		"--approach", "multi-role",
+		"--roles", " Miniature painter, Space Wolves lore expert , Critical reviewer ",
+		"--prompt", "question",
+	}, "", false, client)
+	if code != 0 {
+		t.Fatalf("code=%d stderr=%q", code, stderr)
+	}
+	system := client.requests[0].Messages[0].Content
+	for _, want := range []string{
+		"1. Miniature painter\n2. Space Wolves lore expert\n3. Critical reviewer",
+		"## Miniature painter\n## Space Wolves lore expert\n## Critical reviewer",
+		"Under each heading, write a substantial response using 2-4 short paragraphs.",
+		"Separate paragraphs with blank lines; do not compress a role's entire answer into one paragraph.",
+	} {
+		if !strings.Contains(system, want) {
+			t.Errorf("system message missing %q: %q", want, system)
+		}
+	}
+}
+
+func TestCustomFormatReplacesMultiRoleMarkdownHeadings(t *testing.T) {
+	formatPath := writeTempFile(t, "role={role}; answer={answer}")
+	client := newFakeClient(answerResponse("ok"))
+	code, _, stderr := runTest(t, []string{
+		"--approach", "multi-role",
+		"--roles", "Painter, Critic",
+		"--format", formatPath,
+		"--prompt", "question",
+	}, "", false, client)
+	if code != 0 {
+		t.Fatalf("code=%d stderr=%q", code, stderr)
+	}
+	system := client.requests[0].Messages[0].Content
+	if !strings.Contains(system, "Within the supplied answer format, clearly attribute every answer to its role.") {
+		t.Errorf("system message lacks custom-format attribution: %q", system)
+	}
+	if strings.Contains(system, "Use exactly these Markdown section headings") || strings.Contains(system, "## Painter") {
+		t.Errorf("system message contains built-in headings with a custom format: %q", system)
+	}
+}
+
+func TestSelfPromptMakesTwoRequestsAndPrintsOnlyFinalAnswer(t *testing.T) {
+	client := newFakeClient(
+		answerResponse("Improved solving prompt\n"),
+		answerResponse("Final answer\n\n"),
+	)
+	code, stdout, stderr := runTest(t, []string{"-a", "self-prompt", "-p", "Original request"}, "", false, client)
+	if code != 0 || stdout != "Final answer\n" || stderr != "" {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
+	}
+	if len(client.requests) != 2 {
+		t.Fatalf("request count = %d", len(client.requests))
+	}
+	first := client.requests[0].Messages
+	if len(first) != 2 || first[0].Role != "system" || !strings.Contains(first[0].Content, "Return only the rewritten prompt") {
+		t.Fatalf("first request messages = %#v", first)
+	}
+	if first[1] != (chatMessage{Role: "user", Content: "Original request"}) {
+		t.Errorf("first user message = %#v", first[1])
+	}
+	assertMessages(t, client.requests[1].Messages, []chatMessage{{Role: "user", Content: "Improved solving prompt\n"}})
+}
+
+func TestSelfPromptAppliesAnswerControlsOnlyToFinalRequest(t *testing.T) {
+	formatPath := writeTempFile(t, "Title: {title}\n")
+	client := newFakeClient(answerResponse("generated prompt"), answerResponse("final"))
+	code, _, stderr := runTest(t, []string{
+		"--approach", "self-prompt",
+		"--format", formatPath,
+		"--length", "two paragraphs",
+		"--prompt", "question",
+	}, "", false, client)
+	if code != 0 {
+		t.Fatalf("code=%d stderr=%q", code, stderr)
+	}
+	if len(client.requests) != 2 {
+		t.Fatalf("request count = %d", len(client.requests))
+	}
+	generatorSystem := client.requests[0].Messages[0].Content
+	for _, unwanted := range []string{"Response requirements:", "Target final-answer length:"} {
+		if strings.Contains(generatorSystem, unwanted) {
+			t.Errorf("generator system contains %q: %q", unwanted, generatorSystem)
+		}
+	}
+	finalSystem := client.requests[1].Messages[0].Content
+	for _, want := range []string{"<answer-format>\nTitle: {title}\n</answer-format>", "Target final-answer length:\ntwo paragraphs"} {
+		if !strings.Contains(finalSystem, want) {
+			t.Errorf("final system missing %q: %q", want, finalSystem)
+		}
+	}
+	if strings.Contains(finalSystem, "Prompt-generation approach:") {
+		t.Errorf("final system still contains prompt-generation instructions: %q", finalSystem)
+	}
+	if got := client.requests[1].Messages[len(client.requests[1].Messages)-1]; got != (chatMessage{Role: "user", Content: "generated prompt"}) {
+		t.Errorf("final user message = %#v", got)
+	}
+}
+
+func TestSelfPromptAfterClarificationUsesFullConversation(t *testing.T) {
+	client := newFakeClient(
+		answerResponse("Which audience?"),
+		answerResponse("Self-contained generated prompt"),
+		answerResponse("Final response"),
+	)
+	code, stdout, stderr := runTest(t,
+		[]string{"-p", "Write a guide", "-s", "READY", "-a", "self-prompt"},
+		"New developers; READY\n", false, client)
+	if code != 0 || stdout != "Final response\n" || stderr != "Which audience?\n" {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
+	}
+	if len(client.requests) != 3 {
+		t.Fatalf("request count = %d", len(client.requests))
+	}
+	generatorMessages := client.requests[1].Messages
+	if len(generatorMessages) != 4 {
+		t.Fatalf("generator message count = %d: %#v", len(generatorMessages), generatorMessages)
+	}
+	if !strings.Contains(generatorMessages[0].Content, "Produce only the self-contained solving prompt now") {
+		t.Errorf("generator system lacks final status: %q", generatorMessages[0].Content)
+	}
+	assertMessages(t, generatorMessages[1:], []chatMessage{
+		{Role: "user", Content: "Write a guide"},
+		{Role: "assistant", Content: "Which audience?"},
+		{Role: "user", Content: "New developers; READY"},
+	})
+	assertMessages(t, client.requests[2].Messages, []chatMessage{{Role: "user", Content: "Self-contained generated prompt"}})
+}
+
 func TestFormatWithoutTrailingNewline(t *testing.T) {
 	path := writeTempFile(t, "[title]\n  exact spacing")
 	client := newFakeClient(answerResponse("ok"))
@@ -151,6 +341,14 @@ func TestOptionValidation(t *testing.T) {
 		{name: "whitespace length", args: []string{"--length", " \n"}, want: "length is empty"},
 		{name: "empty stop", args: []string{"-s", ""}, want: "stop sequence is empty"},
 		{name: "whitespace stop", args: []string{"--stop", " \t"}, want: "stop sequence is empty"},
+		{name: "empty approach", args: []string{"--approach", ""}, want: "approach is empty"},
+		{name: "whitespace approach", args: []string{"-a", " \t"}, want: "approach is empty"},
+		{name: "unknown approach", args: []string{"--approach", "fast"}, want: "valid approaches: none, step-by-step, self-prompt, multi-role"},
+		{name: "roles without multi role", args: []string{"--roles", "Painter,Critic"}, want: "--roles requires --approach multi-role"},
+		{name: "empty roles", args: []string{"--approach", "multi-role", "--roles", " \t"}, want: "roles are empty"},
+		{name: "one role", args: []string{"--approach", "multi-role", "--roles", "Painter"}, want: "requires at least two roles"},
+		{name: "empty role item", args: []string{"--approach", "multi-role", "--roles", "Painter,,Critic"}, want: "role 2 is empty"},
+		{name: "role line break", args: []string{"--approach", "multi-role", "--roles", "Painter,Line one\nLine two"}, want: "contains a line break"},
 		{name: "missing format file", args: []string{"-f", missing}, want: "read format file"},
 		{name: "directory format", args: []string{"-f", directory}, want: "read format file"},
 		{name: "zero length format", args: []string{"-f", empty}, want: "format file"},
@@ -360,6 +558,48 @@ func TestAPIFailureDuringClarification(t *testing.T) {
 	}
 }
 
+func TestAPIFailureDuringSelfPromptFinalRequest(t *testing.T) {
+	client := newFakeClient(
+		answerResponse("generated prompt"),
+		fakeResponse{status: 503, body: `{"error":{"message":"unavailable"}}`},
+	)
+	code, stdout, stderr := runTest(t, []string{"-p", "prompt", "-a", "self-prompt"}, "", false, client)
+	if code != 1 || stdout != "" || !strings.Contains(stderr, "503 Service Unavailable: unavailable") {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
+	}
+	if strings.Contains(stdout, "generated prompt") {
+		t.Errorf("stdout leaked generated prompt: %q", stdout)
+	}
+}
+
+func TestSelfPromptDebugLogsBothRequests(t *testing.T) {
+	client := newFakeClient(answerResponse("generated prompt"), answerResponse("final"))
+	code, stdout, stderr := runTest(t, []string{"-d", "-p", "prompt", "-a", "self-prompt"}, "", false, client)
+	if code != 0 || stdout != "final\n" {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
+	}
+	if got := strings.Count(stderr, "> POST "+testEndpoint+" HTTP/1.1"); got != 2 {
+		t.Errorf("debug request count = %d, want 2: %q", got, stderr)
+	}
+	if !strings.Contains(stderr, `"content":"generated prompt"`) {
+		t.Errorf("debug output does not contain generated prompt request: %q", stderr)
+	}
+}
+
+func TestInteractiveSelfPromptSpinsForBothRequests(t *testing.T) {
+	client := newFakeClient(answerResponse("generated prompt"), answerResponse("final"))
+	code, stdout, stderr := runTest(t, []string{"--approach", "self-prompt"}, "original prompt\n", true, client)
+	if code != 0 || stdout != "final\n" {
+		t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
+	}
+	if !strings.HasPrefix(stderr, "Prompt: ") {
+		t.Errorf("interactive prompt missing: %q", stderr)
+	}
+	if got := strings.Count(stderr, "Waiting for DeepSeek /"); got != 2 {
+		t.Errorf("spinner count = %d, want 2: %q", got, stderr)
+	}
+}
+
 func TestDebugOutputIsRedactedAndAnswerStaysClean(t *testing.T) {
 	response := answerResponse("answer")
 	response.headers = http.Header{"X-Echo": []string{testAPIKey}}
@@ -391,7 +631,7 @@ func TestHelpDoesNotRequireAPIKey(t *testing.T) {
 	for _, arg := range []string{"-h", "--help"} {
 		t.Run(arg, func(t *testing.T) {
 			code, stdout, stderr := runTestWithKey(t, []string{arg}, "", false, newFakeClient(), "")
-			if code != 0 || !strings.Contains(stdout, "-f, --format FILE") || !strings.Contains(stdout, "-s, --stop SEQUENCE") || stderr != "" {
+			if code != 0 || !strings.Contains(stdout, "-f, --format FILE") || !strings.Contains(stdout, "-s, --stop SEQUENCE") || !strings.Contains(stdout, "-a, --approach MODE") || !strings.Contains(stdout, "--roles LIST") || stderr != "" {
 				t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
 			}
 		})
