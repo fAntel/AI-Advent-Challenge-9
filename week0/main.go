@@ -8,10 +8,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -83,11 +85,34 @@ func (a *approachValue) Set(value string) error {
 	}
 }
 
+type temperatureValue struct {
+	value float64
+	set   bool
+}
+
+func (t *temperatureValue) String() string {
+	if !t.set {
+		return ""
+	}
+	return strconv.FormatFloat(t.value, 'g', -1, 64)
+}
+
+func (t *temperatureValue) Set(value string) error {
+	parsed, err := strconv.ParseFloat(value, 64)
+	if err != nil || math.IsNaN(parsed) || math.IsInf(parsed, 0) || parsed < 0 || parsed > 2 {
+		return errors.New("temperature must be a number between 0 and 2")
+	}
+	t.value = parsed
+	t.set = true
+	return nil
+}
+
 type chatRequest struct {
-	Model    string        `json:"model"`
-	Messages []chatMessage `json:"messages"`
-	Thinking thinkingMode  `json:"thinking"`
-	Stream   bool          `json:"stream"`
+	Model       string        `json:"model"`
+	Messages    []chatMessage `json:"messages"`
+	Thinking    thinkingMode  `json:"thinking"`
+	Stream      bool          `json:"stream"`
+	Temperature *float64      `json:"temperature,omitempty"`
 }
 
 type chatMessage struct {
@@ -144,6 +169,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	var stop promptValue
 	var roles promptValue
 	approach := approachValue{value: approachNone}
+	var temperature temperatureValue
 	var debug bool
 	var help bool
 	fs.Var(&prompt, "p", "prompt to send (takes precedence over stdin)")
@@ -157,6 +183,8 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	fs.Var(&approach, "a", "prompt approach: "+validApproaches)
 	fs.Var(&approach, "approach", "prompt approach: "+validApproaches)
 	fs.Var(&roles, "roles", "comma-separated roles for the multi-role approach")
+	fs.Var(&temperature, "t", "sampling temperature from 0 to 2")
+	fs.Var(&temperature, "temperature", "sampling temperature from 0 to 2")
 	fs.BoolVar(&debug, "d", false, "print masked HTTP diagnostics to stderr")
 	fs.BoolVar(&debug, "debug", false, "print masked HTTP diagnostics to stderr")
 	fs.BoolVar(&help, "h", false, "show this help")
@@ -255,6 +283,10 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 	}
 	messages = append(messages, chatMessage{Role: "user", Content: promptText})
 	showSpinner := deps.interactiveStdin && (stop.set || !prompt.set)
+	var selectedTemperature *float64
+	if temperature.set {
+		selectedTemperature = &temperature.value
+	}
 
 	for {
 		final := !stop.set || containsFold(messages[len(messages)-1].Content, stop.value)
@@ -262,7 +294,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 		if stop.set {
 			requestMessages = withClarificationTurnStatus(messages, final, approach.value)
 		}
-		answer, ok := requestAnswer(requestMessages, debug, showSpinner, stderr, deps, apiKey)
+		var requestTemperature *float64
+		if final && approach.value != approachSelfPrompt {
+			requestTemperature = selectedTemperature
+		}
+		answer, ok := requestAnswer(requestMessages, requestTemperature, debug, showSpinner, stderr, deps, apiKey)
 		if !ok {
 			return 1
 		}
@@ -274,7 +310,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer, deps dependen
 					finalMessages = append(finalMessages, chatMessage{Role: "system", Content: systemMessage})
 				}
 				finalMessages = append(finalMessages, chatMessage{Role: "user", Content: answer})
-				answer, ok = requestAnswer(finalMessages, debug, showSpinner, stderr, deps, apiKey)
+				answer, ok = requestAnswer(finalMessages, selectedTemperature, debug, showSpinner, stderr, deps, apiKey)
 				if !ok {
 					return 1
 				}
@@ -421,12 +457,13 @@ func withClarificationTurnStatus(messages []chatMessage, final bool, approach ap
 	return result
 }
 
-func requestAnswer(messages []chatMessage, debug, showSpinner bool, stderr io.Writer, deps dependencies, apiKey string) (string, bool) {
+func requestAnswer(messages []chatMessage, temperature *float64, debug, showSpinner bool, stderr io.Writer, deps dependencies, apiKey string) (string, bool) {
 	body, err := json.Marshal(chatRequest{
-		Model:    defaultModel,
-		Messages: messages,
-		Thinking: thinkingMode{Type: "disabled"},
-		Stream:   false,
+		Model:       defaultModel,
+		Messages:    messages,
+		Thinking:    thinkingMode{Type: "disabled"},
+		Stream:      false,
+		Temperature: temperature,
 	})
 	if err != nil {
 		fmt.Fprintf(stderr, "error: encode request: %v\n", err)
@@ -584,6 +621,8 @@ Options:
                       self-prompt, or multi-role.
       --roles LIST    Comma-separated roles for multi-role (default:
                       "Business analyst, Engineer, Critic").
+  -t, --temperature N Sampling temperature from 0 to 2. If omitted, do not send
+                      a temperature value and use the API default.
   -d, --debug         Print masked HTTP request/response details to stderr.
   -h, --help          Show this help.
 
@@ -594,6 +633,7 @@ Examples:
   deepseek-asker --prompt "Explain goroutines briefly"
   printf 'Explain goroutines briefly' | deepseek-asker
   deepseek-asker -p "Compare Go and Rust" -l "3 paragraphs"
+  deepseek-asker -p "Write a surprising story" --temperature 1.3
   deepseek-asker -p "Review this proposal" --approach multi-role
   deepseek-asker -p "Design an army palette" -a multi-role \
     --roles "Miniature painter, Lore expert, Critic"

@@ -69,6 +69,21 @@ rejected. The options can be combined:
 ./deepseek-asker -p 'Write a release note' -f release-format.txt -l '150 words'
 ```
 
+## Sampling temperature
+
+Use `-t`/`--temperature` to set the sampling temperature to a number from `0`
+through `2`. Lower values make answers more focused and deterministic, while
+higher values make them more varied. When this option is omitted, the request
+does not include a temperature and DeepSeek uses its API default.
+
+```sh
+./deepseek-asker -p 'Write a surprising story' --temperature 1.3
+```
+
+In clarification mode, the temperature applies only to the request that
+produces the final answer. With `self-prompt`, it likewise applies to the final
+answer request rather than the intermediate prompt-generation request.
+
 ## Prompt approaches
 
 Use `-a`/`--approach` to select one prompt strategy. The option accepts exactly

@@ -32,6 +32,9 @@ func TestOneShotRequestIsUnchanged(t *testing.T) {
 	if request.Model != defaultModel || request.Thinking.Type != "disabled" || request.Stream {
 		t.Errorf("unexpected request settings: %+v", request)
 	}
+	if request.Temperature != nil || strings.Contains(client.bodies[0], `"temperature"`) {
+		t.Errorf("omitted temperature was sent: request=%+v body=%s", request, client.bodies[0])
+	}
 	assertMessages(t, request.Messages, []chatMessage{{Role: "user", Content: "from flag"}})
 	if got := client.headers[0].Get("Authorization"); got != "Bearer "+testAPIKey {
 		t.Errorf("Authorization = %q", got)
@@ -39,6 +42,65 @@ func TestOneShotRequestIsUnchanged(t *testing.T) {
 	if got := client.headers[0].Get("Content-Type"); got != "application/json" {
 		t.Errorf("Content-Type = %q", got)
 	}
+}
+
+func TestTemperatureFlagsAndBoundaries(t *testing.T) {
+	tests := []struct {
+		name string
+		args []string
+		want float64
+	}{
+		{name: "short zero", args: []string{"-t", "0"}, want: 0},
+		{name: "long decimal", args: []string{"--temperature", "1.3"}, want: 1.3},
+		{name: "upper boundary", args: []string{"--temperature", "2"}, want: 2},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := newFakeClient(answerResponse("ok"))
+			args := append(tt.args, "-p", "question")
+			code, _, stderr := runTest(t, args, "", false, client)
+			if code != 0 || stderr != "" {
+				t.Fatalf("code=%d stderr=%q", code, stderr)
+			}
+			if got := client.requests[0].Temperature; got == nil || *got != tt.want {
+				t.Errorf("temperature = %v, want %v", got, tt.want)
+			}
+			if !strings.Contains(client.bodies[0], `"temperature":`) {
+				t.Errorf("request body lacks temperature: %s", client.bodies[0])
+			}
+		})
+	}
+}
+
+func TestTemperatureAppliesOnlyToFinalAnswerRequests(t *testing.T) {
+	t.Run("clarification", func(t *testing.T) {
+		client := newFakeClient(answerResponse("question"), answerResponse("final"))
+		code, _, stderr := runTest(t, []string{"-t", "0.4", "-s", "done", "-p", "question"}, "done\n", false, client)
+		if code != 0 {
+			t.Fatalf("code=%d stderr=%q", code, stderr)
+		}
+		if client.requests[0].Temperature != nil {
+			t.Errorf("clarification request temperature = %v, want nil", client.requests[0].Temperature)
+		}
+		if got := client.requests[1].Temperature; got == nil || *got != 0.4 {
+			t.Errorf("final request temperature = %v, want 0.4", got)
+		}
+	})
+
+	t.Run("self prompt", func(t *testing.T) {
+		client := newFakeClient(answerResponse("generated prompt"), answerResponse("final"))
+		code, _, stderr := runTest(t, []string{"--temperature", "1.2", "-a", "self-prompt", "-p", "question"}, "", false, client)
+		if code != 0 {
+			t.Fatalf("code=%d stderr=%q", code, stderr)
+		}
+		if client.requests[0].Temperature != nil {
+			t.Errorf("prompt-generation request temperature = %v, want nil", client.requests[0].Temperature)
+		}
+		if got := client.requests[1].Temperature; got == nil || *got != 1.2 {
+			t.Errorf("final request temperature = %v, want 1.2", got)
+		}
+	})
 }
 
 func TestPromptInputModes(t *testing.T) {
@@ -344,6 +406,12 @@ func TestOptionValidation(t *testing.T) {
 		{name: "empty approach", args: []string{"--approach", ""}, want: "approach is empty"},
 		{name: "whitespace approach", args: []string{"-a", " \t"}, want: "approach is empty"},
 		{name: "unknown approach", args: []string{"--approach", "fast"}, want: "valid approaches: none, step-by-step, self-prompt, multi-role"},
+		{name: "empty temperature", args: []string{"--temperature", ""}, want: "temperature must be a number between 0 and 2"},
+		{name: "non-numeric temperature", args: []string{"-t", "warm"}, want: "temperature must be a number between 0 and 2"},
+		{name: "temperature below range", args: []string{"--temperature", "-0.1"}, want: "temperature must be a number between 0 and 2"},
+		{name: "temperature above range", args: []string{"--temperature", "2.1"}, want: "temperature must be a number between 0 and 2"},
+		{name: "temperature NaN", args: []string{"--temperature", "NaN"}, want: "temperature must be a number between 0 and 2"},
+		{name: "temperature infinity", args: []string{"--temperature", "+Inf"}, want: "temperature must be a number between 0 and 2"},
 		{name: "roles without multi role", args: []string{"--roles", "Painter,Critic"}, want: "--roles requires --approach multi-role"},
 		{name: "empty roles", args: []string{"--approach", "multi-role", "--roles", " \t"}, want: "roles are empty"},
 		{name: "one role", args: []string{"--approach", "multi-role", "--roles", "Painter"}, want: "requires at least two roles"},
@@ -631,7 +699,7 @@ func TestHelpDoesNotRequireAPIKey(t *testing.T) {
 	for _, arg := range []string{"-h", "--help"} {
 		t.Run(arg, func(t *testing.T) {
 			code, stdout, stderr := runTestWithKey(t, []string{arg}, "", false, newFakeClient(), "")
-			if code != 0 || !strings.Contains(stdout, "-f, --format FILE") || !strings.Contains(stdout, "-s, --stop SEQUENCE") || !strings.Contains(stdout, "-a, --approach MODE") || !strings.Contains(stdout, "--roles LIST") || stderr != "" {
+			if code != 0 || !strings.Contains(stdout, "-f, --format FILE") || !strings.Contains(stdout, "-s, --stop SEQUENCE") || !strings.Contains(stdout, "-a, --approach MODE") || !strings.Contains(stdout, "--roles LIST") || !strings.Contains(stdout, "-t, --temperature N") || stderr != "" {
 				t.Fatalf("code=%d stdout=%q stderr=%q", code, stdout, stderr)
 			}
 		})
@@ -770,6 +838,7 @@ type fakeClient struct {
 	responses []fakeResponse
 	requests  []chatRequest
 	headers   []http.Header
+	bodies    []string
 }
 
 func newFakeClient(responses ...fakeResponse) *fakeClient {
@@ -777,12 +846,17 @@ func newFakeClient(responses ...fakeResponse) *fakeClient {
 }
 
 func (f *fakeClient) Do(req *http.Request) (*http.Response, error) {
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
+	}
 	var request chatRequest
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+	if err := json.Unmarshal(body, &request); err != nil {
 		return nil, err
 	}
 	f.requests = append(f.requests, request)
 	f.headers = append(f.headers, req.Header.Clone())
+	f.bodies = append(f.bodies, string(body))
 	index := len(f.requests) - 1
 	if index >= len(f.responses) {
 		return nil, errors.New("unexpected request")
