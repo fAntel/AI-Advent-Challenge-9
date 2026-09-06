@@ -1,0 +1,3 @@
+Date: <when happened>
+Main participants: <list of names>
+Short description: <short description>
