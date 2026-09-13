@@ -24,6 +24,8 @@ context_window_tokens = 1000000
 # Keep the newest messages verbatim. Once another batch becomes old enough,
 # replace that batch with an updated summary.
 compression_enabled = true
+# full, summary, sliding, sticky-facts, or branching
+context_strategy = "summary"
 recent_messages = 5
 summary_batch_messages = 5
 system_prompt = """

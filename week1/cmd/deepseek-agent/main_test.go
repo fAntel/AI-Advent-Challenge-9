@@ -28,7 +28,7 @@ func TestSessionStatsShowLatestCallDialogTotalsAndGrowth(t *testing.T) {
 		"latest answer request: input context=200",
 		"model answer=25",
 		"context window: 200 / 1000 (20.00%)",
-		"whole dialog: calls=3, cumulative input=270, model answers=40, total=310",
+		"whole dialog: calls=3, cumulative input=270, model output=40, total=310",
 		"history memory: summarized=5 messages, verbatim=2 messages",
 		"compression overhead: calls=1, input=50, output=10, total=60",
 		"input-context growth: 20 -> 200 (+180 tokens)",

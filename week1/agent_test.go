@@ -276,6 +276,7 @@ func TestAgentCanDisableHistoryCompression(t *testing.T) {
 	cfg.Agent.SummaryBatchMessages = 2
 	settings := DefaultSettings(cfg)
 	settings.Compression = false
+	settings.ContextStrategy = "full"
 	fake := &fakeCompleter{answers: []string{"answer one", "answer two"}}
 	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
 	defer a.Close()
@@ -313,7 +314,7 @@ func TestFailedCompressionRetainsRawMessages(t *testing.T) {
 
 func TestRequestMessagesUseSummaryBeforeVerbatimHistory(t *testing.T) {
 	settings := DefaultSettings(DefaultConfig())
-	messages := requestMessages("system", "Earlier fact", []Message{{Role: "user", Content: "Newest question"}}, settings, false)
+	messages := requestMessages("system", "Earlier fact", nil, []Message{{Role: "user", Content: "Newest question"}}, settings, false)
 	if len(messages) != 2 || !strings.Contains(messages[0].Content, "Earlier fact") || messages[1].Content != "Newest question" {
 		t.Fatalf("messages=%+v", messages)
 	}
@@ -340,6 +341,106 @@ func TestRecoveryKeepsMessagesWhenCompressionWasInterrupted(t *testing.T) {
 	}
 	if got.Operation.State != "completed" || got.Messages[0].Content != "keep me" || got.Operation.Warning == "" {
 		t.Fatalf("recovered session=%+v", got)
+	}
+}
+
+func TestSlidingWindowDropsMessagesOutsideRecentLimit(t *testing.T) {
+	cfg := testConfig(t)
+	cfg.Agent.RecentMessages = 2
+	settings := DefaultSettings(cfg)
+	settings.ContextStrategy = "sliding"
+	settings.Compression = false
+	fake := &fakeCompleter{answers: []string{"a1", "a2", "a3"}}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: &settings})
+	lease, _ := a.Attach(s.ID)
+	for _, question := range []string{"q1", "q2", "q3"} {
+		if err := a.Submit(s.ID, lease, MessageRequest{Content: question}); err != nil {
+			t.Fatal(err)
+		}
+		waitState(t, a, s.ID, "completed")
+	}
+	got, _ := a.Get(s.ID)
+	if len(got.Messages) != 2 || got.Messages[0].Content != "q3" || got.Messages[1].Content != "a3" {
+		t.Fatalf("messages=%+v", got.Messages)
+	}
+	thirdRequest := fake.requests[2]
+	if len(thirdRequest) != 2 || thirdRequest[0].Content != "a2" || thirdRequest[1].Content != "q3" {
+		t.Fatalf("third request=%+v", thirdRequest)
+	}
+}
+
+func TestStickyFactsUpdateBeforeAnswerAndSurviveSlidingWindow(t *testing.T) {
+	cfg := testConfig(t)
+	cfg.Agent.RecentMessages = 2
+	settings := DefaultSettings(cfg)
+	settings.ContextStrategy = "sticky-facts"
+	settings.Compression = false
+	fake := &fakeCompleter{answers: []string{`{"goal":"visit Oslo","budget":"low"}`, "plan", `{"goal":"visit Oslo","budget":"low","transport":"train"}`, "updated plan"}}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: &settings})
+	lease, _ := a.Attach(s.ID)
+	_ = a.Submit(s.ID, lease, MessageRequest{Content: "Plan a cheap Oslo trip"})
+	waitState(t, a, s.ID, "completed")
+	_ = a.Submit(s.ID, lease, MessageRequest{Content: "I prefer trains"})
+	got := waitState(t, a, s.ID, "completed")
+	if got.Facts["goal"] != "visit Oslo" || got.Facts["transport"] != "train" || len(got.Messages) != 2 {
+		t.Fatalf("facts=%+v messages=%+v", got.Facts, got.Messages)
+	}
+	if len(got.Calls) != 4 || got.Calls[0].Purpose != "facts" || got.Calls[1].Purpose != "answer" {
+		t.Fatalf("calls=%+v", got.Calls)
+	}
+	if len(fake.requests) != 4 || !strings.Contains(fake.requests[3][0].Content, `"transport":"train"`) {
+		t.Fatalf("answer request=%+v", fake.requests[3])
+	}
+}
+
+func TestBranchesContinueIndependentlyFromCheckpoint(t *testing.T) {
+	cfg := testConfig(t)
+	settings := DefaultSettings(cfg)
+	settings.ContextStrategy = "branching"
+	settings.Compression = false
+	fake := &fakeCompleter{answers: []string{"base answer", "branch A answer"}}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	root, _ := a.Create(CreateSessionRequest{Settings: &settings})
+	rootLease, _ := a.Attach(root.ID)
+	_ = a.Submit(root.ID, rootLease, MessageRequest{Content: "shared question"})
+	waitState(t, a, root.ID, "completed")
+	checkpoint, err := a.CreateCheckpoint(root.ID, rootLease, "fork")
+	if err != nil {
+		t.Fatal(err)
+	}
+	branchA, err := a.CreateBranch(root.ID, rootLease, BranchRequest{Name: "option-a", Checkpoint: checkpoint.Name})
+	if err != nil {
+		t.Fatal(err)
+	}
+	branchB, err := a.CreateBranch(root.ID, rootLease, BranchRequest{Name: "option-b", Checkpoint: checkpoint.ID})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if branchA.ID == branchB.ID || branchA.RootSessionID != root.ID || branchB.RootSessionID != root.ID || len(branchA.Messages) != 2 || branchA.Metrics.Requests != 0 {
+		t.Fatalf("branchA=%+v branchB=%+v", branchA, branchB)
+	}
+	branchLease, _ := a.Attach(branchA.ID)
+	_ = a.Submit(branchA.ID, branchLease, MessageRequest{Content: "take option A"})
+	waitState(t, a, branchA.ID, "completed")
+	unchanged, _ := a.Get(branchB.ID)
+	if len(unchanged.Messages) != 2 {
+		t.Fatalf("branch B changed: %+v", unchanged.Messages)
+	}
+	related, err := a.RelatedBranches(branchA.ID)
+	if err != nil || len(related) != 3 {
+		t.Fatalf("related=%+v error=%v", related, err)
+	}
+}
+
+func TestParseFactsAcceptsJSONFence(t *testing.T) {
+	facts, err := parseFacts("```json\n{\"preference\":\"concise\"}\n```")
+	if err != nil || facts["preference"] != "concise" {
+		t.Fatalf("facts=%+v error=%v", facts, err)
 	}
 }
 func ptrSettings(s Settings) *Settings { return &s }

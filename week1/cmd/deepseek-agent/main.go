@@ -18,9 +18,9 @@ import (
 )
 
 type options struct {
-	prompt, system, systemFile, formatFile, length, stop, approach, roles, model, reasoning string
-	temperature                                                                             float64
-	temperatureSet, stats, debug, compression                                               bool
+	prompt, system, systemFile, formatFile, length, stop, approach, roles, model, reasoning, strategy string
+	temperature                                                                                       float64
+	temperatureSet, stats, debug, compression, compressionSet, strategySet                            bool
 }
 
 func main() {
@@ -84,7 +84,19 @@ func parseOptions(args []string, defaults agent.Settings) (options, agent.Settin
 	fs.BoolVar(&o.debug, "debug", false, "return masked HTTP diagnostics")
 	fs.BoolVar(&o.debug, "d", false, "return masked HTTP diagnostics")
 	fs.BoolVar(&o.compression, "compression", defaults.Compression, "compress older conversation history")
+	fs.StringVar(&o.strategy, "strategy", defaults.ContextStrategy, "context strategy: full, summary, sliding, sticky-facts, or branching")
 	_ = fs.Parse(args)
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "compression" {
+			o.compressionSet = true
+		}
+		if f.Name == "strategy" {
+			o.strategySet = true
+		}
+	})
+	if o.compressionSet && o.strategySet {
+		fatal(errors.New("--compression and --strategy are mutually exclusive"))
+	}
 	s := defaults
 	s.Model = o.model
 	s.Reasoning = o.reasoning
@@ -93,7 +105,15 @@ func parseOptions(args []string, defaults agent.Settings) (options, agent.Settin
 	s.Stop = o.stop
 	s.Stats = o.stats
 	s.Debug = o.debug
-	s.Compression = o.compression
+	s.ContextStrategy = o.strategy
+	if o.compressionSet {
+		if o.compression {
+			s.ContextStrategy = "summary"
+		} else {
+			s.ContextStrategy = "full"
+		}
+	}
+	s.Compression = s.ContextStrategy == "summary"
 	if o.temperatureSet {
 		s.Temperature = &o.temperature
 	}
@@ -234,6 +254,18 @@ func findDaemon() (string, error) {
 }
 
 func runSession(api *agent.APIClient, cfg agent.Config, id, initial string, settings agent.Settings) {
+	for {
+		next := runAttachedSession(api, cfg, id, initial, settings)
+		if next == "" {
+			return
+		}
+		current, err := api.Get(next)
+		fatalIf(err)
+		id, initial, settings = next, "", current.Settings
+	}
+}
+
+func runAttachedSession(api *agent.APIClient, cfg agent.Config, id, initial string, settings agent.Settings) string {
 	lease, err := api.Attach(id)
 	fatalIf(err)
 	defer api.Detach(id, lease)
@@ -276,7 +308,7 @@ func runSession(api *agent.APIClient, cfg agent.Config, id, initial string, sett
 	if initial != "" {
 		fatalIf(api.Submit(id, lease, initial, settings))
 		if wait(api, cfg, id, settings) != "awaiting_input" {
-			return
+			return ""
 		}
 	}
 	reader := bufio.NewReader(os.Stdin)
@@ -284,15 +316,19 @@ func runSession(api *agent.APIClient, cfg agent.Config, id, initial string, sett
 		fmt.Print("You: ")
 		line, e := reader.ReadString('\n')
 		if e != nil && len(line) == 0 {
-			return
+			return ""
 		}
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
 		if strings.HasPrefix(line, "/") {
-			if handleCommand(api, cfg, id, lease, line, &settings) {
-				return
+			result := handleCommand(api, cfg, id, lease, line, &settings)
+			if result.exit {
+				return ""
+			}
+			if result.switchID != "" {
+				return result.switchID
 			}
 			continue
 		}
@@ -326,7 +362,13 @@ func wait(api *agent.APIClient, cfg agent.Config, id string, settings agent.Sett
 		}
 	}
 }
-func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line string, s *agent.Settings) bool {
+
+type commandResult struct {
+	exit     bool
+	switchID string
+}
+
+func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line string, s *agent.Settings) commandResult {
 	parts := strings.SplitN(strings.TrimPrefix(line, "/"), " ", 2)
 	cmd := parts[0]
 	value := ""
@@ -340,9 +382,9 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		} else {
 			fmt.Fprintln(os.Stderr, "could not load session stats:", err)
 		}
-		return true
+		return commandResult{exit: true}
 	case "help":
-		fmt.Println("/settings /summary /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
+		fmt.Println("/settings /summary /facts /strategy /checkpoint /checkpoints /branch /branches /switch /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
 	case "settings":
 		data, _ := json.MarshalIndent(s, "", "  ")
 		fmt.Println(string(data))
@@ -354,6 +396,72 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 			fmt.Println("No conversation summary yet.")
 		} else {
 			fmt.Printf("Conversation summary (%d messages):\n%s\n", current.SummarizedMessages, current.Summary)
+		}
+	case "facts":
+		current, err := api.Get(id)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else if len(current.Facts) == 0 {
+			fmt.Println("No sticky facts yet.")
+		} else {
+			data, _ := json.MarshalIndent(current.Facts, "", "  ")
+			fmt.Println(string(data))
+		}
+	case "strategy":
+		if value == "" {
+			fmt.Println(s.ContextStrategy)
+		} else {
+			candidate := *s
+			candidate.ContextStrategy = value
+			candidate.Compression = value == "summary"
+			if err := agent.ValidateSettings(candidate); err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+			} else {
+				*s = candidate
+			}
+		}
+	case "checkpoint":
+		if value == "" {
+			fmt.Fprintln(os.Stderr, "usage: /checkpoint NAME")
+		} else {
+			checkpoint, err := api.CreateCheckpoint(id, lease, value)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+			} else {
+				fmt.Printf("Checkpoint %q created: %s\n", checkpoint.Name, checkpoint.ID)
+			}
+		}
+	case "checkpoints":
+		current, err := api.Get(id)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else if len(current.Checkpoints) == 0 {
+			fmt.Println("No checkpoints yet.")
+		} else {
+			for _, checkpoint := range current.Checkpoints {
+				fmt.Printf("%-16s %s  %s\n", checkpoint.Name, checkpoint.ID, checkpoint.CreatedAt.Local().Format("2006-01-02 15:04:05"))
+			}
+		}
+	case "branch":
+		fields := strings.Fields(value)
+		if len(fields) != 2 {
+			fmt.Fprintln(os.Stderr, "usage: /branch NAME CHECKPOINT")
+		} else {
+			branch, err := api.CreateBranch(id, lease, agent.BranchRequest{Name: fields[0], Checkpoint: fields[1]})
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+			} else {
+				fmt.Printf("Branch %q created: %s\n", branch.BranchName, branch.ID)
+			}
+		}
+	case "branches":
+		printBranches(api, id)
+	case "switch":
+		target, err := resolveBranch(api, id, value)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else {
+			return commandResult{switchID: target}
 		}
 	case "model":
 		s.Model = value
@@ -405,8 +513,10 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		switch value {
 		case "on":
 			s.Compression = true
+			s.ContextStrategy = "summary"
 		case "off":
 			s.Compression = false
+			s.ContextStrategy = "full"
 		default:
 			fmt.Fprintln(os.Stderr, "usage: /compression on|off")
 		}
@@ -420,8 +530,52 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 	default:
 		fmt.Fprintln(os.Stderr, "unknown command; use /help")
 	}
-	return false
+	return commandResult{}
 }
+
+func printBranches(api *agent.APIClient, id string) {
+	branches, err := api.Branches(id)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		return
+	}
+	for _, branch := range branches {
+		name := branch.BranchName
+		if name == "" {
+			name = "root"
+		}
+		marker := " "
+		if branch.ID == id {
+			marker = "*"
+		}
+		fmt.Printf("%s %-16s %s\n", marker, name, branch.ID)
+	}
+}
+
+func resolveBranch(api *agent.APIClient, id, value string) (string, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return "", errors.New("usage: /switch BRANCH_OR_SESSION_ID")
+	}
+	branches, err := api.Branches(id)
+	if err != nil {
+		return "", err
+	}
+	for _, branch := range branches {
+		name := branch.BranchName
+		if name == "" {
+			name = "root"
+		}
+		if branch.ID == value || name == value {
+			if branch.ID == id {
+				return "", errors.New("already on that branch")
+			}
+			return branch.ID, nil
+		}
+	}
+	return "", fmt.Errorf("branch %q not found", value)
+}
+
 func unset(s *agent.Settings, v string) {
 	switch v {
 	case "temperature":
@@ -453,21 +607,37 @@ func printExtras(session *agent.Session) {
 }
 
 func printSessionStats(w io.Writer, s *agent.Session) {
+	strategy := s.Settings.ContextStrategy
+	if strategy == "" {
+		if s.Settings.Compression {
+			strategy = "summary"
+		} else {
+			strategy = "full"
+		}
+	}
+	fmt.Fprintln(w, "Session token stats:")
+	fmt.Fprintf(w, "  context strategy: %s\n", strategy)
 	if len(s.Calls) == 0 {
-		fmt.Fprintln(w, "Session token stats: no completed API calls yet")
+		fmt.Fprintln(w, "  no completed API calls yet")
 		return
 	}
 	answerCalls := make([]agent.CallMetrics, 0, len(s.Calls))
-	var summaryMetrics agent.Metrics
+	var summaryMetrics, factsMetrics agent.Metrics
+	addCall := func(metrics *agent.Metrics, call agent.CallMetrics) {
+		metrics.Requests++
+		metrics.Duration += call.Duration
+		metrics.Usage.PromptTokens += call.Usage.PromptTokens
+		metrics.Usage.CompletionTokens += call.Usage.CompletionTokens
+		metrics.Usage.TotalTokens += call.Usage.TotalTokens
+		metrics.CostUSD += call.CostUSD
+	}
 	for _, call := range s.Calls {
-		if call.Purpose == "summary" {
-			summaryMetrics.Requests++
-			summaryMetrics.Duration += call.Duration
-			summaryMetrics.Usage.PromptTokens += call.Usage.PromptTokens
-			summaryMetrics.Usage.CompletionTokens += call.Usage.CompletionTokens
-			summaryMetrics.Usage.TotalTokens += call.Usage.TotalTokens
-			summaryMetrics.CostUSD += call.CostUSD
-		} else {
+		switch call.Purpose {
+		case "summary":
+			addCall(&summaryMetrics, call)
+		case "facts":
+			addCall(&factsMetrics, call)
+		default:
 			answerCalls = append(answerCalls, call)
 		}
 	}
@@ -481,18 +651,26 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 		limit = 1_000_000
 	}
 	percent := 100 * float64(u.PromptTokens) / float64(limit)
-	fmt.Fprintln(w, "Session token stats:")
 	fmt.Fprintf(w, "  latest answer request: input context=%d (cache hit=%d, miss=%d), model answer=%d, total=%d\n", u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens, u.CompletionTokens, u.TotalTokens)
 	if u.ReasoningTokens > 0 {
 		fmt.Fprintf(w, "  latest reasoning tokens: %d\n", u.ReasoningTokens)
 	}
 	fmt.Fprintf(w, "  context window: %d / %d (%.2f%%)\n", u.PromptTokens, limit, percent)
 	t := s.Metrics
-	fmt.Fprintf(w, "  whole dialog: calls=%d, cumulative input=%d, model answers=%d, total=%d\n", t.Requests, t.Usage.PromptTokens, t.Usage.CompletionTokens, t.Usage.TotalTokens)
+	fmt.Fprintf(w, "  whole dialog: calls=%d, cumulative input=%d, model output=%d, total=%d\n", t.Requests, t.Usage.PromptTokens, t.Usage.CompletionTokens, t.Usage.TotalTokens)
 	fmt.Fprintf(w, "  estimated dialog cost: $%.8f USD\n", t.CostUSD)
 	fmt.Fprintf(w, "  history memory: summarized=%d messages, verbatim=%d messages, summary=%d tokens\n", s.SummarizedMessages, len(s.Messages), s.SummaryTokens)
 	if summaryMetrics.Requests > 0 {
 		fmt.Fprintf(w, "  compression overhead: calls=%d, input=%d, output=%d, total=%d, cost=$%.8f USD\n", summaryMetrics.Requests, summaryMetrics.Usage.PromptTokens, summaryMetrics.Usage.CompletionTokens, summaryMetrics.Usage.TotalTokens, summaryMetrics.CostUSD)
+	}
+	if len(s.Facts) > 0 || factsMetrics.Requests > 0 {
+		fmt.Fprintf(w, "  sticky facts: %d\n", len(s.Facts))
+	}
+	if factsMetrics.Requests > 0 {
+		fmt.Fprintf(w, "  facts-update overhead: calls=%d, input=%d, output=%d, total=%d, cost=$%.8f USD\n", factsMetrics.Requests, factsMetrics.Usage.PromptTokens, factsMetrics.Usage.CompletionTokens, factsMetrics.Usage.TotalTokens, factsMetrics.CostUSD)
+	}
+	if s.BranchName != "" {
+		fmt.Fprintf(w, "  branch: %s (parent=%s)\n", s.BranchName, s.ParentSessionID)
 	}
 	if !s.TokenAccountingComplete {
 		fmt.Fprintln(w, "  note: cumulative totals cover only calls made after token tracking was added")

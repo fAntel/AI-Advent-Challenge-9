@@ -43,10 +43,18 @@ func TestClientAutostartDefaultsOn(t *testing.T) {
 
 func TestHistoryCompressionDefaults(t *testing.T) {
 	cfg := DefaultConfig()
-	if !cfg.Agent.CompressionEnabled || cfg.Agent.RecentMessages != 5 || cfg.Agent.SummaryBatchMessages != 5 {
+	if !cfg.Agent.CompressionEnabled || cfg.Agent.ContextStrategy != "summary" || cfg.Agent.RecentMessages != 5 || cfg.Agent.SummaryBatchMessages != 5 {
 		t.Fatalf("agent config=%+v", cfg.Agent)
 	}
 	if !DefaultSettings(cfg).Compression {
 		t.Fatal("new sessions should enable compression by default")
+	}
+}
+
+func TestContextStrategyValidation(t *testing.T) {
+	settings := DefaultSettings(DefaultConfig())
+	settings.ContextStrategy = "unknown"
+	if ValidateSettings(settings) == nil {
+		t.Fatal("expected unknown context strategy to be rejected")
 	}
 }

@@ -100,6 +100,37 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, map[string]string{"state": "running"}, s.Agent.Retry(id, token(r)), 202)
 	case "discard":
 		s.respond(w, map[string]bool{"ok": true}, s.Agent.Discard(id, token(r)), 200)
+	case "checkpoints":
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		var req CheckpointRequest
+		if e := decodeJSON(w, r, &req); e != nil {
+			s.respond(w, nil, e, 0)
+			return
+		}
+		checkpoint, e := s.Agent.CreateCheckpoint(id, token(r), req.Name)
+		s.respond(w, checkpoint, e, http.StatusCreated)
+	case "branch":
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		var req BranchRequest
+		if e := decodeJSON(w, r, &req); e != nil {
+			s.respond(w, nil, e, 0)
+			return
+		}
+		branch, e := s.Agent.CreateBranch(id, token(r), req)
+		s.respond(w, branch, e, http.StatusCreated)
+	case "branches":
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		branches, e := s.Agent.RelatedBranches(id)
+		s.respond(w, branches, e, http.StatusOK)
 	default:
 		writeJSON(w, 404, ErrorResponse{"not found"})
 	}

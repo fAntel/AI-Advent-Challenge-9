@@ -13,17 +13,18 @@ type Message struct {
 }
 
 type Settings struct {
-	Model       string   `json:"model"`
-	Reasoning   string   `json:"reasoning"`
-	Temperature *float64 `json:"temperature,omitempty"`
-	Approach    string   `json:"approach"`
-	Roles       []string `json:"roles,omitempty"`
-	Format      string   `json:"format,omitempty"`
-	Length      string   `json:"length,omitempty"`
-	Stop        string   `json:"stop,omitempty"`
-	Stats       bool     `json:"stats,omitempty"`
-	Debug       bool     `json:"debug,omitempty"`
-	Compression bool     `json:"compression"`
+	Model           string   `json:"model"`
+	Reasoning       string   `json:"reasoning"`
+	Temperature     *float64 `json:"temperature,omitempty"`
+	Approach        string   `json:"approach"`
+	Roles           []string `json:"roles,omitempty"`
+	Format          string   `json:"format,omitempty"`
+	Length          string   `json:"length,omitempty"`
+	Stop            string   `json:"stop,omitempty"`
+	Stats           bool     `json:"stats,omitempty"`
+	Debug           bool     `json:"debug,omitempty"`
+	Compression     bool     `json:"compression"`
+	ContextStrategy string   `json:"context_strategy,omitempty"`
 }
 
 type Usage struct {
@@ -69,24 +70,42 @@ type Operation struct {
 }
 
 type Session struct {
-	ID                      string        `json:"id"`
-	CreatedAt               time.Time     `json:"created_at"`
-	UpdatedAt               time.Time     `json:"updated_at"`
-	SystemPrompt            string        `json:"system_prompt,omitempty"`
-	Settings                Settings      `json:"settings"`
-	Messages                []Message     `json:"messages"`
-	Operation               *Operation    `json:"operation,omitempty"`
-	Metrics                 Metrics       `json:"metrics"`
-	Calls                   []CallMetrics `json:"calls,omitempty"`
-	ContextWindowTokens     int           `json:"context_window_tokens"`
-	TokenAccountingComplete bool          `json:"token_accounting_complete"`
-	Summary                 string        `json:"summary,omitempty"`
-	SummaryTokens           int           `json:"summary_tokens,omitempty"`
-	SummarizedMessages      int           `json:"summarized_messages,omitempty"`
-	RecentMessages          int           `json:"recent_messages"`
-	SummaryBatchMessages    int           `json:"summary_batch_messages"`
-	Attached                bool          `json:"attached,omitempty"`
-	Preview                 string        `json:"preview,omitempty"`
+	ID                      string            `json:"id"`
+	CreatedAt               time.Time         `json:"created_at"`
+	UpdatedAt               time.Time         `json:"updated_at"`
+	SystemPrompt            string            `json:"system_prompt,omitempty"`
+	Settings                Settings          `json:"settings"`
+	Messages                []Message         `json:"messages"`
+	Operation               *Operation        `json:"operation,omitempty"`
+	Metrics                 Metrics           `json:"metrics"`
+	Calls                   []CallMetrics     `json:"calls,omitempty"`
+	ContextWindowTokens     int               `json:"context_window_tokens"`
+	TokenAccountingComplete bool              `json:"token_accounting_complete"`
+	Summary                 string            `json:"summary,omitempty"`
+	SummaryTokens           int               `json:"summary_tokens,omitempty"`
+	SummarizedMessages      int               `json:"summarized_messages,omitempty"`
+	RecentMessages          int               `json:"recent_messages"`
+	SummaryBatchMessages    int               `json:"summary_batch_messages"`
+	Facts                   map[string]string `json:"facts,omitempty"`
+	Checkpoints             []Checkpoint      `json:"checkpoints,omitempty"`
+	RootSessionID           string            `json:"root_session_id,omitempty"`
+	ParentSessionID         string            `json:"parent_session_id,omitempty"`
+	BranchName              string            `json:"branch_name,omitempty"`
+	BranchedFromCheckpoint  string            `json:"branched_from_checkpoint,omitempty"`
+	Attached                bool              `json:"attached,omitempty"`
+	Preview                 string            `json:"preview,omitempty"`
+}
+
+type Checkpoint struct {
+	ID                 string            `json:"id"`
+	Name               string            `json:"name"`
+	CreatedAt          time.Time         `json:"created_at"`
+	Settings           Settings          `json:"settings"`
+	Messages           []Message         `json:"messages"`
+	Summary            string            `json:"summary,omitempty"`
+	SummaryTokens      int               `json:"summary_tokens,omitempty"`
+	SummarizedMessages int               `json:"summarized_messages,omitempty"`
+	Facts              map[string]string `json:"facts,omitempty"`
 }
 
 type CreateSessionRequest struct {
@@ -97,6 +116,15 @@ type CreateSessionRequest struct {
 type MessageRequest struct {
 	Content  string    `json:"content"`
 	Settings *Settings `json:"settings,omitempty"`
+}
+
+type CheckpointRequest struct {
+	Name string `json:"name"`
+}
+
+type BranchRequest struct {
+	Name       string `json:"name"`
+	Checkpoint string `json:"checkpoint"`
 }
 
 type LeaseResponse struct {

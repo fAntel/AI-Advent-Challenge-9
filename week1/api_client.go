@@ -107,6 +107,21 @@ func (c *APIClient) Discard(id, t string) error {
 	_, e := c.do("POST", "/v1/sessions/"+id+"/discard", t, nil, nil)
 	return e
 }
+func (c *APIClient) CreateCheckpoint(id, t, name string) (Checkpoint, error) {
+	var checkpoint Checkpoint
+	_, e := c.do("POST", "/v1/sessions/"+id+"/checkpoints", t, CheckpointRequest{Name: name}, &checkpoint)
+	return checkpoint, e
+}
+func (c *APIClient) CreateBranch(id, t string, req BranchRequest) (Session, error) {
+	var session Session
+	_, e := c.do("POST", "/v1/sessions/"+id+"/branch", t, req, &session)
+	return session, e
+}
+func (c *APIClient) Branches(id string) ([]Session, error) {
+	var sessions []Session
+	_, e := c.do("GET", "/v1/sessions/"+id+"/branches", "", nil, &sessions)
+	return sessions, e
+}
 func (c *APIClient) Delete(id string) error {
 	_, e := c.do("DELETE", "/v1/sessions/"+id, "", nil, nil)
 	return e

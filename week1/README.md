@@ -109,7 +109,7 @@ the TOML `[agent]` section:
 The Week 0 controls remain available as long flags (with the original short
 forms where applicable): `--format`, `--length`, `--stop`, `--approach`,
 `--roles`, `--temperature`, `--model`, `--reasoning`, `--stats`,
-`--compression`, and `--debug`.
+`--compression`, `--strategy`, and `--debug`.
 In the REPL, `/help` lists their command equivalents and `/settings` displays
 the current values.
 
@@ -133,7 +133,7 @@ after every answer and `/stats off` disables that automatic per-answer output.
 Session token stats:
   latest answer request: input context=200 (cache hit=30, miss=170), model answer=25, total=225
   context window: 200 / 1000000 (0.02%)
-  whole dialog: calls=2, cumulative input=220, model answers=30, total=250
+  whole dialog: calls=2, cumulative input=220, model output=30, total=250
   estimated dialog cost: $0.00003508 USD
   history memory: summarized=0 messages, verbatim=4 messages, summary=0 tokens
   input-context growth: 20 -> 200 (+180 tokens)
@@ -187,6 +187,85 @@ output rates in DeepSeek's [current pricing table](https://api-docs.deepseek.com
 finish reason in its [Chat Completion API reference](https://api-docs.deepseek.com/api/create-chat-completion/)
 and notes that local tokenizers only estimate API usage in its
 [token usage guide](https://api-docs.deepseek.com/quick_start/token_usage/).
+
+## Context-management strategies
+
+Select a strategy when creating or resuming a session, or switch the current
+session before its next message:
+
+```sh
+./deepseek-agent --strategy sliding
+./deepseek-agent --strategy sticky-facts
+./deepseek-agent --strategy branching
+```
+
+```text
+/strategy sliding
+/strategy sticky-facts
+/strategy branching
+```
+
+Strategy changes apply to future messages. Switching away from `sliding` or
+another lossy strategy cannot restore messages that were already discarded.
+
+The available strategies are:
+
+- `sliding`: send and retain only the newest `agent.recent_messages`. Older
+  messages are permanently dropped.
+- `sticky-facts`: update a separately persisted key-value facts block after
+  every user message, then answer using those facts plus the newest N messages.
+  `/facts` displays the current block. Invalid fact updates retain the previous
+  facts and the answer continues with the available sliding window.
+- `branching`: keep the complete available history independently in each
+  branch. Named checkpoints can produce multiple sibling sessions that then
+  evolve separately.
+- `summary`: the rolling-summary strategy from Task3.
+- `full`: an unbounded baseline used by `--compression=false` comparisons.
+
+Sticky-facts extraction is an additional API call before every answer. `/stats`
+reports its token and cost overhead separately from answer calls and summary
+calls.
+
+### Branching workflow
+
+Start with the branching strategy, establish shared context, then create a
+checkpoint and two branches from exactly that snapshot:
+
+```text
+/checkpoint fork
+/branch conservative fork
+/branch ambitious fork
+/checkpoints
+/branches
+/switch conservative
+```
+
+Continue the conservative dialog, then use `/switch ambitious` to work on the
+alternative. `/switch root` returns to the original session. `/branches` marks
+the current branch with `*` and shows every related session ID. Branches are
+ordinary persisted sessions owned by the same OS user, but carry their root,
+parent, name, and checkpoint lineage. Each branch starts fresh token and cost
+totals after the checkpoint, making their later behavior directly comparable.
+
+### Comparison scenario
+
+Run the same scenario in three new sessions, using `sliding`, `sticky-facts`,
+and `branching`. In the first message, establish a distinctive goal,
+restriction, preference, and decision. Continue until that first message falls
+outside the sliding window, then ask the agent to recall and apply all four.
+For branching, checkpoint before presenting two incompatible alternatives and
+continue each alternative in its own branch.
+
+Record these values from `/stats` for each run:
+
+| Strategy | Answer quality | Important details retained | Latest answer input | Extra memory calls | Usage comfort |
+| --- | --- | --- | ---: | ---: | --- |
+| Sliding | Fill after test | Fill after test | Fill after test | 0 | Fill after test |
+| Sticky facts | Fill after test | Fill after test | Fill after test | See facts overhead | Fill after test |
+| Branching | Fill after test | Fill after test | Fill after test | 0 | Fill after test |
+
+This table intentionally contains no invented measurements: use the returned
+API usage and observed answers from the recorded runs as the comparison result.
 
 ## History compression
 

@@ -54,6 +54,7 @@ type AgentConfig struct {
 	CompressionEnabled   bool   `toml:"compression_enabled"`
 	RecentMessages       int    `toml:"recent_messages"`
 	SummaryBatchMessages int    `toml:"summary_batch_messages"`
+	ContextStrategy      string `toml:"context_strategy"`
 }
 type ClientConfig struct {
 	PollInterval Duration `toml:"poll_interval"`
@@ -76,7 +77,7 @@ func DefaultConfig() Config {
 		DeepSeek: DeepSeekConfig{Endpoint: "https://api.deepseek.com/chat/completions", Model: FlashModel, Reasoning: "none"},
 		Agent: AgentConfig{
 			ContextWindowTokens: 1_000_000, CompressionEnabled: true,
-			RecentMessages: 5, SummaryBatchMessages: 5,
+			RecentMessages: 5, SummaryBatchMessages: 5, ContextStrategy: "summary",
 		},
 		Client: ClientConfig{PollInterval: Duration(250 * time.Millisecond), Autostart: true},
 	}
@@ -140,11 +141,18 @@ func (c Config) Validate() error {
 	if c.Agent.RecentMessages <= 0 || c.Agent.SummaryBatchMessages <= 0 {
 		return errors.New("agent recent_messages and summary_batch_messages must be positive")
 	}
+	if !validContextStrategy(c.Agent.ContextStrategy) {
+		return fmt.Errorf("unknown agent.context_strategy %q", c.Agent.ContextStrategy)
+	}
 	return ValidateSettings(Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none"})
 }
 
 func DefaultSettings(c Config) Settings {
-	return Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}, Compression: c.Agent.CompressionEnabled}
+	strategy := c.Agent.ContextStrategy
+	if strategy == "summary" && !c.Agent.CompressionEnabled {
+		strategy = "full"
+	}
+	return Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}, Compression: strategy == "summary", ContextStrategy: strategy}
 }
 
 func ValidateSettings(s Settings) error {
@@ -170,5 +178,17 @@ func ValidateSettings(s Settings) error {
 	if s.Approach == "multi-role" && len(s.Roles) < 2 {
 		return errors.New("multi-role requires at least two roles")
 	}
+	if s.ContextStrategy != "" && !validContextStrategy(s.ContextStrategy) {
+		return fmt.Errorf("unknown context strategy %q", s.ContextStrategy)
+	}
 	return nil
+}
+
+func validContextStrategy(strategy string) bool {
+	switch strategy {
+	case "full", "summary", "sliding", "sticky-facts", "branching":
+		return true
+	default:
+		return false
+	}
 }
