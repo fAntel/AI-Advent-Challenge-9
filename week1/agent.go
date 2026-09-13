@@ -27,13 +27,14 @@ type Agent struct {
 	completer                                Completer
 	logger                                   *DebugLogger
 	defaults                                 Settings
+	contextWindowTokens                      int
 	leaseTimeout, evictAfter, requestTimeout time.Duration
 	sessions                                 map[string]*runtimeSession
 	closed                                   chan struct{}
 }
 
 func NewAgent(cfg Config, completer Completer, logger *DebugLogger) (*Agent, error) {
-	a := &Agent{store: Store{Dir: cfg.Daemon.SessionDir}, completer: completer, logger: logger, defaults: DefaultSettings(cfg), leaseTimeout: time.Duration(cfg.Daemon.LeaseTimeout), evictAfter: time.Duration(cfg.Daemon.EvictAfter), requestTimeout: time.Duration(cfg.Daemon.RequestTimeout), sessions: map[string]*runtimeSession{}, closed: make(chan struct{})}
+	a := &Agent{store: Store{Dir: cfg.Daemon.SessionDir}, completer: completer, logger: logger, defaults: DefaultSettings(cfg), contextWindowTokens: cfg.Agent.ContextWindowTokens, leaseTimeout: time.Duration(cfg.Daemon.LeaseTimeout), evictAfter: time.Duration(cfg.Daemon.EvictAfter), requestTimeout: time.Duration(cfg.Daemon.RequestTimeout), sessions: map[string]*runtimeSession{}, closed: make(chan struct{})}
 	if err := a.store.Recover(); err != nil {
 		return nil, err
 	}
@@ -64,7 +65,7 @@ func (a *Agent) Create(req CreateSessionRequest) (*Session, error) {
 	if err := ValidateSettings(settings); err != nil {
 		return nil, err
 	}
-	s := &Session{ID: randomID(), CreatedAt: now, UpdatedAt: now, SystemPrompt: req.SystemPrompt, Settings: settings, Messages: []Message{}}
+	s := &Session{ID: randomID(), CreatedAt: now, UpdatedAt: now, SystemPrompt: req.SystemPrompt, Settings: settings, Messages: []Message{}, ContextWindowTokens: a.contextWindowTokens, TokenAccountingComplete: true}
 	if err := a.store.Save(s); err != nil {
 		return nil, err
 	}
@@ -79,6 +80,9 @@ func (a *Agent) loadLocked(id string) (*runtimeSession, error) {
 	s, err := a.store.Load(id)
 	if err != nil {
 		return nil, ErrNotFound
+	}
+	if s.ContextWindowTokens == 0 {
+		s.ContextWindowTokens = a.contextWindowTokens
 	}
 	r := &runtimeSession{session: s}
 	a.sessions[id] = r
@@ -267,17 +271,25 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	if err != nil {
 		r.session.Operation.State = "failed"
 		r.session.Operation.Error = a.logger.Redact(err.Error())
+		if errors.Is(err, ErrContextWindowExceeded) {
+			r.session.Operation.Error = "model context window exceeded; start a new session or shorten the dialog"
+		}
 		if op.Settings.Debug {
 			r.session.Operation.Diagnostics = completion.Diagnostics
 		}
 		a.logger.Log("workflow.failed", id, opID, err.Error())
 	} else {
 		r.session.Messages = append(r.session.Messages, Message{Role: "assistant", Content: completion.Answer})
-		addMetrics(&r.session.Operation.Metrics, completion.Metrics)
+		recordCompletion(r.session, completion)
+		a.logUsage(id, opID, completion)
 		if op.Settings.Debug {
 			r.session.Operation.Diagnostics += completion.Diagnostics
 		}
-		if op.Settings.Stop != "" && !containsFold(s.Messages[len(s.Messages)-1].Content, op.Settings.Stop) {
+		if completion.Call.FinishReason == "length" {
+			r.session.Operation.State = "truncated"
+			r.session.Operation.Warning = "model answer was truncated because it reached a token limit"
+			a.logger.Log("answer.truncated", id, opID, r.session.Operation.Warning)
+		} else if op.Settings.Stop != "" && !containsFold(s.Messages[len(s.Messages)-1].Content, op.Settings.Stop) {
 			r.session.Operation.State = "awaiting_input"
 			a.logger.Log("workflow.awaiting_input", id, opID, "clarification answer received")
 		} else if op.Settings.Approach == "self-prompt" {
@@ -294,11 +306,17 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 				r.session.Operation.Error = a.logger.Redact(e.Error())
 			} else {
 				r.session.Messages[len(r.session.Messages)-1].Content = second.Answer
-				addMetrics(&r.session.Operation.Metrics, second.Metrics)
+				recordCompletion(r.session, second)
+				a.logUsage(id, opID, second)
 				if op.Settings.Debug {
 					r.session.Operation.Diagnostics += second.Diagnostics
 				}
-				r.session.Operation.State = "completed"
+				if second.Call.FinishReason == "length" {
+					r.session.Operation.State = "truncated"
+					r.session.Operation.Warning = "model answer was truncated because it reached a token limit"
+				} else {
+					r.session.Operation.State = "completed"
+				}
 			}
 		} else {
 			r.session.Operation.State = "completed"
@@ -360,11 +378,32 @@ func addMetrics(dst *Metrics, m Metrics) {
 	dst.Usage.ReasoningTokens += m.Usage.ReasoningTokens
 	dst.Usage.TotalTokens += m.Usage.TotalTokens
 }
+func recordCompletion(s *Session, completion Completion) {
+	call := completion.Call
+	if call.StartedAt.IsZero() {
+		call.Duration = completion.Metrics.Duration
+		call.Usage = completion.Metrics.Usage
+		call.CostUSD = completion.Metrics.CostUSD
+	}
+	s.Operation.Calls = append(s.Operation.Calls, call)
+	s.Calls = append(s.Calls, call)
+	addMetrics(&s.Operation.Metrics, completion.Metrics)
+	addMetrics(&s.Metrics, completion.Metrics)
+}
+func (a *Agent) logUsage(sessionID, operationID string, completion Completion) {
+	u := completion.Metrics.Usage
+	a.logger.Log("usage.recorded", sessionID, operationID,
+		fmt.Sprintf("input=%d cache_hit=%d cache_miss=%d output=%d total=%d cost_usd=%.8f finish_reason=%s",
+			u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens,
+			u.CompletionTokens, u.TotalTokens, completion.Metrics.CostUSD, completion.Call.FinishReason))
+}
 func cloneSession(s *Session) *Session {
 	c := *s
 	c.Messages = append([]Message(nil), s.Messages...)
+	c.Calls = append([]CallMetrics(nil), s.Calls...)
 	if s.Operation != nil {
 		o := *s.Operation
+		o.Calls = append([]CallMetrics(nil), s.Operation.Calls...)
 		c.Operation = &o
 	}
 	c.Attached = false

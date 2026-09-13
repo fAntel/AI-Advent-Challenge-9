@@ -17,8 +17,12 @@ type Completion struct {
 	Answer      string
 	Usage       Usage
 	Metrics     Metrics
+	Call        CallMetrics
 	Diagnostics string
 }
+
+var ErrContextWindowExceeded = errors.New("model context window exceeded")
+
 type Completer interface {
 	Complete(context.Context, []Message, Settings) (Completion, error)
 }
@@ -98,6 +102,10 @@ func (c *DeepSeekClient) Complete(ctx context.Context, messages []Message, setti
 		return Completion{Diagnostics: diagnostic}, fmt.Errorf("read response: %s", c.Logger.Redact(readErr.Error()))
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		lower := strings.ToLower(string(responseBody))
+		if strings.Contains(lower, "context") && (strings.Contains(lower, "length") || strings.Contains(lower, "token")) {
+			return Completion{Diagnostics: diagnostic}, fmt.Errorf("%w: DeepSeek API returned %s: %s", ErrContextWindowExceeded, resp.Status, c.Logger.Redact(string(responseBody)))
+		}
 		return Completion{Diagnostics: diagnostic}, fmt.Errorf("DeepSeek API returned %s: %s", resp.Status, c.Logger.Redact(string(responseBody)))
 	}
 	var raw struct {
@@ -115,6 +123,7 @@ func (c *DeepSeekClient) Complete(ctx context.Context, messages []Message, setti
 			Message struct {
 				Content *string `json:"content"`
 			} `json:"message"`
+			FinishReason string `json:"finish_reason"`
 		} `json:"choices"`
 	}
 	if err := json.Unmarshal(responseBody, &raw); err != nil {
@@ -124,7 +133,9 @@ func (c *DeepSeekClient) Complete(ctx context.Context, messages []Message, setti
 		return Completion{Diagnostics: diagnostic}, errors.New("DeepSeek response does not contain an answer")
 	}
 	u := Usage{PromptTokens: raw.Usage.Prompt, PromptCacheHitTokens: raw.Usage.Hit, PromptCacheMissTokens: raw.Usage.Miss, CompletionTokens: raw.Usage.Completion, ReasoningTokens: raw.Usage.Details.Reasoning, TotalTokens: raw.Usage.Total}
-	return Completion{Answer: *raw.Choices[0].Message.Content, Usage: u, Metrics: Metrics{Requests: 1, Duration: duration, Usage: u, CostUSD: estimateCost(settings.Model, started, u)}, Diagnostics: diagnostic}, nil
+	cost := estimateCost(settings.Model, u)
+	call := CallMetrics{StartedAt: started.UTC(), Duration: duration, Usage: u, CostUSD: cost, FinishReason: raw.Choices[0].FinishReason}
+	return Completion{Answer: *raw.Choices[0].Message.Content, Usage: u, Metrics: Metrics{Requests: 1, Duration: duration, Usage: u, CostUSD: cost}, Call: call, Diagnostics: diagnostic}, nil
 }
 
 func dumpRequest(req *http.Request, body []byte, logger *DebugLogger) string {
@@ -154,16 +165,10 @@ func writeHeaders(b *strings.Builder, h http.Header) {
 	}
 }
 
-func estimateCost(model string, started time.Time, u Usage) float64 {
-	rates := [3]float64{0.007, 0.22, 0.66}
+func estimateCost(model string, u Usage) float64 {
+	rates := [3]float64{0.0028, 0.14, 0.28}
 	if model == ProModel {
-		rates = [3]float64{0.022, 0.66, 1.98}
-	}
-	utc := started.UTC()
-	if utc.Weekday() != time.Saturday && utc.Weekday() != time.Sunday && ((utc.Hour() >= 1 && utc.Hour() < 4) || (utc.Hour() >= 6 && utc.Hour() < 10)) {
-		for i := range rates {
-			rates[i] *= 2
-		}
+		rates = [3]float64{0.003625, 0.435, 0.87}
 	}
 	return (float64(u.PromptCacheHitTokens)*rates[0] + float64(u.PromptCacheMissTokens)*rates[1] + float64(u.CompletionTokens)*rates[2]) / 1_000_000
 }

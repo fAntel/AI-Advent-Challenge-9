@@ -11,10 +11,12 @@ import (
 )
 
 type fakeCompleter struct {
-	mu      sync.Mutex
-	answers []string
-	entered chan struct{}
-	release chan struct{}
+	mu            sync.Mutex
+	answers       []string
+	usages        []Usage
+	finishReasons []string
+	entered       chan struct{}
+	release       chan struct{}
 }
 
 func (f *fakeCompleter) Complete(ctx context.Context, m []Message, s Settings) (Completion, error) {
@@ -39,7 +41,17 @@ func (f *fakeCompleter) Complete(ctx context.Context, m []Message, s Settings) (
 		f.answers = f.answers[1:]
 	}
 	u := Usage{PromptTokens: 1, CompletionTokens: 2, TotalTokens: 3}
-	return Completion{Answer: answer, Metrics: Metrics{Requests: 1, Usage: u}}, nil
+	if len(f.usages) > 0 {
+		u = f.usages[0]
+		f.usages = f.usages[1:]
+	}
+	finishReason := "stop"
+	if len(f.finishReasons) > 0 {
+		finishReason = f.finishReasons[0]
+		f.finishReasons = f.finishReasons[1:]
+	}
+	call := CallMetrics{Usage: u, FinishReason: finishReason}
+	return Completion{Answer: answer, Usage: u, Call: call, Metrics: Metrics{Requests: 1, Usage: u}}, nil
 }
 
 func testConfig(t *testing.T) Config {
@@ -145,6 +157,64 @@ func TestValidateSettings(t *testing.T) {
 	s.Reasoning = "high"
 	if ValidateSettings(s) == nil {
 		t.Fatal("expected temperature/reasoning conflict")
+	}
+}
+
+func TestAgentPersistsPerCallAndWholeDialogTokenCounts(t *testing.T) {
+	cfg := testConfig(t)
+	fake := &fakeCompleter{
+		answers: []string{"short answer", "long answer"},
+		usages: []Usage{
+			{PromptTokens: 20, PromptCacheMissTokens: 20, CompletionTokens: 5, TotalTokens: 25},
+			{PromptTokens: 75, PromptCacheHitTokens: 15, PromptCacheMissTokens: 60, CompletionTokens: 10, TotalTokens: 85},
+		},
+	}
+	a, err := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+	lease, _ := a.Attach(s.ID)
+	if err := a.Submit(s.ID, lease, MessageRequest{Content: "first"}); err != nil {
+		t.Fatal(err)
+	}
+	waitState(t, a, s.ID, "completed")
+	if err := a.Submit(s.ID, lease, MessageRequest{Content: "second"}); err != nil {
+		t.Fatal(err)
+	}
+	got := waitState(t, a, s.ID, "completed")
+	if len(got.Calls) != 2 {
+		t.Fatalf("calls=%d", len(got.Calls))
+	}
+	if got.Calls[1].Usage.PromptTokens != 75 {
+		t.Fatalf("latest prompt tokens=%d", got.Calls[1].Usage.PromptTokens)
+	}
+	if got.Metrics.Requests != 2 || got.Metrics.Usage.PromptTokens != 95 || got.Metrics.Usage.CompletionTokens != 15 || got.Metrics.Usage.TotalTokens != 110 {
+		t.Fatalf("session metrics=%+v", got.Metrics)
+	}
+	saved, err := a.store.Load(s.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(saved.Calls) != 2 || saved.Metrics.Usage.TotalTokens != 110 {
+		t.Fatalf("persisted stats=%+v calls=%d", saved.Metrics, len(saved.Calls))
+	}
+}
+
+func TestAgentMarksLengthLimitedAnswerAsTruncated(t *testing.T) {
+	cfg := testConfig(t)
+	fake := &fakeCompleter{answers: []string{"partial"}, finishReasons: []string{"length"}}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+	lease, _ := a.Attach(s.ID)
+	if err := a.Submit(s.ID, lease, MessageRequest{Content: "write a lot"}); err != nil {
+		t.Fatal(err)
+	}
+	got := waitState(t, a, s.ID, "truncated")
+	if got.Operation.Warning == "" || got.Calls[0].FinishReason != "length" {
+		t.Fatalf("operation=%+v calls=%+v", got.Operation, got.Calls)
 	}
 }
 func ptrSettings(s Settings) *Settings { return &s }

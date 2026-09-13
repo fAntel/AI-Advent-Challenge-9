@@ -248,9 +248,12 @@ func runSession(api *agent.APIClient, cfg agent.Config, id, initial string, sett
 			}
 		case "failed", "interrupted":
 			fmt.Fprintln(os.Stderr, "agent:", current.Operation.State+":", current.Operation.Error)
-		case "completed":
+		case "completed", "truncated":
 			if len(current.Messages) > 0 {
 				fmt.Println("Last answer:", current.Messages[len(current.Messages)-1].Content)
+			}
+			if current.Operation.Warning != "" {
+				fmt.Fprintln(os.Stderr, "Warning:", current.Operation.Warning)
 			}
 		}
 	}
@@ -306,11 +309,14 @@ func wait(api *agent.APIClient, cfg agent.Config, id string, settings agent.Sett
 		switch s.Operation.State {
 		case "running":
 			continue
-		case "awaiting_input", "completed":
+		case "awaiting_input", "completed", "truncated":
 			if len(s.Messages) > 0 {
 				fmt.Println("Agent:", s.Messages[len(s.Messages)-1].Content)
 			}
-			printExtras(s.Operation)
+			if s.Operation.Warning != "" {
+				fmt.Fprintln(os.Stderr, "Warning:", s.Operation.Warning)
+			}
+			printExtras(&s)
 			return s.Operation.State
 		case "failed", "interrupted":
 			fmt.Fprintln(os.Stderr, "agent:", s.Operation.State+":", s.Operation.Error)
@@ -327,9 +333,14 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 	}
 	switch cmd {
 	case "exit":
+		if current, err := api.Get(id); err == nil {
+			printSessionStats(os.Stderr, &current)
+		} else {
+			fmt.Fprintln(os.Stderr, "could not load session stats:", err)
+		}
 		return true
 	case "help":
-		fmt.Println("/settings /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats /debug /retry /discard /exit")
+		fmt.Println("/settings /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /debug /retry /discard /exit")
 	case "settings":
 		data, _ := json.MarshalIndent(s, "", "  ")
 		fmt.Println(string(data))
@@ -364,7 +375,21 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		unset(s, value)
 		validate(s)
 	case "stats":
-		s.Stats = value != "off"
+		switch value {
+		case "":
+			current, err := api.Get(id)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+			} else {
+				printSessionStats(os.Stderr, &current)
+			}
+		case "on":
+			s.Stats = true
+		case "off":
+			s.Stats = false
+		default:
+			fmt.Fprintln(os.Stderr, "usage: /stats [on|off]")
+		}
 	case "debug":
 		s.Debug = value != "off"
 	case "retry":
@@ -397,12 +422,52 @@ func unset(s *agent.Settings, v string) {
 		fmt.Fprintln(os.Stderr, "unknown setting")
 	}
 }
-func printExtras(o *agent.Operation) {
+func printExtras(session *agent.Session) {
+	o := session.Operation
 	if o.Settings.Stats {
-		fmt.Fprintf(os.Stderr, "Stats: requests=%d duration=%s input=%d output=%d total=%d estimated_cost=$%.8f USD\n", o.Metrics.Requests, o.Metrics.Duration.Round(time.Millisecond), o.Metrics.Usage.PromptTokens, o.Metrics.Usage.CompletionTokens, o.Metrics.Usage.TotalTokens, o.Metrics.CostUSD)
+		printSessionStats(os.Stderr, session)
 	}
 	if o.Settings.Debug && o.Diagnostics != "" {
 		fmt.Fprint(os.Stderr, o.Diagnostics)
+	}
+}
+
+func printSessionStats(w io.Writer, s *agent.Session) {
+	if len(s.Calls) == 0 {
+		fmt.Fprintln(w, "Session token stats: no completed API calls yet")
+		return
+	}
+	latest := s.Calls[len(s.Calls)-1]
+	u := latest.Usage
+	limit := s.ContextWindowTokens
+	if limit <= 0 {
+		limit = 1_000_000
+	}
+	percent := 100 * float64(u.PromptTokens) / float64(limit)
+	fmt.Fprintln(w, "Session token stats:")
+	fmt.Fprintf(w, "  latest API call: input context=%d (cache hit=%d, miss=%d), model answer=%d, total=%d\n", u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens, u.CompletionTokens, u.TotalTokens)
+	if u.ReasoningTokens > 0 {
+		fmt.Fprintf(w, "  latest reasoning tokens: %d\n", u.ReasoningTokens)
+	}
+	fmt.Fprintf(w, "  context window: %d / %d (%.2f%%)\n", u.PromptTokens, limit, percent)
+	t := s.Metrics
+	fmt.Fprintf(w, "  whole dialog: calls=%d, cumulative input=%d, model answers=%d, total=%d\n", t.Requests, t.Usage.PromptTokens, t.Usage.CompletionTokens, t.Usage.TotalTokens)
+	fmt.Fprintf(w, "  estimated dialog cost: $%.8f USD\n", t.CostUSD)
+	if !s.TokenAccountingComplete {
+		fmt.Fprintln(w, "  note: cumulative totals cover only calls made after token tracking was added")
+	}
+	if len(s.Calls) > 1 {
+		first := s.Calls[0].Usage.PromptTokens
+		delta := u.PromptTokens - first
+		fmt.Fprintf(w, "  input-context growth: %d -> %d (%+d tokens)\n", first, u.PromptTokens, delta)
+	}
+	if latest.FinishReason != "" {
+		fmt.Fprintf(w, "  latest finish reason: %s\n", latest.FinishReason)
+	}
+	if latest.FinishReason == "length" {
+		fmt.Fprintln(w, "  warning: the model answer was truncated at a token limit")
+	} else if percent >= 90 {
+		fmt.Fprintln(w, "  warning: latest input is close to the configured context-window limit")
 	}
 }
 func splitRoles(v string) []string {

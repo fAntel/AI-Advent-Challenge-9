@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	agent "deepseek-agent"
+	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -31,10 +32,15 @@ func main() {
 	}
 	if stopRequested {
 		client := agent.NewAPIClient(cfg.Daemon.SocketPath, 5*time.Second)
-		if err := client.Shutdown(); err != nil {
+		stopped, err := stopDaemon(client)
+		if err != nil {
 			fatal(fmt.Errorf("stop daemon: %w", err))
 		}
-		fmt.Fprintln(os.Stderr, "deepseek-agentd stopped")
+		if stopped {
+			fmt.Fprintln(os.Stderr, "deepseek-agentd stopped")
+		} else {
+			fmt.Fprintln(os.Stderr, "deepseek-agentd is not running")
+		}
 		return
 	}
 	key := os.Getenv("DEEPSEEK_API_KEY")
@@ -94,5 +100,12 @@ func main() {
 	cancelShutdown()
 	a.Close()
 	_ = os.Remove(cfg.Daemon.SocketPath)
+}
+func stopDaemon(client *agent.APIClient) (bool, error) {
+	err := client.Shutdown()
+	if errors.Is(err, agent.ErrDaemonUnavailable) {
+		return false, nil
+	}
+	return err == nil, err
 }
 func fatal(err error) { fmt.Fprintln(os.Stderr, "error:", err); os.Exit(1) }

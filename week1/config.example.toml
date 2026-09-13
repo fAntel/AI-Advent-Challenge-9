@@ -19,6 +19,8 @@ model = "deepseek-v4-flash"
 reasoning = "none"
 
 [agent]
+# Used to show how much of the model's input context the latest request used.
+context_window_tokens = 1000000
 system_prompt = """
 You are a helpful assistant.
 Answer accurately and clearly.

@@ -49,7 +49,8 @@ type DeepSeekConfig struct {
 }
 
 type AgentConfig struct {
-	SystemPrompt string `toml:"system_prompt"`
+	SystemPrompt        string `toml:"system_prompt"`
+	ContextWindowTokens int    `toml:"context_window_tokens"`
 }
 type ClientConfig struct {
 	PollInterval Duration `toml:"poll_interval"`
@@ -70,6 +71,7 @@ func DefaultConfig() Config {
 			LogPath: logPath, LogMaxBytes: 10 << 20, LogBackups: 3,
 		},
 		DeepSeek: DeepSeekConfig{Endpoint: "https://api.deepseek.com/chat/completions", Model: FlashModel, Reasoning: "none"},
+		Agent:    AgentConfig{ContextWindowTokens: 1_000_000},
 		Client:   ClientConfig{PollInterval: Duration(250 * time.Millisecond), Autostart: true},
 	}
 }
@@ -125,6 +127,9 @@ func (c Config) Validate() error {
 	}
 	if c.Daemon.LogMaxBytes <= 0 || c.Daemon.LogBackups < 0 {
 		return errors.New("invalid log rotation settings")
+	}
+	if c.Agent.ContextWindowTokens <= 0 {
+		return errors.New("agent.context_window_tokens must be positive")
 	}
 	return ValidateSettings(Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none"})
 }

@@ -41,28 +41,45 @@ type Metrics struct {
 	CostUSD  float64       `json:"cost_usd"`
 }
 
+// CallMetrics records the authoritative token counts returned by DeepSeek for
+// one HTTP API call. PromptTokens is the entire context sent for that call,
+// not just the user's latest message.
+type CallMetrics struct {
+	StartedAt    time.Time     `json:"started_at"`
+	Duration     time.Duration `json:"duration"`
+	Usage        Usage         `json:"usage"`
+	CostUSD      float64       `json:"cost_usd"`
+	FinishReason string        `json:"finish_reason,omitempty"`
+}
+
 type Operation struct {
-	ID          string     `json:"id"`
-	State       string     `json:"state"`
-	Settings    Settings   `json:"settings"`
-	StartedAt   time.Time  `json:"started_at"`
-	FinishedAt  *time.Time `json:"finished_at,omitempty"`
-	Error       string     `json:"error,omitempty"`
-	Diagnostics string     `json:"diagnostics,omitempty"`
-	Metrics     Metrics    `json:"metrics"`
-	BaseCount   int        `json:"base_count"`
+	ID          string        `json:"id"`
+	State       string        `json:"state"`
+	Settings    Settings      `json:"settings"`
+	StartedAt   time.Time     `json:"started_at"`
+	FinishedAt  *time.Time    `json:"finished_at,omitempty"`
+	Error       string        `json:"error,omitempty"`
+	Warning     string        `json:"warning,omitempty"`
+	Diagnostics string        `json:"diagnostics,omitempty"`
+	Metrics     Metrics       `json:"metrics"`
+	Calls       []CallMetrics `json:"calls,omitempty"`
+	BaseCount   int           `json:"base_count"`
 }
 
 type Session struct {
-	ID           string     `json:"id"`
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
-	SystemPrompt string     `json:"system_prompt,omitempty"`
-	Settings     Settings   `json:"settings"`
-	Messages     []Message  `json:"messages"`
-	Operation    *Operation `json:"operation,omitempty"`
-	Attached     bool       `json:"attached,omitempty"`
-	Preview      string     `json:"preview,omitempty"`
+	ID                      string        `json:"id"`
+	CreatedAt               time.Time     `json:"created_at"`
+	UpdatedAt               time.Time     `json:"updated_at"`
+	SystemPrompt            string        `json:"system_prompt,omitempty"`
+	Settings                Settings      `json:"settings"`
+	Messages                []Message     `json:"messages"`
+	Operation               *Operation    `json:"operation,omitempty"`
+	Metrics                 Metrics       `json:"metrics"`
+	Calls                   []CallMetrics `json:"calls,omitempty"`
+	ContextWindowTokens     int           `json:"context_window_tokens"`
+	TokenAccountingComplete bool          `json:"token_accounting_complete"`
+	Attached                bool          `json:"attached,omitempty"`
+	Preview                 string        `json:"preview,omitempty"`
 }
 
 type CreateSessionRequest struct {

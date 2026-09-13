@@ -12,6 +12,8 @@ type Server struct {
 	Shutdown func()
 }
 
+const maxRequestBodyBytes = 8 << 20
+
 func (s Server) Handler() http.Handler { return http.HandlerFunc(s.serveHTTP) }
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -20,7 +22,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 }
 func decodeJSON(w http.ResponseWriter, r *http.Request, v any) error {
 	defer r.Body.Close()
-	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 2<<20))
+	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxRequestBodyBytes))
 	dec.DisallowUnknownFields()
 	return dec.Decode(v)
 }
