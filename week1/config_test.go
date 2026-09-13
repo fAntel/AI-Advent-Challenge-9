@@ -40,3 +40,13 @@ func TestClientAutostartDefaultsOn(t *testing.T) {
 		t.Fatal("autostart should default to true")
 	}
 }
+
+func TestHistoryCompressionDefaults(t *testing.T) {
+	cfg := DefaultConfig()
+	if !cfg.Agent.CompressionEnabled || cfg.Agent.RecentMessages != 5 || cfg.Agent.SummaryBatchMessages != 5 {
+		t.Fatalf("agent config=%+v", cfg.Agent)
+	}
+	if !DefaultSettings(cfg).Compression {
+		t.Fatal("new sessions should enable compression by default")
+	}
+}

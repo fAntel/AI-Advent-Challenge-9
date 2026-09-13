@@ -23,6 +23,7 @@ type Settings struct {
 	Stop        string   `json:"stop,omitempty"`
 	Stats       bool     `json:"stats,omitempty"`
 	Debug       bool     `json:"debug,omitempty"`
+	Compression bool     `json:"compression"`
 }
 
 type Usage struct {
@@ -50,6 +51,7 @@ type CallMetrics struct {
 	Usage        Usage         `json:"usage"`
 	CostUSD      float64       `json:"cost_usd"`
 	FinishReason string        `json:"finish_reason,omitempty"`
+	Purpose      string        `json:"purpose,omitempty"`
 }
 
 type Operation struct {
@@ -78,6 +80,11 @@ type Session struct {
 	Calls                   []CallMetrics `json:"calls,omitempty"`
 	ContextWindowTokens     int           `json:"context_window_tokens"`
 	TokenAccountingComplete bool          `json:"token_accounting_complete"`
+	Summary                 string        `json:"summary,omitempty"`
+	SummaryTokens           int           `json:"summary_tokens,omitempty"`
+	SummarizedMessages      int           `json:"summarized_messages,omitempty"`
+	RecentMessages          int           `json:"recent_messages"`
+	SummaryBatchMessages    int           `json:"summary_batch_messages"`
 	Attached                bool          `json:"attached,omitempty"`
 	Preview                 string        `json:"preview,omitempty"`
 }

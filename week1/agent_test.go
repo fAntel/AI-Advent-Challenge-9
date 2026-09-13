@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,6 +16,8 @@ type fakeCompleter struct {
 	answers       []string
 	usages        []Usage
 	finishReasons []string
+	failures      []error
+	requests      [][]Message
 	entered       chan struct{}
 	release       chan struct{}
 }
@@ -35,6 +38,14 @@ func (f *fakeCompleter) Complete(ctx context.Context, m []Message, s Settings) (
 	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	f.requests = append(f.requests, append([]Message(nil), m...))
+	if len(f.failures) > 0 {
+		failure := f.failures[0]
+		f.failures = f.failures[1:]
+		if failure != nil {
+			return Completion{}, failure
+		}
+	}
 	answer := "ok"
 	if len(f.answers) > 0 {
 		answer = f.answers[0]
@@ -215,6 +226,120 @@ func TestAgentMarksLengthLimitedAnswerAsTruncated(t *testing.T) {
 	got := waitState(t, a, s.ID, "truncated")
 	if got.Operation.Warning == "" || got.Calls[0].FinishReason != "length" {
 		t.Fatalf("operation=%+v calls=%+v", got.Operation, got.Calls)
+	}
+}
+
+func TestAgentCompressesOldMessagesAndPersistsSummary(t *testing.T) {
+	cfg := testConfig(t)
+	cfg.Agent.RecentMessages = 2
+	cfg.Agent.SummaryBatchMessages = 2
+	fake := &fakeCompleter{answers: []string{"answer one", "answer two", "summary of the first turn"}}
+	a, err := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+	lease, _ := a.Attach(s.ID)
+	if err := a.Submit(s.ID, lease, MessageRequest{Content: "question one"}); err != nil {
+		t.Fatal(err)
+	}
+	waitState(t, a, s.ID, "completed")
+	if err := a.Submit(s.ID, lease, MessageRequest{Content: "question two"}); err != nil {
+		t.Fatal(err)
+	}
+	got := waitState(t, a, s.ID, "completed")
+	if got.Summary != "summary of the first turn" || got.SummaryTokens != 2 || got.SummarizedMessages != 2 {
+		t.Fatalf("summary=%q tokens=%d summarized=%d", got.Summary, got.SummaryTokens, got.SummarizedMessages)
+	}
+	if len(got.Messages) != 2 || got.Messages[0].Content != "question two" || got.Messages[1].Content != "answer two" {
+		t.Fatalf("verbatim messages=%+v", got.Messages)
+	}
+	if len(got.Calls) != 3 || got.Calls[2].Purpose != "summary" || got.Metrics.Requests != 3 {
+		t.Fatalf("calls=%+v metrics=%+v", got.Calls, got.Metrics)
+	}
+	if len(fake.requests) != 3 || !strings.Contains(fake.requests[2][1].Content, "question one") || !strings.Contains(fake.requests[2][1].Content, "answer one") {
+		t.Fatalf("summary request=%+v", fake.requests)
+	}
+	saved, err := a.store.Load(s.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if saved.Summary != got.Summary || len(saved.Messages) != 2 {
+		t.Fatalf("persisted session=%+v", saved)
+	}
+}
+
+func TestAgentCanDisableHistoryCompression(t *testing.T) {
+	cfg := testConfig(t)
+	cfg.Agent.RecentMessages = 2
+	cfg.Agent.SummaryBatchMessages = 2
+	settings := DefaultSettings(cfg)
+	settings.Compression = false
+	fake := &fakeCompleter{answers: []string{"answer one", "answer two"}}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: &settings})
+	lease, _ := a.Attach(s.ID)
+	_ = a.Submit(s.ID, lease, MessageRequest{Content: "question one"})
+	waitState(t, a, s.ID, "completed")
+	_ = a.Submit(s.ID, lease, MessageRequest{Content: "question two"})
+	got := waitState(t, a, s.ID, "completed")
+	if got.Summary != "" || len(got.Messages) != 4 || len(got.Calls) != 2 {
+		t.Fatalf("unexpected compression: summary=%q messages=%d calls=%d", got.Summary, len(got.Messages), len(got.Calls))
+	}
+}
+
+func TestFailedCompressionRetainsRawMessages(t *testing.T) {
+	cfg := testConfig(t)
+	cfg.Agent.RecentMessages = 2
+	cfg.Agent.SummaryBatchMessages = 2
+	fake := &fakeCompleter{
+		answers:  []string{"answer one", "answer two"},
+		failures: []error{nil, nil, errors.New("summary unavailable")},
+	}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	s, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+	lease, _ := a.Attach(s.ID)
+	_ = a.Submit(s.ID, lease, MessageRequest{Content: "question one"})
+	waitState(t, a, s.ID, "completed")
+	_ = a.Submit(s.ID, lease, MessageRequest{Content: "question two"})
+	got := waitState(t, a, s.ID, "completed")
+	if got.Summary != "" || len(got.Messages) != 4 || !strings.Contains(got.Operation.Warning, "summary unavailable") {
+		t.Fatalf("session=%+v", got)
+	}
+}
+
+func TestRequestMessagesUseSummaryBeforeVerbatimHistory(t *testing.T) {
+	settings := DefaultSettings(DefaultConfig())
+	messages := requestMessages("system", "Earlier fact", []Message{{Role: "user", Content: "Newest question"}}, settings, false)
+	if len(messages) != 2 || !strings.Contains(messages[0].Content, "Earlier fact") || messages[1].Content != "Newest question" {
+		t.Fatalf("messages=%+v", messages)
+	}
+}
+
+func TestRecoveryKeepsMessagesWhenCompressionWasInterrupted(t *testing.T) {
+	store := Store{Dir: filepath.Join(t.TempDir(), "sessions")}
+	session := &Session{
+		ID:       strings.Repeat("a", 32),
+		Messages: []Message{{Role: "user", Content: "keep me"}},
+		Operation: &Operation{
+			State: "compressing",
+		},
+	}
+	if err := store.Save(session); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Recover(); err != nil {
+		t.Fatal(err)
+	}
+	got, err := store.Load(session.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Operation.State != "completed" || got.Messages[0].Content != "keep me" || got.Operation.Warning == "" {
+		t.Fatalf("recovered session=%+v", got)
 	}
 }
 func ptrSettings(s Settings) *Settings { return &s }

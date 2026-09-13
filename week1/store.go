@@ -97,6 +97,12 @@ func (s Store) Recover() error {
 			if err := s.Save(&sessions[i]); err != nil {
 				return err
 			}
+		} else if sessions[i].Operation != nil && sessions[i].Operation.State == "compressing" {
+			sessions[i].Operation.State = "completed"
+			sessions[i].Operation.Warning = "daemon stopped while history compression was running; uncompressed messages were retained"
+			if err := s.Save(&sessions[i]); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

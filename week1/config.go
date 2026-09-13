@@ -49,8 +49,11 @@ type DeepSeekConfig struct {
 }
 
 type AgentConfig struct {
-	SystemPrompt        string `toml:"system_prompt"`
-	ContextWindowTokens int    `toml:"context_window_tokens"`
+	SystemPrompt         string `toml:"system_prompt"`
+	ContextWindowTokens  int    `toml:"context_window_tokens"`
+	CompressionEnabled   bool   `toml:"compression_enabled"`
+	RecentMessages       int    `toml:"recent_messages"`
+	SummaryBatchMessages int    `toml:"summary_batch_messages"`
 }
 type ClientConfig struct {
 	PollInterval Duration `toml:"poll_interval"`
@@ -71,8 +74,11 @@ func DefaultConfig() Config {
 			LogPath: logPath, LogMaxBytes: 10 << 20, LogBackups: 3,
 		},
 		DeepSeek: DeepSeekConfig{Endpoint: "https://api.deepseek.com/chat/completions", Model: FlashModel, Reasoning: "none"},
-		Agent:    AgentConfig{ContextWindowTokens: 1_000_000},
-		Client:   ClientConfig{PollInterval: Duration(250 * time.Millisecond), Autostart: true},
+		Agent: AgentConfig{
+			ContextWindowTokens: 1_000_000, CompressionEnabled: true,
+			RecentMessages: 5, SummaryBatchMessages: 5,
+		},
+		Client: ClientConfig{PollInterval: Duration(250 * time.Millisecond), Autostart: true},
 	}
 }
 
@@ -131,11 +137,14 @@ func (c Config) Validate() error {
 	if c.Agent.ContextWindowTokens <= 0 {
 		return errors.New("agent.context_window_tokens must be positive")
 	}
+	if c.Agent.RecentMessages <= 0 || c.Agent.SummaryBatchMessages <= 0 {
+		return errors.New("agent recent_messages and summary_batch_messages must be positive")
+	}
 	return ValidateSettings(Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none"})
 }
 
 func DefaultSettings(c Config) Settings {
-	return Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}}
+	return Settings{Model: c.DeepSeek.Model, Reasoning: c.DeepSeek.Reasoning, Temperature: c.DeepSeek.Temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}, Compression: c.Agent.CompressionEnabled}
 }
 
 func ValidateSettings(s Settings) error {

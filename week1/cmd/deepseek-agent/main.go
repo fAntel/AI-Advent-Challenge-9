@@ -20,7 +20,7 @@ import (
 type options struct {
 	prompt, system, systemFile, formatFile, length, stop, approach, roles, model, reasoning string
 	temperature                                                                             float64
-	temperatureSet, stats, debug                                                            bool
+	temperatureSet, stats, debug, compression                                               bool
 }
 
 func main() {
@@ -83,6 +83,7 @@ func parseOptions(args []string, defaults agent.Settings) (options, agent.Settin
 	fs.BoolVar(&o.stats, "stats", false, "show operation statistics")
 	fs.BoolVar(&o.debug, "debug", false, "return masked HTTP diagnostics")
 	fs.BoolVar(&o.debug, "d", false, "return masked HTTP diagnostics")
+	fs.BoolVar(&o.compression, "compression", defaults.Compression, "compress older conversation history")
 	_ = fs.Parse(args)
 	s := defaults
 	s.Model = o.model
@@ -92,6 +93,7 @@ func parseOptions(args []string, defaults agent.Settings) (options, agent.Settin
 	s.Stop = o.stop
 	s.Stats = o.stats
 	s.Debug = o.debug
+	s.Compression = o.compression
 	if o.temperatureSet {
 		s.Temperature = &o.temperature
 	}
@@ -240,7 +242,7 @@ func runSession(api *agent.APIClient, cfg agent.Config, id, initial string, sett
 	fatalIf(err)
 	if current.Operation != nil {
 		switch current.Operation.State {
-		case "running":
+		case "running", "compressing":
 			wait(api, cfg, id, settings)
 		case "awaiting_input":
 			if len(current.Messages) > 0 {
@@ -307,7 +309,7 @@ func wait(api *agent.APIClient, cfg agent.Config, id string, settings agent.Sett
 			continue
 		}
 		switch s.Operation.State {
-		case "running":
+		case "running", "compressing":
 			continue
 		case "awaiting_input", "completed", "truncated":
 			if len(s.Messages) > 0 {
@@ -340,10 +342,19 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		}
 		return true
 	case "help":
-		fmt.Println("/settings /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /debug /retry /discard /exit")
+		fmt.Println("/settings /summary /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
 	case "settings":
 		data, _ := json.MarshalIndent(s, "", "  ")
 		fmt.Println(string(data))
+	case "summary":
+		current, err := api.Get(id)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else if current.Summary == "" {
+			fmt.Println("No conversation summary yet.")
+		} else {
+			fmt.Printf("Conversation summary (%d messages):\n%s\n", current.SummarizedMessages, current.Summary)
+		}
 	case "model":
 		s.Model = value
 		validate(s)
@@ -389,6 +400,15 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 			s.Stats = false
 		default:
 			fmt.Fprintln(os.Stderr, "usage: /stats [on|off]")
+		}
+	case "compression":
+		switch value {
+		case "on":
+			s.Compression = true
+		case "off":
+			s.Compression = false
+		default:
+			fmt.Fprintln(os.Stderr, "usage: /compression on|off")
 		}
 	case "debug":
 		s.Debug = value != "off"
@@ -437,7 +457,24 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 		fmt.Fprintln(w, "Session token stats: no completed API calls yet")
 		return
 	}
+	answerCalls := make([]agent.CallMetrics, 0, len(s.Calls))
+	var summaryMetrics agent.Metrics
+	for _, call := range s.Calls {
+		if call.Purpose == "summary" {
+			summaryMetrics.Requests++
+			summaryMetrics.Duration += call.Duration
+			summaryMetrics.Usage.PromptTokens += call.Usage.PromptTokens
+			summaryMetrics.Usage.CompletionTokens += call.Usage.CompletionTokens
+			summaryMetrics.Usage.TotalTokens += call.Usage.TotalTokens
+			summaryMetrics.CostUSD += call.CostUSD
+		} else {
+			answerCalls = append(answerCalls, call)
+		}
+	}
 	latest := s.Calls[len(s.Calls)-1]
+	if len(answerCalls) > 0 {
+		latest = answerCalls[len(answerCalls)-1]
+	}
 	u := latest.Usage
 	limit := s.ContextWindowTokens
 	if limit <= 0 {
@@ -445,7 +482,7 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 	}
 	percent := 100 * float64(u.PromptTokens) / float64(limit)
 	fmt.Fprintln(w, "Session token stats:")
-	fmt.Fprintf(w, "  latest API call: input context=%d (cache hit=%d, miss=%d), model answer=%d, total=%d\n", u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens, u.CompletionTokens, u.TotalTokens)
+	fmt.Fprintf(w, "  latest answer request: input context=%d (cache hit=%d, miss=%d), model answer=%d, total=%d\n", u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens, u.CompletionTokens, u.TotalTokens)
 	if u.ReasoningTokens > 0 {
 		fmt.Fprintf(w, "  latest reasoning tokens: %d\n", u.ReasoningTokens)
 	}
@@ -453,11 +490,15 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 	t := s.Metrics
 	fmt.Fprintf(w, "  whole dialog: calls=%d, cumulative input=%d, model answers=%d, total=%d\n", t.Requests, t.Usage.PromptTokens, t.Usage.CompletionTokens, t.Usage.TotalTokens)
 	fmt.Fprintf(w, "  estimated dialog cost: $%.8f USD\n", t.CostUSD)
+	fmt.Fprintf(w, "  history memory: summarized=%d messages, verbatim=%d messages, summary=%d tokens\n", s.SummarizedMessages, len(s.Messages), s.SummaryTokens)
+	if summaryMetrics.Requests > 0 {
+		fmt.Fprintf(w, "  compression overhead: calls=%d, input=%d, output=%d, total=%d, cost=$%.8f USD\n", summaryMetrics.Requests, summaryMetrics.Usage.PromptTokens, summaryMetrics.Usage.CompletionTokens, summaryMetrics.Usage.TotalTokens, summaryMetrics.CostUSD)
+	}
 	if !s.TokenAccountingComplete {
 		fmt.Fprintln(w, "  note: cumulative totals cover only calls made after token tracking was added")
 	}
-	if len(s.Calls) > 1 {
-		first := s.Calls[0].Usage.PromptTokens
+	if len(answerCalls) > 1 {
+		first := answerCalls[0].Usage.PromptTokens
 		delta := u.PromptTokens - first
 		fmt.Fprintf(w, "  input-context growth: %d -> %d (%+d tokens)\n", first, u.PromptTokens, delta)
 	}

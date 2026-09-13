@@ -108,7 +108,8 @@ the TOML `[agent]` section:
 
 The Week 0 controls remain available as long flags (with the original short
 forms where applicable): `--format`, `--length`, `--stop`, `--approach`,
-`--roles`, `--temperature`, `--model`, `--reasoning`, `--stats`, and `--debug`.
+`--roles`, `--temperature`, `--model`, `--reasoning`, `--stats`,
+`--compression`, and `--debug`.
 In the REPL, `/help` lists their command equivalents and `/settings` displays
 the current values.
 
@@ -118,7 +119,7 @@ After every successful API call, the agent stores DeepSeek's returned usage
 alongside the session. These are the authoritative server-side counts rather
 than a local tokenizer estimate. The statistics distinguish:
 
-- **latest API-call input context** (`prompt_tokens`): the system prompt plus
+- **latest answer-request input context** (`prompt_tokens`): the system prompt plus
   the complete dialog history sent to the model, including the newest message;
 - **latest model answer** (`completion_tokens`);
 - **whole dialog**: cumulative input, output, total tokens, API calls, and
@@ -130,10 +131,11 @@ after every answer and `/stats off` disables that automatic per-answer output.
 
 ```text
 Session token stats:
-  latest API call: input context=200 (cache hit=30, miss=170), model answer=25, total=225
+  latest answer request: input context=200 (cache hit=30, miss=170), model answer=25, total=225
   context window: 200 / 1000000 (0.02%)
   whole dialog: calls=2, cumulative input=220, model answers=30, total=250
   estimated dialog cost: $0.00003508 USD
+  history memory: summarized=0 messages, verbatim=4 messages, summary=0 tokens
   input-context growth: 20 -> 200 (+180 tokens)
   latest finish reason: stop
 ```
@@ -186,6 +188,60 @@ finish reason in its [Chat Completion API reference](https://api-docs.deepseek.c
 and notes that local tokenizers only estimate API usage in its
 [token usage guide](https://api-docs.deepseek.com/quick_start/token_usage/).
 
+## History compression
+
+History compression is enabled by default for new sessions. The default policy
+keeps the newest five messages verbatim. When another batch of five messages
+becomes old enough, the agent asks DeepSeek to merge that batch with the
+existing conversation summary. It then persists the updated summary separately
+and removes only that successfully summarized batch from the raw history.
+
+Subsequent answer requests contain, in order:
+
+1. the session system prompt and stored conversation summary;
+2. the remaining recent messages as-is;
+3. the newest user message.
+
+The summary prompt asks the model for at most 300 words while retaining user
+preferences, facts, decisions, constraints, commitments, names, and unresolved
+questions. A failed or token-limited summary is not installed and its source
+messages are not removed.
+Compression API calls are included in cumulative token and cost totals and are
+reported separately as `compression overhead` by `/stats`. `/summary` prints
+the stored summary and the number of messages it replaces. Debug logging adds
+`history.compression.start`, `history.compression.complete`, and
+`history.compression.failed` lifecycle records.
+
+Configure the policy in `[agent]`:
+
+```toml
+compression_enabled = true
+recent_messages = 5
+summary_batch_messages = 5
+```
+
+Use `/compression on` or `/compression off` to change the behavior for future
+messages in the current session. Disabling compression does not reconstruct
+messages that were already summarized. For a clean comparison, create two new
+sessions:
+
+```sh
+# Full, uncompressed history
+./deepseek-agent --compression=false --stats
+
+# Default compressed history
+./deepseek-agent --compression=true --stats
+```
+
+Give both sessions the same sequence: establish a distinctive fact in the
+first message, continue for at least five turns, and finally ask the agent to
+recall and use that fact. Compare answer correctness and detail, then compare
+the latest answer-request input, cumulative totals, and compression overhead in
+`/stats`. Use `/summary` in the compressed session to show what replaced the
+older raw messages. Sessions created by builds predating this feature keep
+compression disabled until `/compression on` is used, avoiding unexpected
+removal of their existing raw history.
+
 `/stop TEXT` enables the clarification workflow for subsequent requests and
 keeps that sequence until it is replaced. `/unset stop` returns to ordinary
 chat. The agent uses the whole session history during clarification:
@@ -223,11 +279,11 @@ the complete existing log and continues printing new events; `Ctrl+C` stops
 watching without stopping the daemon.
 
 The private, mode-`0600` log records session loading, attachment, API request
-and response, token usage and estimated cost, answer receipt, saving, lease
-expiry, and RAM eviction. HTTP authorization is always written as
-`Bearer [REDACTED]`, and literal occurrences of the API key are redacted from
-headers, bodies, URLs, and errors. Logs rotate at 10 MiB by default and retain
-three backups.
+and response, token usage and estimated cost, history compression, answer
+receipt, saving, lease expiry, and RAM eviction. HTTP authorization is always
+written as `Bearer [REDACTED]`, and literal occurrences of the API key are
+redacted from headers, bodies, URLs, and errors. Logs rotate at 10 MiB by
+default and retain three backups.
 
 Debug logs still contain complete prompts, system prompts, conversation data,
 and model answers. Treat them as sensitive. The client `/debug` setting is

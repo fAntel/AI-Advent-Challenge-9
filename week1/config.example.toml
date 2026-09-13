@@ -21,6 +21,11 @@ reasoning = "none"
 [agent]
 # Used to show how much of the model's input context the latest request used.
 context_window_tokens = 1000000
+# Keep the newest messages verbatim. Once another batch becomes old enough,
+# replace that batch with an updated summary.
+compression_enabled = true
+recent_messages = 5
+summary_batch_messages = 5
 system_prompt = """
 You are a helpful assistant.
 Answer accurately and clearly.
