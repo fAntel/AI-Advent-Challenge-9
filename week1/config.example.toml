@@ -1,0 +1,29 @@
+[daemon]
+# Paths beginning with ~/ are expanded for the daemon user.
+socket_path = "~/.local/state/deepseek-agent/agent.sock"
+session_dir = "~/.local/state/deepseek-agent/sessions"
+request_timeout = "5m"
+lease_timeout = "30s"
+evict_after = "2s"
+
+# Debug logging is disabled by default. The command-line --debug flag also
+# enables it without changing this file.
+debug = false
+log_path = "~/Library/Logs/deepseek-agent/agentd.log"
+log_max_bytes = 10485760
+log_backups = 3
+
+[deepseek]
+endpoint = "https://api.deepseek.com/chat/completions"
+model = "deepseek-v4-flash"
+reasoning = "none"
+
+[agent]
+system_prompt = """
+You are a helpful assistant.
+Answer accurately and clearly.
+"""
+
+[client]
+poll_interval = "250ms"
+autostart = true

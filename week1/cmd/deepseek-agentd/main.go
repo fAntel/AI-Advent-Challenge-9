@@ -1,0 +1,98 @@
+package main
+
+import (
+	"context"
+	agent "deepseek-agent"
+	"flag"
+	"fmt"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
+)
+
+func main() {
+	debug := flag.Bool("debug", false, "enable private debug logging")
+	stop := flag.Bool("stop", false, "stop the running daemon")
+	flag.Parse()
+	cfg, err := agent.LoadConfig()
+	if err != nil {
+		fatal(err)
+	}
+	if *debug {
+		cfg.Daemon.Debug = true
+	}
+	stopRequested := *stop || (flag.NArg() == 1 && flag.Arg(0) == "stop")
+	if flag.NArg() > 1 || (flag.NArg() == 1 && flag.Arg(0) != "stop") {
+		fatal(fmt.Errorf("usage: deepseek-agentd [--debug] | deepseek-agentd stop"))
+	}
+	if stopRequested {
+		client := agent.NewAPIClient(cfg.Daemon.SocketPath, 5*time.Second)
+		if err := client.Shutdown(); err != nil {
+			fatal(fmt.Errorf("stop daemon: %w", err))
+		}
+		fmt.Fprintln(os.Stderr, "deepseek-agentd stopped")
+		return
+	}
+	key := os.Getenv("DEEPSEEK_API_KEY")
+	if key == "" {
+		fatal(fmt.Errorf("DEEPSEEK_API_KEY is not set; start the daemon from a shell that exports it"))
+	}
+	logger := agent.NewDebugLogger(cfg.Daemon, key)
+	logger.Log("daemon.start", "", "", "daemon starting; API key present=true")
+	if err := os.MkdirAll(filepath.Dir(cfg.Daemon.SocketPath), 0700); err != nil {
+		fatal(err)
+	}
+	_ = os.Chmod(filepath.Dir(cfg.Daemon.SocketPath), 0700)
+	if info, err := os.Lstat(cfg.Daemon.SocketPath); err == nil {
+		if info.Mode()&os.ModeSocket == 0 {
+			fatal(fmt.Errorf("socket path exists and is not a socket: %s", cfg.Daemon.SocketPath))
+		}
+		if existing, dialErr := net.DialTimeout("unix", cfg.Daemon.SocketPath, 250*time.Millisecond); dialErr == nil {
+			_ = existing.Close()
+			fatal(fmt.Errorf("deepseek-agentd is already running at %s", cfg.Daemon.SocketPath))
+		}
+		_ = os.Remove(cfg.Daemon.SocketPath)
+	}
+	ln, err := net.Listen("unix", cfg.Daemon.SocketPath)
+	if err != nil {
+		fatal(err)
+	}
+	_ = os.Chmod(cfg.Daemon.SocketPath, 0600)
+	httpClient := &http.Client{Timeout: time.Duration(cfg.Daemon.RequestTimeout)}
+	llm := &agent.DeepSeekClient{HTTP: httpClient, Endpoint: cfg.DeepSeek.Endpoint, APIKey: key, Logger: logger}
+	a, err := agent.NewAgent(cfg, llm, logger)
+	if err != nil {
+		fatal(err)
+	}
+	shutdownRequested := make(chan struct{}, 1)
+	handler := agent.Server{Agent: a, Shutdown: func() {
+		select {
+		case shutdownRequested <- struct{}{}:
+		default:
+		}
+	}}
+	server := &http.Server{Handler: handler.Handler(), ReadHeaderTimeout: 5 * time.Second}
+	go func() {
+		if err := server.Serve(ln); err != nil && err != http.ErrServerClosed {
+			fatal(err)
+		}
+	}()
+	fmt.Fprintf(os.Stderr, "deepseek-agentd listening on %s\n", cfg.Daemon.SocketPath)
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+	select {
+	case <-signals:
+	case <-shutdownRequested:
+	}
+	logger.Log("daemon.shutdown", "", "", "graceful shutdown")
+	shutdownContext, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
+	_ = server.Shutdown(shutdownContext)
+	cancelShutdown()
+	a.Close()
+	_ = os.Remove(cfg.Daemon.SocketPath)
+}
+func fatal(err error) { fmt.Fprintln(os.Stderr, "error:", err); os.Exit(1) }

@@ -9,7 +9,7 @@ the `Week0 Task0` commit represents the first day of the first week.
 Week directories include:
 
 - `week0/`
-- `week1/`
+- `week1/` — a persistent DeepSeek agent daemon and chat CLI
 - and so on
 
 Many assignments include a video demonstration. These videos are collected in the [AI Advent Challenge #9 playlist](https://www.youtube.com/playlist?list=PLY0ndpx99mvs).
