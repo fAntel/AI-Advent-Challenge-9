@@ -113,6 +113,23 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, map[string]string{"state": "running"}, s.Agent.Retry(id, token(r)), 202)
 	case "discard":
 		s.respond(w, map[string]bool{"ok": true}, s.Agent.Discard(id, token(r)), 200)
+	case "continue":
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		s.respond(w, map[string]string{"state": "running"}, s.Agent.ContinueTask(id, token(r)), http.StatusAccepted)
+	case "back":
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		var req TaskBackRequest
+		if e := decodeJSON(w, r, &req); e != nil {
+			s.respond(w, nil, e, 0)
+			return
+		}
+		s.respond(w, map[string]string{"state": "running"}, s.Agent.BackTask(id, token(r), req.Phase), http.StatusAccepted)
 	case "checkpoints":
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)

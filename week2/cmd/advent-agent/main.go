@@ -216,11 +216,7 @@ func resume(api *agent.APIClient, cfg agent.Config, args []string) {
 			fatal(errors.New("no saved sessions"))
 		}
 		for i, s := range sessions {
-			state := "idle"
-			if s.Operation != nil {
-				state = s.Operation.State
-			}
-			fmt.Printf("%d) %s  %-14s %s  %s\n", i+1, s.ID, state, s.UpdatedAt.Local().Format("2006-01-02 15:04"), s.Preview)
+			fmt.Printf("%d) %s  %-20s %s  %s\n", i+1, s.ID, sessionLifecycleLabel(s), s.UpdatedAt.Local().Format("2006-01-02 15:04"), sessionListPreview(s))
 		}
 		fmt.Print("Session: ")
 		line, _ := bufio.NewReader(os.Stdin).ReadString('\n')
@@ -234,6 +230,33 @@ func resume(api *agent.APIClient, cfg agent.Config, args []string) {
 	fatalIf(err)
 	_, settings := parseOptions(optionArgs, session.Settings)
 	runSession(api, cfg, id, "", settings)
+}
+
+func sessionLifecycleLabel(session agent.Session) string {
+	if session.Task != nil {
+		return session.Task.Phase + "/" + session.Task.Status
+	}
+	if session.Operation != nil {
+		return "legacy/" + session.Operation.State
+	}
+	return "empty"
+}
+
+func sessionListPreview(session agent.Session) string {
+	if session.Task != nil {
+		return session.Task.Objective
+	}
+	if session.Preview != "" {
+		return session.Preview
+	}
+	if len(session.Messages) > 0 {
+		preview := session.Messages[0].Content
+		if len(preview) > 60 {
+			preview = preview[:60]
+		}
+		return preview
+	}
+	return "(no task started)"
 }
 
 func ensureDaemon(api *agent.APIClient, cfg agent.Config) error {
@@ -340,6 +363,7 @@ func runAttachedSession(api *agent.APIClient, cfg agent.Config, id, initial stri
 			}
 		}
 	}
+	printTaskState(os.Stderr, &current, false)
 	done := make(chan struct{})
 	go func() {
 		t := time.NewTicker(time.Duration(cfg.Daemon.LeaseTimeout) / 3)
@@ -404,6 +428,7 @@ func wait(api *agent.APIClient, cfg agent.Config, id string, settings agent.Sett
 				fmt.Fprintln(os.Stderr, "Warning:", s.Operation.Warning)
 			}
 			printExtras(&s)
+			printTaskState(os.Stderr, &s, false)
 			return s.Operation.State
 		case "failed", "interrupted":
 			fmt.Fprintln(os.Stderr, "agent:", s.Operation.State+":", s.Operation.Error)
@@ -433,7 +458,30 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		}
 		return commandResult{exit: true}
 	case "help":
-		fmt.Println("/memory [short|working|long] /remember SCOPE KEY VALUE /memory edit SCOPE KEY VALUE /memory move SOURCE KEY DESTINATION /forget SCOPE KEY /clear /instructions /settings /summary /strategy /checkpoint /checkpoints /branch /branches /switch /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
+		fmt.Println("/task /continue /back [planning|execution|validation] /memory [short|working|long] /remember SCOPE KEY VALUE /memory edit SCOPE KEY VALUE /memory move SOURCE KEY DESTINATION /forget SCOPE KEY /clear /instructions /settings /summary /strategy /checkpoint /checkpoints /branch /branches /switch /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
+	case "task":
+		current, err := api.Get(id)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else {
+			printTaskState(os.Stdout, &current, true)
+		}
+	case "continue":
+		if value != "" {
+			fmt.Fprintln(os.Stderr, "usage: /continue")
+		} else if err := api.ContinueTask(id, lease); err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else {
+			wait(api, cfg, id, *s)
+		}
+	case "back":
+		if len(strings.Fields(value)) > 1 {
+			fmt.Fprintln(os.Stderr, "usage: /back [planning|execution|validation]")
+		} else if err := api.BackTask(id, lease, value); err != nil {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		} else {
+			wait(api, cfg, id, *s)
+		}
 	case "settings":
 		data, _ := json.MarshalIndent(s, "", "  ")
 		fmt.Println(string(data))
@@ -747,6 +795,36 @@ func printExtras(session *agent.Session) {
 	}
 	if o.Settings.Debug && o.Diagnostics != "" {
 		fmt.Fprint(os.Stderr, o.Diagnostics)
+	}
+}
+
+func printTaskState(w io.Writer, session *agent.Session, history bool) {
+	task := session.Task
+	if task == nil {
+		if history {
+			fmt.Fprintln(w, "No active task.")
+		}
+		return
+	}
+	fmt.Fprintf(w, "Task %s\n", task.ID)
+	fmt.Fprintf(w, "  objective: %s\n", task.Objective)
+	fmt.Fprintf(w, "  state: %s\n", task.Phase)
+	fmt.Fprintf(w, "  status: %s\n", task.Status)
+	fmt.Fprintf(w, "  expected action: %s\n", task.ExpectedAction)
+	if !history {
+		return
+	}
+	if len(task.Attempts) == 0 {
+		fmt.Fprintln(w, "  phase history: (none)")
+		return
+	}
+	fmt.Fprintln(w, "  phase history:")
+	for i, attempt := range task.Attempts {
+		authority := "authoritative"
+		if attempt.Superseded {
+			authority = "superseded"
+		}
+		fmt.Fprintf(w, "    %d. %s — %s, %s\n", i+1, attempt.Phase, attempt.Status, authority)
 	}
 }
 

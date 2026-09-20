@@ -63,6 +63,40 @@ type Operation struct {
 	Metrics     Metrics       `json:"metrics"`
 	Calls       []CallMetrics `json:"calls,omitempty"`
 	BaseCount   int           `json:"base_count"`
+	TaskBefore  *TaskState    `json:"task_before,omitempty"`
+}
+
+const (
+	TaskPhasePlanning   = "planning"
+	TaskPhaseExecution  = "execution"
+	TaskPhaseValidation = "validation"
+	TaskPhaseDone       = "done"
+
+	TaskStatusRunning  = "running"
+	TaskStatusPaused   = "paused"
+	TaskStatusFailed   = "failed"
+	TaskStatusTerminal = "terminal"
+)
+
+type TaskAttempt struct {
+	ID         string     `json:"id"`
+	Phase      string     `json:"phase"`
+	Output     string     `json:"output"`
+	Status     string     `json:"status"`
+	StartedAt  time.Time  `json:"started_at"`
+	FinishedAt *time.Time `json:"finished_at,omitempty"`
+	Superseded bool       `json:"superseded,omitempty"`
+}
+
+type TaskState struct {
+	ID             string        `json:"id"`
+	Objective      string        `json:"objective"`
+	Phase          string        `json:"phase"`
+	Status         string        `json:"status"`
+	ExpectedAction string        `json:"expected_action"`
+	CreatedAt      time.Time     `json:"created_at"`
+	UpdatedAt      time.Time     `json:"updated_at"`
+	Attempts       []TaskAttempt `json:"attempts,omitempty"`
 }
 
 type Session struct {
@@ -77,6 +111,7 @@ type Session struct {
 	Settings                Settings            `json:"settings"`
 	Messages                []Message           `json:"messages"`
 	Operation               *Operation          `json:"operation,omitempty"`
+	Task                    *TaskState          `json:"task,omitempty"`
 	Metrics                 Metrics             `json:"metrics"`
 	Calls                   []CallMetrics       `json:"calls,omitempty"`
 	ContextWindowTokens     int                 `json:"context_window_tokens"`
@@ -107,6 +142,7 @@ type Checkpoint struct {
 	SummaryTokens      int               `json:"summary_tokens,omitempty"`
 	SummarizedMessages int               `json:"summarized_messages,omitempty"`
 	Facts              map[string]string `json:"facts,omitempty"`
+	Task               *TaskState        `json:"task,omitempty"`
 }
 
 type InstructionSource struct {
@@ -138,6 +174,10 @@ type CheckpointRequest struct {
 type BranchRequest struct {
 	Name       string `json:"name"`
 	Checkpoint string `json:"checkpoint"`
+}
+
+type TaskBackRequest struct {
+	Phase string `json:"phase,omitempty"`
 }
 
 type MemoryMutationRequest struct {

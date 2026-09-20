@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 )
 
 type Store struct{ Dir string }
@@ -140,21 +141,54 @@ func (s Store) Recover() error {
 		return err
 	}
 	for i := range sessions {
+		changed := false
 		if sessions[i].Operation != nil && sessions[i].Operation.State == "running" {
 			sessions[i].Operation.State = "interrupted"
 			sessions[i].Operation.Error = "daemon stopped while request was running"
-			if err := s.Save(&sessions[i]); err != nil {
-				return err
+			if sessions[i].Task != nil {
+				sessions[i].Task.Status = TaskStatusFailed
+				sessions[i].Task.ExpectedAction = taskExpectedAction(sessions[i].Task.Phase, TaskStatusFailed)
+				sessions[i].Task.UpdatedAt = time.Now().UTC()
 			}
+			changed = true
 		} else if sessions[i].Operation != nil && sessions[i].Operation.State == "compressing" {
 			sessions[i].Operation.State = "completed"
 			sessions[i].Operation.Warning = "daemon stopped while history compression was running; uncompressed messages were retained"
+			changed = true
+		}
+		if invalidateUnsupportedToolAttempt(&sessions[i]) {
+			changed = true
+		}
+		if changed {
 			if err := s.Save(&sessions[i]); err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func invalidateUnsupportedToolAttempt(session *Session) bool {
+	if session.Task == nil || session.Task.Status != TaskStatusPaused || session.Operation == nil {
+		return false
+	}
+	for i := len(session.Task.Attempts) - 1; i >= 0; i-- {
+		attempt := &session.Task.Attempts[i]
+		if attempt.Phase != session.Task.Phase || attempt.Superseded {
+			continue
+		}
+		if attempt.Status == "completed" && containsUnsupportedToolCall(attempt.Output) {
+			attempt.Status = "failed"
+			session.Task.Status = TaskStatusFailed
+			session.Task.ExpectedAction = taskExpectedAction(session.Task.Phase, TaskStatusFailed)
+			session.Task.UpdatedAt = time.Now().UTC()
+			session.Operation.State = "failed"
+			session.Operation.Error = "model attempted to call a tool, but this harness has no tool executor; use /retry to request a text-only result or /discard"
+			return true
+		}
+		return false
+	}
+	return false
 }
 func (s Store) find(id string) (string, error) {
 	if !validID(id) {

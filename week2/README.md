@@ -1,9 +1,28 @@
-# advent-agent — Week 2 Task 0
+# advent-agent — Week 2 Task 2
 
 `advent-agent` is a persistent, provider-neutral chat harness with explicit,
 profile-scoped memory. The shipped provider adapter is DeepSeek. The CLI talks
 to `advent-agentd` over a private Unix socket; the daemon owns requests,
 sessions, compression, branches, accounting, and persistence.
+
+Every user task is controlled by a persisted daemon-owned lifecycle:
+
+```text
+planning → execution → validation → done
+```
+
+Each phase makes an answer request and then pauses. `/continue` advances one
+phase. A normal message while paused is feedback and reruns the current phase;
+it cannot skip or change the lifecycle state. `/back` reruns the immediately
+preceding phase, while `/back planning|execution|validation` returns to a named
+earlier phase. After `done`, the next normal message starts a new task in the
+same session.
+
+The provider has no shell, filesystem, network, or other tool executor.
+Execution therefore returns the best code, prose, patch, or instructions it can
+produce in text. If a provider emits raw tool-call syntax such as DSML anyway,
+the daemon rejects that phase as failed instead of treating it as completed;
+use `/retry` for a text-only result or `/discard` to restore the prior phase.
 
 ## Build and test
 
@@ -56,6 +75,12 @@ are stored in the session. Editing a source file does not alter old sessions.
 
 Session listing, resume, deletion, and branches are restricted to the selected
 profile. A session cannot change profile.
+
+The resume picker reports task lifecycle state rather than the last request
+state: for example, `planning/paused`, `execution/failed`, or `done/terminal`.
+`empty` means the session was created but no task was submitted.
+`legacy/completed` identifies a conversation saved before task lifecycle state
+was introduced; its final provider request completed, but it has no task phase.
 
 ## Three memory scopes
 
@@ -123,18 +148,29 @@ temporary files and atomic replacement.
 /forget SCOPE KEY
 /clear
 /instructions
+/task
+/continue
+/back [planning|execution|validation]
 ```
 
 Memory placement is always explicit; nothing is promoted automatically.
 Mutations are rejected while an answer or compression operation is active.
-`/clear` removes only the current session's dialog and summary. Metrics,
-working memory, and long-term memory remain.
+`/clear` removes the current task together with the session's dialog and
+summary. Metrics, working memory, and long-term memory remain.
 
 Every answer reloads memory, so CRUD changes affect the next prompt. Prompt
-context order is snapshotted instructions, long-term INI, working INI, rolling
-summary, then current dialog. Memory blocks are labeled contextual data, not
+context order is snapshotted instructions, the harness-owned task block,
+long-term INI, working INI, rolling summary, then current dialog. The task
+block contains the original objective, current phase, fixed phase instruction,
+and relevant prior attempts. Memory blocks are labeled contextual data, not
 behavioral instructions. Factual conflict precedence is current dialog >
 working memory > long-term memory.
+
+`/task` displays the objective, phase, status, deterministic expected action,
+and phase-attempt history. Failed or daemon-interrupted phase calls remain in
+that phase: `/retry` reruns them and `/discard` restores the exact pre-operation
+task snapshot. Checkpoints include task state, so branches evolve independently
+from the selected snapshot while profile and project memories remain shared.
 
 The supported context strategies are `full`, `summary`, `sliding`, and
 `branching`. Week 1 compression, token/cost accounting, leases, daemon
@@ -147,19 +183,15 @@ explicit.
 
 After `make test && make build`, use the rebuilt `week2/advent-agent`:
 
-1. Run `./advent-agent --profile coding`, then store a long-term preference
-   and project constraint with `/remember preference ...` and `/remember
-   working ...`; ask a question that makes both visible.
-2. Start another coding session in the same directory and use `/memory` to
-   show both persist.
-3. Run the coding profile from another Git repository or directory; `/memory`
-   shows long-term memory but an empty working section.
-4. Run `./advent-agent --profile writer resume`; its session list, profile
-   config (including temperature/model), snapshotted `/instructions`, and
-   memory are independent.
-5. Store writer tone and genre entries, ask for prose, then use `/memory edit`,
-   `/memory move`, and `/forget` and ask again to show immediate changes.
-6. Run `/clear`, followed by `/memory`, to show only dialog and rolling summary
-   were removed.
+1. Run `./advent-agent --profile coding`, enter a task, and use `/task` to
+   inspect the paused `planning` state.
+2. Exit and run `./advent-agent --profile coding resume SESSION_ID`; `/task`
+   shows the objective and plan without asking for either again.
+3. Send planning feedback and inspect the superseded attempt with `/task`, then
+   use `/continue` to run `execution`.
+4. Use `/back planning` to revise from an earlier phase, then `/continue`
+   through `execution`, `validation`, and `done`, inspecting every pause.
+5. Start a second task with a normal message after `done`. Use `/clear` to show
+   task/dialog state is removed while `/memory` and `/stats` remain.
 
 See `config.example.toml` for all harness settings.

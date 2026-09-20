@@ -112,6 +112,14 @@ func (c *APIClient) Discard(id, t string) error {
 	_, e := c.do("POST", "/v1/sessions/"+id+"/discard", t, nil, nil)
 	return e
 }
+func (c *APIClient) ContinueTask(id, t string) error {
+	_, e := c.do("POST", "/v1/sessions/"+id+"/continue", t, nil, nil)
+	return e
+}
+func (c *APIClient) BackTask(id, t, phase string) error {
+	_, e := c.do("POST", "/v1/sessions/"+id+"/back", t, TaskBackRequest{Phase: phase}, nil)
+	return e
+}
 func (c *APIClient) CreateCheckpoint(id, t, name string) (Checkpoint, error) {
 	var checkpoint Checkpoint
 	_, e := c.do("POST", "/v1/sessions/"+id+"/checkpoints", t, CheckpointRequest{Name: name}, &checkpoint)

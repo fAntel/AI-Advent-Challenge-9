@@ -126,7 +126,7 @@ func TestMemoryPromptOrderAndImmediateCRUD(t *testing.T) {
 	}
 	waitState(t, a, s.ID, "completed")
 	prompt := fake.requests[0][0].Content
-	indices := []int{strings.Index(prompt, "shared rules"), strings.Index(prompt, "coding rules"), strings.Index(prompt, "[preferences]"), strings.Index(prompt, "[working]")}
+	indices := []int{strings.Index(prompt, "shared rules"), strings.Index(prompt, "coding rules"), strings.Index(prompt, "<harness-task>"), strings.Index(prompt, "[preferences]"), strings.Index(prompt, "[working]")}
 	for i := 1; i < len(indices); i++ {
 		if indices[i] <= indices[i-1] {
 			t.Fatalf("prompt order %v:\n%s", indices, prompt)
@@ -172,7 +172,7 @@ func TestClearOnlyShortTermAndMutationRejectedWhileActive(t *testing.T) {
 		t.Fatal(err)
 	}
 	got, _ := a.Get(s.ID)
-	if len(got.Messages) != 0 || got.Summary != "" || got.Metrics.Requests != 1 {
+	if len(got.Messages) != 0 || got.Summary != "" || got.Task != nil || got.Metrics.Requests != 1 {
 		t.Fatalf("cleared session=%+v", got)
 	}
 	view, _ := a.Memory(s.ID)

@@ -116,7 +116,7 @@ func TestAgentPersistsBackgroundAnswerAfterDetach(t *testing.T) {
 	t.Fatal("background answer was not persisted")
 }
 
-func TestClarificationUsesPersistedWorkflow(t *testing.T) {
+func TestTaskFeedbackRerunsCurrentPhaseAndIgnoresStopWorkflow(t *testing.T) {
 	cfg := testConfig(t)
 	fake := &fakeCompleter{answers: []string{"Which city?", "Final answer"}}
 	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
@@ -128,12 +128,15 @@ func TestClarificationUsesPersistedWorkflow(t *testing.T) {
 	if err := a.Submit(s.ID, lease, MessageRequest{Content: "Plan a trip"}); err != nil {
 		t.Fatal(err)
 	}
-	waitState(t, a, s.ID, "awaiting_input")
+	first := waitState(t, a, s.ID, "completed")
+	if first.Task.Phase != TaskPhasePlanning || first.Task.Status != TaskStatusPaused {
+		t.Fatalf("task=%+v", first.Task)
+	}
 	if err := a.Submit(s.ID, lease, MessageRequest{Content: "Paris READY"}); err != nil {
 		t.Fatal(err)
 	}
 	got := waitState(t, a, s.ID, "completed")
-	if len(got.Messages) != 4 || got.Messages[3].Content != "Final answer" {
+	if len(got.Messages) != 4 || got.Messages[3].Content != "Final answer" || got.Task.Phase != TaskPhasePlanning || got.Task.Status != TaskStatusPaused {
 		t.Fatalf("messages=%+v", got.Messages)
 	}
 }
@@ -224,7 +227,7 @@ func TestAgentMarksLengthLimitedAnswerAsTruncated(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := waitState(t, a, s.ID, "truncated")
-	if got.Operation.Warning == "" || got.Calls[0].FinishReason != "length" {
+	if got.Operation.Warning == "" || got.Calls[0].FinishReason != "length" || got.Task.Status != TaskStatusPaused || got.Task.Attempts[0].Status != "truncated" {
 		t.Fatalf("operation=%+v calls=%+v", got.Operation, got.Calls)
 	}
 }
@@ -344,6 +347,53 @@ func TestRecoveryKeepsMessagesWhenCompressionWasInterrupted(t *testing.T) {
 	}
 }
 
+func TestRecoveryMarksInterruptedTaskFailed(t *testing.T) {
+	store := Store{Dir: filepath.Join(t.TempDir(), "sessions")}
+	now := time.Now().UTC()
+	session := &Session{
+		ID:      strings.Repeat("b", 32),
+		Profile: DefaultProfile,
+		Task:    &TaskState{ID: "task", Objective: "objective", Phase: TaskPhaseExecution, Status: TaskStatusRunning, CreatedAt: now, UpdatedAt: now},
+		Operation: &Operation{
+			ID: "operation", State: "running",
+		},
+	}
+	if err := store.Save(session); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Recover(); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := store.Load(session.ID)
+	if got.Operation.State != "interrupted" || got.Task.Status != TaskStatusFailed || !strings.Contains(got.Task.ExpectedAction, "/retry") {
+		t.Fatalf("recovered=%+v", got)
+	}
+}
+
+func TestRecoveryInvalidatesPreviouslyAcceptedToolCallOutput(t *testing.T) {
+	store := Store{Dir: filepath.Join(t.TempDir(), "sessions")}
+	now := time.Now().UTC()
+	session := &Session{
+		ID:      strings.Repeat("c", 32),
+		Profile: DefaultProfile,
+		Task: &TaskState{
+			ID: "task", Objective: "write code", Phase: TaskPhaseExecution, Status: TaskStatusPaused, CreatedAt: now, UpdatedAt: now,
+			Attempts: []TaskAttempt{{ID: "attempt", Phase: TaskPhaseExecution, Output: "<｜｜DSML｜｜ calls>", Status: "completed", StartedAt: now, FinishedAt: &now}},
+		},
+		Operation: &Operation{ID: "operation", State: "completed"},
+	}
+	if err := store.Save(session); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Recover(); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := store.Load(session.ID)
+	if got.Operation.State != "failed" || got.Task.Status != TaskStatusFailed || got.Task.Attempts[0].Status != "failed" || !strings.Contains(got.Operation.Error, "no tool executor") {
+		t.Fatalf("recovered=%+v", got)
+	}
+}
+
 func TestSlidingWindowDropsMessagesOutsideRecentLimit(t *testing.T) {
 	cfg := testConfig(t)
 	cfg.Agent.RecentMessages = 2
@@ -366,7 +416,7 @@ func TestSlidingWindowDropsMessagesOutsideRecentLimit(t *testing.T) {
 		t.Fatalf("messages=%+v", got.Messages)
 	}
 	thirdRequest := fake.requests[2]
-	if len(thirdRequest) != 2 || thirdRequest[0].Content != "a2" || thirdRequest[1].Content != "q3" {
+	if len(thirdRequest) != 4 || thirdRequest[1].Content != "a2" || thirdRequest[2].Content != "q3" || !strings.Contains(thirdRequest[0].Content, "current_phase: planning") || !strings.Contains(thirdRequest[3].Content, "HARNESS CONTROL") {
 		t.Fatalf("third request=%+v", thirdRequest)
 	}
 }
@@ -403,14 +453,14 @@ func TestBranchesContinueIndependentlyFromCheckpoint(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if branchA.ID == branchB.ID || branchA.RootSessionID != root.ID || branchB.RootSessionID != root.ID || len(branchA.Messages) != 2 || branchA.Metrics.Requests != 0 {
+	if branchA.ID == branchB.ID || branchA.RootSessionID != root.ID || branchB.RootSessionID != root.ID || len(branchA.Messages) != 2 || branchA.Metrics.Requests != 0 || branchA.Task == nil || branchA.Task.Objective != "shared question" {
 		t.Fatalf("branchA=%+v branchB=%+v", branchA, branchB)
 	}
 	branchLease, _ := a.Attach(branchA.ID)
 	_ = a.Submit(branchA.ID, branchLease, MessageRequest{Content: "take option A"})
 	waitState(t, a, branchA.ID, "completed")
 	unchanged, _ := a.Get(branchB.ID)
-	if len(unchanged.Messages) != 2 {
+	if len(unchanged.Messages) != 2 || len(unchanged.Task.Attempts) != 1 || unchanged.Task.Attempts[0].Superseded {
 		t.Fatalf("branch B changed: %+v", unchanged.Messages)
 	}
 	related, err := a.RelatedBranches(branchA.ID)
