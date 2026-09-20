@@ -54,10 +54,15 @@ func TestTaskTransitionEndpointsRunDaemonValidatedPhases(t *testing.T) {
 		t.Fatalf("back task=%+v", got.Task)
 	}
 	invalid := call("/v1/sessions/"+session.ID+"/back", `{"phase":"validation"}`)
-	if invalid.Code != http.StatusBadRequest {
+	if invalid.Code != http.StatusConflict {
 		var failure ErrorResponse
 		_ = json.Unmarshal(invalid.Body.Bytes(), &failure)
 		t.Fatalf("invalid status=%d error=%q", invalid.Code, failure.Error)
+	}
+	var failure ErrorResponse
+	_ = json.Unmarshal(invalid.Body.Bytes(), &failure)
+	if !strings.Contains(failure.Error, "invalid task transition") || !strings.Contains(failure.Error, "cannot move from planning to \"validation\"") {
+		t.Fatalf("invalid transition error=%q", failure.Error)
 	}
 }
 

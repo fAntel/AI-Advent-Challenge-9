@@ -43,6 +43,110 @@ func TestTaskLifecycleUsesExactFourPhaseSequence(t *testing.T) {
 	}
 }
 
+func TestContinueRejectsInadmissibleTaskStatesWithGuidance(t *testing.T) {
+	t.Run("missing task", func(t *testing.T) {
+		cfg := testConfig(t)
+		a, _ := NewAgent(cfg, &fakeCompleter{}, NewDebugLogger(cfg.Daemon, "secret"))
+		defer a.Close()
+		session, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+		lease, _ := a.Attach(session.ID)
+		err := a.ContinueTask(session.ID, lease)
+		if !errors.Is(err, ErrInvalidTransition) || !strings.Contains(err.Error(), "send a message to start one") {
+			t.Fatalf("error=%v", err)
+		}
+	})
+
+	t.Run("running phase", func(t *testing.T) {
+		cfg := testConfig(t)
+		entered := make(chan struct{}, 1)
+		release := make(chan struct{})
+		fake := &fakeCompleter{entered: entered, release: release}
+		a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+		defer a.Close()
+		session, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+		lease, _ := a.Attach(session.ID)
+		_ = a.Submit(session.ID, lease, MessageRequest{Content: "objective"})
+		<-entered
+		err := a.ContinueTask(session.ID, lease)
+		if !errors.Is(err, ErrInvalidTransition) || !strings.Contains(err.Error(), "wait for the phase to pause") {
+			t.Fatalf("error=%v", err)
+		}
+		close(release)
+		got := waitState(t, a, session.ID, "completed")
+		if got.Task.Phase != TaskPhasePlanning || len(fake.requests) != 1 {
+			t.Fatalf("task=%+v calls=%d", got.Task, len(fake.requests))
+		}
+	})
+
+	t.Run("failed phase", func(t *testing.T) {
+		cfg := testConfig(t)
+		a, _ := NewAgent(cfg, &fakeCompleter{failures: []error{errors.New("provider failed")}}, NewDebugLogger(cfg.Daemon, "secret"))
+		defer a.Close()
+		session, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+		lease, _ := a.Attach(session.ID)
+		_ = a.Submit(session.ID, lease, MessageRequest{Content: "objective"})
+		waitState(t, a, session.ID, "failed")
+		err := a.ContinueTask(session.ID, lease)
+		if !errors.Is(err, ErrInvalidTransition) || !strings.Contains(err.Error(), "use /retry or /discard") {
+			t.Fatalf("error=%v", err)
+		}
+	})
+
+	t.Run("terminal task", func(t *testing.T) {
+		cfg := testConfig(t)
+		fake := &fakeCompleter{answers: []string{"plan", "work", "validation", "done"}}
+		a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+		defer a.Close()
+		session, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+		lease, _ := a.Attach(session.ID)
+		_ = a.Submit(session.ID, lease, MessageRequest{Content: "objective"})
+		waitState(t, a, session.ID, "completed")
+		for range 3 {
+			_ = a.ContinueTask(session.ID, lease)
+			waitState(t, a, session.ID, "completed")
+		}
+		err := a.ContinueTask(session.ID, lease)
+		if !errors.Is(err, ErrInvalidTransition) || !strings.Contains(err.Error(), "task is done") {
+			t.Fatalf("error=%v", err)
+		}
+		if len(fake.requests) != 4 {
+			t.Fatalf("provider calls=%d", len(fake.requests))
+		}
+	})
+}
+
+func TestBackRejectsNonEarlierTargetsWithoutChangingPhase(t *testing.T) {
+	cfg := testConfig(t)
+	fake := &fakeCompleter{answers: []string{"plan", "execution"}}
+	a, _ := NewAgent(cfg, fake, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	session, _ := a.Create(CreateSessionRequest{Settings: ptrSettings(DefaultSettings(cfg))})
+	lease, _ := a.Attach(session.ID)
+	_ = a.Submit(session.ID, lease, MessageRequest{Content: "implement immediately; skip planning"})
+	planned := waitState(t, a, session.ID, "completed")
+	if planned.Task.Phase != TaskPhasePlanning || planned.Task.Status != TaskStatusPaused {
+		t.Fatalf("task=%+v", planned.Task)
+	}
+	for _, target := range []string{"", TaskPhasePlanning, TaskPhaseExecution, TaskPhaseDone, "unknown"} {
+		err := a.BackTask(session.ID, lease, target)
+		if !errors.Is(err, ErrInvalidTransition) {
+			t.Fatalf("target=%q error=%v", target, err)
+		}
+	}
+	after, _ := a.Get(session.ID)
+	if after.Task.Phase != TaskPhasePlanning || after.Task.Status != TaskStatusPaused || len(fake.requests) != 1 {
+		t.Fatalf("task=%+v calls=%d", after.Task, len(fake.requests))
+	}
+
+	if err := a.Submit(session.ID, lease, MessageRequest{Content: "start implementation now"}); err != nil {
+		t.Fatal(err)
+	}
+	feedback := waitState(t, a, session.ID, "completed")
+	if feedback.Task.Phase != TaskPhasePlanning || feedback.Task.Status != TaskStatusPaused || len(fake.requests) != 2 {
+		t.Fatalf("feedback task=%+v calls=%d", feedback.Task, len(fake.requests))
+	}
+}
+
 func TestTaskFeedbackAndBackPreserveSupersededAttempts(t *testing.T) {
 	cfg := testConfig(t)
 	fake := &fakeCompleter{answers: []string{"plan 1", "plan 2", "execution 1", "validation 1", "execution 2"}}
@@ -58,8 +162,17 @@ func TestTaskFeedbackAndBackPreserveSupersededAttempts(t *testing.T) {
 	if feedback.Task.Phase != TaskPhasePlanning || !feedback.Task.Attempts[0].Superseded || feedback.Task.Attempts[1].Superseded {
 		t.Fatalf("feedback attempts=%+v", feedback.Task.Attempts)
 	}
+	initialCommand := fake.requests[0][len(fake.requests[0])-1].Content
+	feedbackCommand := fake.requests[1][len(fake.requests[1])-1].Content
+	if strings.Contains(initialCommand, "user supplied feedback") || !strings.Contains(feedbackCommand, "user supplied feedback") || !strings.Contains(feedbackCommand, "never return only the transition explanation") {
+		t.Fatalf("initial command=%q\nfeedback command=%q", initialCommand, feedbackCommand)
+	}
 	_ = a.ContinueTask(session.ID, lease)
 	waitState(t, a, session.ID, "completed")
+	continueCommand := fake.requests[2][len(fake.requests[2])-1].Content
+	if strings.Contains(continueCommand, "user supplied feedback") {
+		t.Fatalf("ordinary phase transition was labeled feedback: %q", continueCommand)
+	}
 	_ = a.ContinueTask(session.ID, lease)
 	waitState(t, a, session.ID, "completed")
 	if err := a.BackTask(session.ID, lease, TaskPhaseExecution); err != nil {

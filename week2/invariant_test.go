@@ -2,6 +2,7 @@ package agent
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -121,6 +122,8 @@ func TestInvariantRefusalBlocksContinueAndFeedbackUnblocks(t *testing.T) {
 	}
 	if err := a.ContinueTask(s.ID, lease); err == nil {
 		t.Fatal("continue accepted while blocked")
+	} else if !errors.Is(err, ErrInvalidTransition) || !strings.Contains(err.Error(), "provide compliant feedback or use /clear") {
+		t.Fatalf("blocked transition error=%v", err)
 	}
 	if err := a.Submit(s.ID, lease, MessageRequest{Content: "Revise it to use Go"}); err != nil {
 		t.Fatal(err)
@@ -128,6 +131,10 @@ func TestInvariantRefusalBlocksContinueAndFeedbackUnblocks(t *testing.T) {
 	unblocked := waitState(t, a, s.ID, "completed")
 	if unblocked.Task.Status != TaskStatusPaused || unblocked.Task.Phase != TaskPhasePlanning || unblocked.Messages[len(unblocked.Messages)-1].Content != "compliant plan" || len(fake.requests) != 2 {
 		t.Fatalf("unblocked=%+v calls=%d", unblocked.Task, len(fake.requests))
+	}
+	feedbackCommand := fake.requests[1][len(fake.requests[1])-1].Content
+	if !strings.Contains(feedbackCommand, "inside the answer field") || !strings.Contains(feedbackCommand, "do not place text outside the JSON object") {
+		t.Fatalf("invariant feedback command=%q", feedbackCommand)
 	}
 }
 

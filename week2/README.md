@@ -1,4 +1,4 @@
-# advent-agent — Week 2 Task 3
+# advent-agent — Week 2 Task 4
 
 `advent-agent` is a persistent, provider-neutral chat harness with explicit,
 profile-scoped memory. The shipped provider adapter is DeepSeek. The CLI talks
@@ -12,12 +12,25 @@ project invariants enforced above task and memory context:
 planning → execution → validation → done
 ```
 
-Each phase makes an answer request and then pauses. `/continue` advances one
-phase. A normal message while paused is feedback and reruns the current phase;
-it cannot skip or change the lifecycle state. `/back` reruns the immediately
-preceding phase, while `/back planning|execution|validation` returns to a named
-earlier phase. After `done`, the next normal message starts a new task in the
-same session.
+Each phase makes an answer request and then pauses. `/continue` explicitly
+approves that phase and advances exactly one step. A normal message while
+paused is feedback and reruns the current phase; it cannot skip or change the
+lifecycle state. `/back` reruns the immediately preceding phase, while `/back
+planning|execution|validation` returns to a named earlier phase. After `done`,
+the next normal message starts a new task in the same session.
+
+On a feedback rerun, the harness tells the model to recognize requests to skip,
+finish, or change phase. The response must briefly explain that only the
+harness can perform transitions and that `/continue` is required, then still
+return the current phase's updated artifact. This keeps the latest attempt
+useful as authoritative context for validation and later phases instead of
+replacing it with a transition explanation alone.
+
+Invalid transitions are rejected without changing task state or calling the
+provider. The error explains why the transition is inadmissible and which
+action is currently expected. This includes attempts to advance a missing,
+running, failed, blocked, or terminal task and attempts to move `/back` to the
+current phase, a later phase, `done`, or an unknown phase.
 
 When invariants conflict with a phase, the daemon displays a refusal citing the
 stored rules and sets the task to `blocked`. `/continue` cannot advance a
@@ -225,11 +238,17 @@ After `make test && make build`, use the rebuilt `week2/advent-agent`:
    inspect the paused `planning` state.
 2. Exit and run `./advent-agent --profile coding resume SESSION_ID`; `/task`
    shows the objective and plan without asking for either again.
-3. Send planning feedback and inspect the superseded attempt with `/task`, then
-   use `/continue` to run `execution`.
-4. Use `/back planning` to revise from an earlier phase, then `/continue`
-   through `execution`, `validation`, and `done`, inspecting every pause.
-5. Start a second task with a normal message after `done`. Use `/clear` to show
+3. Send planning feedback such as `start implementation now`; `/task` still
+   reports `planning/paused`, while the answer explains that ordinary dialog
+   cannot approve or skip a phase and still returns an updated plan.
+4. Try `/back execution` from planning and inspect the explicit invalid
+   transition error. `/task` remains unchanged.
+5. Use `/continue` to approve planning and run `execution`. Try `/back
+   validation`; the forward transition is rejected and execution remains
+   paused.
+6. Use `/continue` through `validation` and `done`, inspecting every pause to
+   show that completion cannot bypass validation.
+7. Start a second task with a normal message after `done`. Use `/clear` to show
    task/dialog state is removed while `/memory` and `/stats` remain.
 
 For the invariant guardrail flow, add architecture and technology rules with

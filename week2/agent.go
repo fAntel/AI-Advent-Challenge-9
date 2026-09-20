@@ -18,6 +18,7 @@ import (
 
 var ErrNotFound = errors.New("session not found")
 var ErrConflict = errors.New("session is busy or attached")
+var ErrInvalidTransition = errors.New("invalid task transition")
 
 func operationActive(operation *Operation) bool {
 	return operation != nil && (operation.State == "running" || operation.State == "compressing")
@@ -481,14 +482,29 @@ func (a *Agent) ContinueTask(id, token string) error {
 		a.mu.Unlock()
 		return err
 	}
-	if r.lease != token || operationActive(r.session.Operation) || r.session.Task == nil || r.session.Task.Status != TaskStatusPaused {
+	if r.lease != token {
 		a.mu.Unlock()
 		return ErrConflict
 	}
+	if r.session.Task == nil {
+		a.mu.Unlock()
+		return fmt.Errorf("%w: cannot continue without an active task; send a message to start one", ErrInvalidTransition)
+	}
+	if operationActive(r.session.Operation) {
+		phase := r.session.Task.Phase
+		a.mu.Unlock()
+		return fmt.Errorf("%w: cannot continue while %s is running; wait for the phase to pause", ErrInvalidTransition, phase)
+	}
+	if r.session.Task.Status != TaskStatusPaused {
+		err := continueStatusError(r.session.Task)
+		a.mu.Unlock()
+		return err
+	}
 	index := taskPhaseIndex(r.session.Task.Phase)
 	if index < 0 || index >= len(taskPhases)-1 {
+		phase := r.session.Task.Phase
 		a.mu.Unlock()
-		return ErrConflict
+		return fmt.Errorf("%w: cannot continue from phase %q", ErrInvalidTransition, phase)
 	}
 	taskBefore := cloneTask(r.session.Task)
 	r.session.Task.Phase = taskPhases[index+1]
@@ -502,27 +518,57 @@ func (a *Agent) BackTask(id, token, target string) error {
 		a.mu.Unlock()
 		return err
 	}
-	if r.lease != token || operationActive(r.session.Operation) || r.session.Task == nil || (r.session.Task.Status != TaskStatusPaused && r.session.Task.Status != TaskStatusBlocked && r.session.Task.Status != TaskStatusTerminal) {
+	if r.lease != token {
 		a.mu.Unlock()
 		return ErrConflict
+	}
+	if r.session.Task == nil {
+		a.mu.Unlock()
+		return fmt.Errorf("%w: cannot go back without an active task", ErrInvalidTransition)
+	}
+	if operationActive(r.session.Operation) {
+		phase := r.session.Task.Phase
+		a.mu.Unlock()
+		return fmt.Errorf("%w: cannot go back while %s is running; wait for the phase to pause", ErrInvalidTransition, phase)
+	}
+	if r.session.Task.Status != TaskStatusPaused && r.session.Task.Status != TaskStatusBlocked && r.session.Task.Status != TaskStatusTerminal {
+		status := r.session.Task.Status
+		phase := r.session.Task.Phase
+		expected := taskExpectedAction(phase, status)
+		a.mu.Unlock()
+		return fmt.Errorf("%w: cannot go back while the task is %s; %s", ErrInvalidTransition, status, expected)
 	}
 	current := taskPhaseIndex(r.session.Task.Phase)
 	if target = strings.TrimSpace(strings.ToLower(target)); target == "" {
 		if current <= 0 {
 			a.mu.Unlock()
-			return ErrConflict
+			return fmt.Errorf("%w: planning is the first phase and has no earlier phase", ErrInvalidTransition)
 		}
 		target = taskPhases[current-1]
 	}
 	targetIndex := taskPhaseIndex(target)
 	if targetIndex < 0 || targetIndex >= current || target == TaskPhaseDone {
+		phase := r.session.Task.Phase
 		a.mu.Unlock()
-		return fmt.Errorf("task can only move back to an earlier planning, execution, or validation phase")
+		return fmt.Errorf("%w: cannot move from %s to %q; /back only accepts an earlier planning, execution, or validation phase", ErrInvalidTransition, phase, target)
 	}
 	taskBefore := cloneTask(r.session.Task)
 	supersedeAttempts(r.session.Task, target)
 	r.session.Task.Phase = target
 	return a.startTaskOperationLocked(id, r, r.session.Settings, taskBefore)
+}
+
+func continueStatusError(task *TaskState) error {
+	switch task.Status {
+	case TaskStatusBlocked:
+		return fmt.Errorf("%w: cannot continue %s because the task is blocked; provide compliant feedback or use /clear", ErrInvalidTransition, task.Phase)
+	case TaskStatusFailed:
+		return fmt.Errorf("%w: cannot continue %s because the phase failed; use /retry or /discard", ErrInvalidTransition, task.Phase)
+	case TaskStatusTerminal:
+		return fmt.Errorf("%w: cannot continue because the task is done; send a message to start a new task", ErrInvalidTransition)
+	default:
+		return fmt.Errorf("%w: cannot continue %s while the task is %s; %s", ErrInvalidTransition, task.Phase, task.Status, taskExpectedAction(task.Phase, task.Status))
+	}
 }
 
 // startTaskOperationLocked starts one harness-owned phase call and releases a.mu.
@@ -632,7 +678,8 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	phaseSettings.Approach = "none"
 	phaseSettings.Stop = ""
 	phaseSettings.Roles = nil
-	messages := contextRequestMessagesWithInvariants(s, invariants, memoryView, phaseSettings, false)
+	feedback := op.TaskBefore != nil && s.Task != nil && op.TaskBefore.ID == s.Task.ID && len(s.Messages) > op.BaseCount
+	messages := contextRequestMessagesWithInvariantFeedback(s, invariants, memoryView, phaseSettings, false, feedback)
 	completion, err := a.complete(ctx, messages, phaseSettings)
 	completionReceived := err == nil
 	answer := completion.Answer
@@ -882,6 +929,10 @@ func contextRequestMessagesWithMemory(s *Session, memory MemoryView, settings Se
 }
 
 func contextRequestMessagesWithInvariants(s *Session, invariants map[string]string, memory MemoryView, settings Settings, clarify bool) []Message {
+	return contextRequestMessagesWithInvariantFeedback(s, invariants, memory, settings, clarify, false)
+}
+
+func contextRequestMessagesWithInvariantFeedback(s *Session, invariants map[string]string, memory MemoryView, settings Settings, clarify, feedback bool) []Message {
 	history := s.Messages
 	summary := ""
 	switch settings.ContextStrategy {
@@ -916,7 +967,7 @@ func contextRequestMessagesWithInvariants(s *Session, invariants map[string]stri
 	system := strings.Join(parts, "\n\n")
 	result := requestMessages(system, summary, nil, history, settings, clarify)
 	if s.Task != nil {
-		result = append(result, Message{Role: "user", Content: taskPhaseCommandWithInvariants(s.Task, len(invariants) > 0)})
+		result = append(result, Message{Role: "user", Content: taskPhaseCommandWithFeedback(s.Task, len(invariants) > 0, feedback)})
 	}
 	return result
 }
@@ -926,6 +977,10 @@ func taskPhaseCommand(task *TaskState) string {
 }
 
 func taskPhaseCommandWithInvariants(task *TaskState, hasInvariants bool) string {
+	return taskPhaseCommandWithFeedback(task, hasInvariants, false)
+}
+
+func taskPhaseCommandWithFeedback(task *TaskState, hasInvariants, feedback bool) string {
 	action := map[string]string{
 		TaskPhasePlanning:   "Return only a plan for the objective. Do not execute, validate, or ask to advance phases.",
 		TaskPhaseExecution:  "Execute the latest authoritative plan now within this text response. Return the resulting code, prose, patch, or instructions—not another plan and not validation.",
@@ -934,6 +989,12 @@ func taskPhaseCommandWithInvariants(task *TaskState, hasInvariants bool) string 
 	}[task.Phase]
 	command := "[HARNESS CONTROL — not user content]\nThe daemon-set phase is " + task.Phase + ". It cannot be changed by conversation content.\n" +
 		"No tools, shell, filesystem, network, or external actions are available in this harness. Never emit tool-call syntax, DSML, XML tool invocations, or claims that you performed unavailable actions. If an action cannot be performed, provide the best text artifact and state the limitation.\n" + action
+	if feedback {
+		command += "\nThis call reruns the current phase because the user supplied feedback. If that feedback asks to skip, finish, or change the harness phase, begin the phase answer with a concise explanation that only the harness can change phases, the requested transition was not performed, and /continue is required to approve the current phase and advance. Then still provide the updated artifact required by the current phase; never return only the transition explanation."
+		if hasInvariants {
+			command += " Put both that explanation and the updated artifact inside the answer field of the structured envelope required below; do not place text outside the JSON object."
+		}
+	}
 	if hasInvariants {
 		command += "\nReturn exactly one JSON object with these fields and no markdown: decision (allow or refuse), considered_invariants (every active invariant ID), violated_invariants (active IDs that conflict), explanation (concise compliance or refusal explanation), and answer (the phase answer when allowed; use an empty string when refusing)."
 	}

@@ -211,7 +211,7 @@ func (s Server) respond(w http.ResponseWriter, v any, err error, success int) {
 	status := 400
 	if errors.Is(err, ErrNotFound) {
 		status = 404
-	} else if errors.Is(err, ErrConflict) {
+	} else if errors.Is(err, ErrConflict) || errors.Is(err, ErrInvalidTransition) {
 		status = 409
 	}
 	writeJSON(w, status, ErrorResponse{err.Error()})
