@@ -61,6 +61,33 @@ func TestTaskTransitionEndpointsRunDaemonValidatedPhases(t *testing.T) {
 	}
 }
 
+func TestInvariantReadAndMutationEndpoints(t *testing.T) {
+	cfg := testConfig(t)
+	a, _ := NewAgent(cfg, &fakeCompleter{}, NewDebugLogger(cfg.Daemon, "secret"))
+	defer a.Close()
+	session, _ := a.Create(CreateSessionRequest{ProjectID: "project", Settings: ptrSettings(DefaultSettings(cfg))})
+	lease, _ := a.Attach(session.ID)
+	handler := Server{Agent: a}.Handler()
+
+	request := httptest.NewRequest(http.MethodPost, "/v1/sessions/"+session.ID+"/invariants", strings.NewReader(`{"action":"create","key":"Technology","value":"Use Go"}`))
+	request.Header.Set("X-Agent-Lease", lease)
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("mutation status=%d body=%s", response.Code, response.Body.String())
+	}
+
+	response = httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/v1/sessions/"+session.ID+"/invariants", nil))
+	if response.Code != http.StatusOK {
+		t.Fatalf("read status=%d body=%s", response.Code, response.Body.String())
+	}
+	var view InvariantView
+	if err := json.Unmarshal(response.Body.Bytes(), &view); err != nil || view.Invariants["technology"] != "Use Go" {
+		t.Fatalf("view=%+v err=%v", view, err)
+	}
+}
+
 func TestShutdownEndpointRejectsGet(t *testing.T) {
 	response := httptest.NewRecorder()
 	Server{}.Handler().ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/v1/shutdown", nil))

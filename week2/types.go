@@ -74,18 +74,24 @@ const (
 
 	TaskStatusRunning  = "running"
 	TaskStatusPaused   = "paused"
+	TaskStatusBlocked  = "blocked"
 	TaskStatusFailed   = "failed"
 	TaskStatusTerminal = "terminal"
 )
 
 type TaskAttempt struct {
-	ID         string     `json:"id"`
-	Phase      string     `json:"phase"`
-	Output     string     `json:"output"`
-	Status     string     `json:"status"`
-	StartedAt  time.Time  `json:"started_at"`
-	FinishedAt *time.Time `json:"finished_at,omitempty"`
-	Superseded bool       `json:"superseded,omitempty"`
+	ID                   string            `json:"id"`
+	Phase                string            `json:"phase"`
+	Output               string            `json:"output"`
+	Status               string            `json:"status"`
+	StartedAt            time.Time         `json:"started_at"`
+	FinishedAt           *time.Time        `json:"finished_at,omitempty"`
+	Superseded           bool              `json:"superseded,omitempty"`
+	Invariants           map[string]string `json:"invariants,omitempty"`
+	Decision             string            `json:"decision,omitempty"`
+	ConsideredInvariants []string          `json:"considered_invariants,omitempty"`
+	ViolatedInvariants   []string          `json:"violated_invariants,omitempty"`
+	Explanation          string            `json:"explanation,omitempty"`
 }
 
 type TaskState struct {
@@ -186,6 +192,16 @@ type MemoryMutationRequest struct {
 	Key         string `json:"key"`
 	Value       string `json:"value,omitempty"`
 	Destination string `json:"destination,omitempty"`
+}
+
+type InvariantMutationRequest struct {
+	Action string `json:"action"`
+	Key    string `json:"key"`
+	Value  string `json:"value,omitempty"`
+}
+
+type InvariantView struct {
+	Invariants map[string]string `json:"invariants"`
 }
 
 type MemoryView struct {

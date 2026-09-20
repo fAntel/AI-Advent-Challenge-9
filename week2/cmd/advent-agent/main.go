@@ -458,7 +458,7 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		}
 		return commandResult{exit: true}
 	case "help":
-		fmt.Println("/task /continue /back [planning|execution|validation] /memory [short|working|long] /remember SCOPE KEY VALUE /memory edit SCOPE KEY VALUE /memory move SOURCE KEY DESTINATION /forget SCOPE KEY /clear /instructions /settings /summary /strategy /checkpoint /checkpoints /branch /branches /switch /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
+		fmt.Println("/task /continue /back [planning|execution|validation] /invariants /invariant add|edit|delete KEY [RULE] /memory [short|working|long] /remember SCOPE KEY VALUE /memory edit SCOPE KEY VALUE /memory move SOURCE KEY DESTINATION /forget SCOPE KEY /clear /instructions /settings /summary /strategy /checkpoint /checkpoints /branch /branches /switch /model /reasoning /temperature /approach /roles /format /length /stop /unset /stats [on|off] /compression [on|off] /debug /retry /discard /exit")
 	case "task":
 		current, err := api.Get(id)
 		if err != nil {
@@ -496,6 +496,19 @@ func handleCommand(api *agent.APIClient, cfg agent.Config, id, lease, line strin
 		}
 	case "memory":
 		handleMemoryCommand(api, id, lease, value)
+	case "invariants":
+		if value != "" {
+			fmt.Fprintln(os.Stderr, "usage: /invariants")
+		} else {
+			view, err := api.Invariants(id)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+			} else {
+				printInvariantSection(view.Invariants)
+			}
+		}
+	case "invariant":
+		handleInvariantCommand(api, id, lease, value)
 	case "remember":
 		fields := strings.SplitN(value, " ", 3)
 		if len(fields) != 3 {
@@ -725,6 +738,38 @@ func handleMemoryCommand(api *agent.APIClient, id, lease, value string) {
 	}
 }
 
+func handleInvariantCommand(api *agent.APIClient, id, lease, value string) {
+	fields := strings.SplitN(value, " ", 3)
+	if len(fields) < 2 || (fields[0] != "delete" && len(fields) != 3) || (fields[0] == "delete" && len(fields) != 2) {
+		fmt.Fprintln(os.Stderr, "usage: /invariant add|edit KEY RULE | /invariant delete KEY")
+		return
+	}
+	action := map[string]string{"add": "create", "edit": "edit", "delete": "delete"}[fields[0]]
+	if action == "" {
+		fmt.Fprintln(os.Stderr, "usage: /invariant add|edit KEY RULE | /invariant delete KEY")
+		return
+	}
+	req := agent.InvariantMutationRequest{Action: action, Key: fields[1]}
+	if len(fields) == 3 {
+		req.Value = fields[2]
+	}
+	if err := api.MutateInvariant(id, lease, req); err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+	}
+}
+
+func printInvariantSection(values map[string]string) {
+	fmt.Println("[invariants]")
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fmt.Printf("%s = %s\n", key, values[key])
+	}
+}
+
 func printBranches(api *agent.APIClient, id string) {
 	branches, err := api.Branches(id)
 	if err != nil {
@@ -825,6 +870,13 @@ func printTaskState(w io.Writer, session *agent.Session, history bool) {
 			authority = "superseded"
 		}
 		fmt.Fprintf(w, "    %d. %s — %s, %s\n", i+1, attempt.Phase, attempt.Status, authority)
+		if attempt.Decision != "" {
+			fmt.Fprintf(w, "       invariant decision: %s", attempt.Decision)
+			if len(attempt.ViolatedInvariants) > 0 {
+				fmt.Fprintf(w, " (violated: %s)", strings.Join(attempt.ViolatedInvariants, ", "))
+			}
+			fmt.Fprintln(w)
+		}
 	}
 }
 

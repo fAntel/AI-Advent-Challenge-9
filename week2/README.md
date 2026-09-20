@@ -1,11 +1,12 @@
-# advent-agent — Week 2 Task 2
+# advent-agent — Week 2 Task 3
 
 `advent-agent` is a persistent, provider-neutral chat harness with explicit,
 profile-scoped memory. The shipped provider adapter is DeepSeek. The CLI talks
 to `advent-agentd` over a private Unix socket; the daemon owns requests,
 sessions, compression, branches, accounting, and persistence.
 
-Every user task is controlled by a persisted daemon-owned lifecycle:
+Every user task is controlled by a persisted daemon-owned lifecycle with
+project invariants enforced above task and memory context:
 
 ```text
 planning → execution → validation → done
@@ -17,6 +18,11 @@ it cannot skip or change the lifecycle state. `/back` reruns the immediately
 preceding phase, while `/back planning|execution|validation` returns to a named
 earlier phase. After `done`, the next normal message starts a new task in the
 same session.
+
+When invariants conflict with a phase, the daemon displays a refusal citing the
+stored rules and sets the task to `blocked`. `/continue` cannot advance a
+blocked task. Normal feedback reruns the same phase, `/back` remains available
+from later phases, and `/clear` abandons the task.
 
 The provider has no shell, filesystem, network, or other tool executor.
 Execution therefore returns the best code, prose, patch, or instructions it can
@@ -100,7 +106,8 @@ current directory outside Git. XDG defaults are:
     ├── long-term.ini
     ├── projects/<project-id>/
     │   ├── project.json
-    │   └── working.ini
+    │   ├── working.ini
+    │   └── invariants.ini
     └── sessions/<session-id>/session.json
 $XDG_RUNTIME_DIR/advent-agent/agent.sock
 ```
@@ -132,6 +139,32 @@ and `-`. Values are non-empty, single-line UTF-8. Creates reject duplicates;
 malformed files produce an error and are never overwritten. Writes use private
 temporary files and atomic replacement.
 
+## Project invariants
+
+Invariants are flat, explicit rules scoped to a profile and canonical project.
+They are shared by branches in that scope and survive restart, resume,
+compression, and `/clear`. A missing `invariants.ini` means no invariants are
+active, so existing projects need no migration.
+
+```ini
+[invariants]
+architecture = Use ports and adapters
+technology = Use Go
+```
+
+Invariant keys and values use the same normalization and single-line UTF-8
+validation as memory, but invariants are not memory. Only `/invariant` CRUD can
+change them; dialog, task text, instructions to ignore them, and memory cannot.
+Mutations are rejected while an answer or compression is active.
+
+For every phase with active invariants, the daemon requires one strict model
+response containing an allow/refuse decision, acknowledgement of every active
+ID, violated IDs, a concise explanation, and (when allowed) the answer. Invalid
+or incomplete responses fail safely and can be handled with `/retry` or
+`/discard`. Each attempt stores its invariant snapshot and decision so later
+edits do not rewrite task history. No private chain-of-thought is requested or
+displayed.
+
 ## Commands
 
 ```text
@@ -146,6 +179,10 @@ temporary files and atomic replacement.
 /memory edit SCOPE KEY NEW_VALUE
 /memory move SOURCE KEY DESTINATION
 /forget SCOPE KEY
+/invariants
+/invariant add KEY RULE
+/invariant edit KEY RULE
+/invariant delete KEY
 /clear
 /instructions
 /task
@@ -158,9 +195,10 @@ Mutations are rejected while an answer or compression operation is active.
 `/clear` removes the current task together with the session's dialog and
 summary. Metrics, working memory, and long-term memory remain.
 
-Every answer reloads memory, so CRUD changes affect the next prompt. Prompt
-context order is snapshotted instructions, the harness-owned task block,
-long-term INI, working INI, rolling summary, then current dialog. The task
+Every answer reloads invariants and memory, so CRUD changes affect the next
+phase. Prompt context order is snapshotted instructions, harness-owned
+invariants, the harness-owned task block, long-term INI, working INI, rolling
+summary, then current dialog. The task
 block contains the original objective, current phase, fixed phase instruction,
 and relevant prior attempts. Memory blocks are labeled contextual data, not
 behavioral instructions. Factual conflict precedence is current dialog >
@@ -193,5 +231,11 @@ After `make test && make build`, use the rebuilt `week2/advent-agent`:
    through `execution`, `validation`, and `done`, inspecting every pause.
 5. Start a second task with a normal message after `done`. Use `/clear` to show
    task/dialog state is removed while `/memory` and `/stats` remain.
+
+For the invariant guardrail flow, add architecture and technology rules with
+`/invariant add`, submit a contradictory task, inspect its cited refusal and
+blocked `/task` state, verify `/continue` is rejected, then provide compliant
+feedback. Resume the session to inspect preserved decision history, and use a
+different profile or project to verify isolation.
 
 See `config.example.toml` for all harness settings.

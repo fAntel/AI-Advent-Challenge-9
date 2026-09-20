@@ -177,6 +177,22 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		s.respond(w, map[string]bool{"ok": true}, s.Agent.MutateMemory(id, token(r), req), http.StatusOK)
+	case "invariants":
+		if r.Method == http.MethodGet {
+			view, e := s.Agent.Invariants(id)
+			s.respond(w, view, e, http.StatusOK)
+			return
+		}
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		var req InvariantMutationRequest
+		if e := decodeJSON(w, r, &req); e != nil {
+			s.respond(w, nil, e, 0)
+			return
+		}
+		s.respond(w, map[string]bool{"ok": true}, s.Agent.MutateInvariant(id, token(r), req), http.StatusOK)
 	case "clear":
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)

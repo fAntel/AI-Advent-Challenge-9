@@ -106,7 +106,7 @@ func (INIMemoryStorage) Load(path string, allowedSections ...string) (map[string
 func (INIMemoryStorage) Save(path string, values map[string]map[string]string) error {
 	for section, entries := range values {
 		switch section {
-		case "working", "preferences", "solutions", "knowledge":
+		case "working", "preferences", "solutions", "knowledge", "invariants":
 		default:
 			return fmt.Errorf("invalid memory section %q", section)
 		}
@@ -235,6 +235,55 @@ func (m MemoryManager) LongTermPath(profile string) string {
 }
 func (m MemoryManager) WorkingPath(profile, project string) string {
 	return filepath.Join(m.profileRoot(profile), "projects", project, "working.ini")
+}
+func (m MemoryManager) InvariantsPath(profile, project string) string {
+	return filepath.Join(m.profileRoot(profile), "projects", project, "invariants.ini")
+}
+
+func (m MemoryManager) Invariants(profile, project string) (map[string]string, error) {
+	values, err := m.storage().Load(m.InvariantsPath(profile, project), "invariants")
+	if err != nil {
+		return nil, err
+	}
+	return values["invariants"], nil
+}
+
+func (m MemoryManager) MutateInvariant(profile, project, action, key, value string) error {
+	key, err := normalizeMemoryKey(key)
+	if err != nil {
+		return fmt.Errorf("invalid invariant key: %w", err)
+	}
+	if action == "create" || action == "edit" {
+		if err := validateMemoryValue(value); err != nil {
+			return fmt.Errorf("invalid invariant rule: %w", err)
+		}
+	}
+	path := m.InvariantsPath(profile, project)
+	data, err := m.storage().Load(path, "invariants")
+	if err != nil {
+		return err
+	}
+	_, exists := data["invariants"][key]
+	switch action {
+	case "create":
+		if exists {
+			return fmt.Errorf("invariant %q already exists", key)
+		}
+		data["invariants"][key] = value
+	case "edit":
+		if !exists {
+			return fmt.Errorf("invariant %q does not exist", key)
+		}
+		data["invariants"][key] = value
+	case "delete":
+		if !exists {
+			return fmt.Errorf("invariant %q does not exist", key)
+		}
+		delete(data["invariants"], key)
+	default:
+		return fmt.Errorf("unknown invariant action %q", action)
+	}
+	return m.storage().Save(path, data)
 }
 func memoryLocation(scope string) (fileKind, section string, err error) {
 	switch scope {

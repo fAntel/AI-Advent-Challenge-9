@@ -148,6 +148,15 @@ func (c *APIClient) MutateMemory(id, token string, req MemoryMutationRequest) er
 	_, e := c.do("POST", "/v1/sessions/"+id+"/memory", token, req, nil)
 	return e
 }
+func (c *APIClient) Invariants(id string) (InvariantView, error) {
+	var view InvariantView
+	_, e := c.do("GET", "/v1/sessions/"+id+"/invariants", "", nil, &view)
+	return view, e
+}
+func (c *APIClient) MutateInvariant(id, token string, req InvariantMutationRequest) error {
+	_, e := c.do("POST", "/v1/sessions/"+id+"/invariants", token, req, nil)
+	return e
+}
 func (c *APIClient) Clear(id, token string) error {
 	_, e := c.do("POST", "/v1/sessions/"+id+"/clear", token, nil, nil)
 	return e
