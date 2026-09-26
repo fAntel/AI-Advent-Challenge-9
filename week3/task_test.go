@@ -334,7 +334,7 @@ func TestUnsupportedProviderToolCallFailsPhaseAndRetryUsesTextOnlyPrompt(t *test
 	}
 	executionRequest := fake.requests[1]
 	command := executionRequest[len(executionRequest)-1].Content
-	if !strings.Contains(command, "No tools, shell, filesystem, network, or external actions are available") || !strings.Contains(command, "Never emit tool-call syntax") {
+	if !strings.Contains(command, "Registered MCP tools may be used in this phase") || !strings.Contains(command, "Use native tool calls") {
 		t.Fatalf("execution command=%q", command)
 	}
 }

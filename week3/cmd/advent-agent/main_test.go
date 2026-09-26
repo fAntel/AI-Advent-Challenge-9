@@ -83,6 +83,12 @@ func TestSessionLifecycleLabelDistinguishesTasksLegacyAndEmptySessions(t *testin
 			preview: "finished",
 		},
 		{
+			name:    "chat conversation",
+			session: agent.Session{Chat: true, Operation: &agent.Operation{State: "completed"}, Messages: []agent.Message{{Role: "user", Content: "hello"}}},
+			label:   "chat/completed",
+			preview: "hello",
+		},
+		{
 			name:    "legacy conversation",
 			session: agent.Session{Operation: &agent.Operation{State: "completed"}, Messages: []agent.Message{{Role: "user", Content: "old question"}}},
 			label:   "legacy/completed",
@@ -104,5 +110,19 @@ func TestSessionLifecycleLabelDistinguishesTasksLegacyAndEmptySessions(t *testin
 				t.Fatalf("preview=%q want=%q", got, test.preview)
 			}
 		})
+	}
+}
+
+func TestPromptAndChatFlagSelectChatMode(t *testing.T) {
+	defaults := agent.DefaultSettings(agent.DefaultConfig())
+	for _, args := range [][]string{{"-p", "Find the lamp"}, {"--prompt", "Find the lamp"}, {"--chat"}} {
+		o, _ := parseOptions(args, defaults)
+		if !usesChatMode(o) {
+			t.Fatalf("args %v did not select chat", args)
+		}
+	}
+	o, _ := parseOptions(nil, defaults)
+	if usesChatMode(o) {
+		t.Fatal("interactive default unexpectedly selected chat")
 	}
 }

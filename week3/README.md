@@ -1,4 +1,4 @@
-# advent-agent — Week 3 Task 0
+# advent-agent — Week 3
 
 `advent-agent` is a persistent, provider-neutral chat harness with explicit,
 profile-scoped memory. The shipped provider adapter is DeepSeek. The CLI talks
@@ -41,6 +41,18 @@ The daemon can connect to registered stdio MCP servers and execute their tools
 during any phase. Tool use does not advance the lifecycle. Raw DSML/XML tool
 syntax is still rejected; DeepSeek must use native tool calls.
 
+For direct conversation without a task lifecycle, use `-p`/`--prompt` or start
+an interactive chat with `--chat`:
+
+```sh
+./advent-agent -p "Find the Desk lamp in HomeBox and tell me its entity ID"
+./advent-agent --chat
+```
+
+Chat sessions keep their mode when resumed. They use the same MCP discovery and
+approval flow, with no planning, execution, or validation phase. Plain
+`./advent-agent` still starts task-oriented interactive sessions.
+
 ## Build and test
 
 From `week3/`:
@@ -50,9 +62,9 @@ make test
 make build
 ```
 
-The exact runnable artifacts are `week3/advent-agent` and
-`week3/advent-agentd`. `make build` builds both command packages and verifies
-their help commands, so demonstrations use newly rebuilt binaries.
+The exact runnable artifacts are `week3/advent-agent`, `week3/advent-agentd`,
+and `week3/homebox-mcp`. `make build` builds all three command packages and
+verifies their help commands, so demonstrations use newly rebuilt binaries.
 
 MCP administration and daemon startup work without `DEEPSEEK_API_KEY`. Export
 the key in the daemon's environment before submitting a chat request. The
@@ -75,6 +87,55 @@ stdio connection; removal and shutdown close it. `mcp tools` follows every
 server page and prints the total tool count after the inventory. Positive MCP TTLs allow cached discovery until expiry, while zero
 or missing TTLs require a new discovery. Refresh errors are shown and leave the
 last snapshot on disk. This task supports stdio commands only.
+
+## HomeBox MCP server (HomeBox 0.26.2)
+
+`homebox-mcp` connects to HomeBox's authenticated HTTPS API. Create a private
+JSON config outside the repository, for example:
+
+```sh
+mkdir -p ~/.config/advent-agent
+cat > ~/.config/advent-agent/homebox-mcp.json <<'JSON'
+{
+  "url": "https://homebox.example.com",
+  "apiKey": "YOUR_HOMEBOX_PERSONAL_API_KEY"
+}
+JSON
+chmod 600 ~/.config/advent-agent/homebox-mcp.json
+```
+
+The URL is the HomeBox base URL, without `/api`. `caFile` may be added for a
+private certificate authority. The config path, rather than the key, is stored
+in the MCP catalog. The server rejects a config readable by other users.
+
+After `make test && make build`, register and inspect the rebuilt artifacts:
+
+```sh
+./advent-agent mcp add homebox --description "HomeBox inventory" -- ./homebox-mcp --config ~/.config/advent-agent/homebox-mcp.json
+./advent-agent mcp tools --refresh homebox
+./advent-agent -p "Find the Desk lamp in HomeBox and tell me its entity ID"
+```
+
+In interactive chat (`./advent-agent --chat`), ask: `Find the Desk lamp in HomeBox and tell me its entity ID.` The
+model can discover `search_entities`, `get_entity`, `list_entity_types`,
+`list_tags`, `create_entity`, and `update_entity`. Search supports `query`,
+`page`, `pageSize`, `tags`, and `parentIds`. Create accepts a name and optional
+description, type ID, parent ID, quantity, and tag IDs. Update patches the type,
+parent, quantity, or tag IDs; supply an empty `tagIds` array to clear tags.
+Read tools run automatically. Create and update trigger the harness's approval
+prompt before an API request is sent.
+
+For a reproducible HTTPS mock, start this in another terminal from `week3/`:
+
+```sh
+go run ./testdata/homebox-mock --config /private/tmp/homebox-demo.json
+```
+
+Then use the same `mcp add`, `mcp tools`, and chat commands above with
+`--config /private/tmp/homebox-demo.json`. The mock returns a `Desk lamp` with
+ID `item-1`. Stop the mock with Ctrl-C. The end-to-end Go test also verifies
+the harness discovers the tool, calls the stdio server, and uses `Desk lamp`
+from the API result in its answer.
 
 The model sees server names and local descriptions at each answer request.
 It can call three fixed functions: `list_mcp_tools` (20 matches per page),

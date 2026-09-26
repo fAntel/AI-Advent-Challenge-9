@@ -122,6 +122,7 @@ type TaskState struct {
 
 type Session struct {
 	ID                      string              `json:"id"`
+	Chat                    bool                `json:"chat,omitempty"`
 	CreatedAt               time.Time           `json:"created_at"`
 	UpdatedAt               time.Time           `json:"updated_at"`
 	SystemPrompt            string              `json:"system_prompt,omitempty"`
@@ -173,6 +174,7 @@ type InstructionSource struct {
 
 type CreateSessionRequest struct {
 	SystemPrompt         string              `json:"system_prompt"`
+	Chat                 bool                `json:"chat,omitempty"`
 	Settings             *Settings           `json:"settings,omitempty"`
 	Profile              string              `json:"profile,omitempty"`
 	ProjectID            string              `json:"project_id,omitempty"`

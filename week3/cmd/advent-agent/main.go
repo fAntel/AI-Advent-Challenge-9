@@ -21,7 +21,7 @@ import (
 type options struct {
 	prompt, system, systemFile, formatFile, length, stop, approach, roles, model, reasoning, strategy string
 	temperature                                                                                       float64
-	temperatureSet, stats, debug, compression, compressionSet, strategySet                            bool
+	temperatureSet, stats, debug, chat, compression, compressionSet, strategySet                      bool
 }
 
 func main() {
@@ -96,8 +96,9 @@ func parseOptions(args []string, defaults agent.Settings) (options, agent.Settin
 		fs.PrintDefaults()
 	}
 	_ = fs.String("profile", "", "configuration profile (global option)")
-	fs.StringVar(&o.prompt, "prompt", "", "one-shot prompt")
-	fs.StringVar(&o.prompt, "p", "", "one-shot prompt")
+	fs.StringVar(&o.prompt, "prompt", "", "one-shot chat prompt")
+	fs.StringVar(&o.prompt, "p", "", "one-shot chat prompt")
+	fs.BoolVar(&o.chat, "chat", false, "start a chat session without a task lifecycle")
 	fs.StringVar(&o.system, "system-prompt", "", "session system prompt")
 	fs.StringVar(&o.systemFile, "system-prompt-file", "", "file containing session system prompt")
 	fs.StringVar(&o.formatFile, "format", "", "answer format file")
@@ -205,10 +206,11 @@ func runNew(api *agent.APIClient, cfg agent.Config, args []string) {
 	instructions, err := agent.ResolveInstructions(cfg, projectPath, system, systemPath)
 	fatalIf(err)
 	fatalIf(ensureDaemon(api, cfg))
-	session, err := api.Create(agent.CreateSessionRequest{Profile: cfg.Profile, ProjectID: projectID, ProjectPath: projectPath, Instructions: instructions, Settings: &settings, ContextWindowTokens: cfg.Agent.ContextWindowTokens, RecentMessages: cfg.Agent.RecentMessages, SummaryBatchMessages: cfg.Agent.SummaryBatchMessages})
+	session, err := api.Create(agent.CreateSessionRequest{Profile: cfg.Profile, Chat: usesChatMode(o), ProjectID: projectID, ProjectPath: projectPath, Instructions: instructions, Settings: &settings, ContextWindowTokens: cfg.Agent.ContextWindowTokens, RecentMessages: cfg.Agent.RecentMessages, SummaryBatchMessages: cfg.Agent.SummaryBatchMessages})
 	fatalIf(err)
 	runSession(api, cfg, session.ID, o.prompt, settings)
 }
+func usesChatMode(o options) bool { return o.chat || o.prompt != "" }
 func resume(api *agent.APIClient, cfg agent.Config, args []string) {
 	fatalIf(ensureDaemon(api, cfg))
 	id := ""
@@ -241,6 +243,12 @@ func resume(api *agent.APIClient, cfg agent.Config, args []string) {
 }
 
 func sessionLifecycleLabel(session agent.Session) string {
+	if session.Chat {
+		if session.Operation != nil {
+			return "chat/" + session.Operation.State
+		}
+		return "chat/empty"
+	}
 	if session.Task != nil {
 		return session.Task.Phase + "/" + session.Task.Status
 	}
