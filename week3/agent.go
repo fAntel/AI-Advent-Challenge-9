@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -103,6 +105,7 @@ type Agent struct {
 	closed                                   chan struct{}
 	closing                                  bool
 	MCP                                      *MCPCatalog
+	usageMu                                  sync.Mutex
 	native                                   NativeToolProvider
 }
 
@@ -738,7 +741,7 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	}
 	if err == nil && containsUnsupportedToolCall(answer) {
 		if !nativeUsed {
-			recordCompletion(r.session, completion, "answer")
+			a.recordCompletion(r.session, completion, "answer")
 		}
 		a.logUsage(id, opID, completion, "answer")
 		completionReceived = false
@@ -751,7 +754,7 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	if err != nil {
 		if completionReceived {
 			if !nativeUsed {
-				recordCompletion(r.session, completion, "answer")
+				a.recordCompletion(r.session, completion, "answer")
 			}
 			a.logUsage(id, opID, completion, "answer")
 		}
@@ -776,7 +779,7 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	} else {
 		r.session.Messages = append(r.session.Messages, Message{Role: "assistant", Content: answer})
 		if !nativeUsed {
-			recordCompletion(r.session, completion, "answer")
+			a.recordCompletion(r.session, completion, "answer")
 		}
 		a.logUsage(id, opID, completion, "answer")
 		if r.session.Task != nil {
@@ -1228,7 +1231,7 @@ func (a *Agent) compressHistory(ctx context.Context, id, opID string, settings S
 		a.logger.Log("history.compression.failed", id, opID, err.Error())
 		return
 	}
-	recordCompletion(s, completion, "summary")
+	a.recordCompletion(s, completion, "summary")
 	a.logUsage(id, opID, completion, "summary")
 	if settings.Debug {
 		s.Operation.Diagnostics += completion.Diagnostics
@@ -1314,7 +1317,7 @@ func addMetrics(dst *Metrics, m Metrics) {
 	dst.Usage.ReasoningTokens += m.Usage.ReasoningTokens
 	dst.Usage.TotalTokens += m.Usage.TotalTokens
 }
-func recordCompletion(s *Session, completion Completion, purpose string) {
+func (a *Agent) recordCompletion(s *Session, completion Completion, purpose string) {
 	call := completion.Call
 	if call.StartedAt.IsZero() {
 		call.Duration = completion.Metrics.Duration
@@ -1322,10 +1325,76 @@ func recordCompletion(s *Session, completion Completion, purpose string) {
 		call.CostUSD = completion.Metrics.CostUSD
 	}
 	call.Purpose = purpose
+	if call.StartedAt.IsZero() {
+		call.StartedAt = time.Now().UTC()
+	}
 	s.Operation.Calls = append(s.Operation.Calls, call)
 	s.Calls = append(s.Calls, call)
 	addMetrics(&s.Operation.Metrics, completion.Metrics)
 	addMetrics(&s.Metrics, completion.Metrics)
+	a.appendUsage(call)
+}
+func (a *Agent) appendUsage(call CallMetrics) {
+	a.usageMu.Lock()
+	defer a.usageMu.Unlock()
+	path := filepath.Join(a.store.Dir, "usage.jsonl")
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		return
+	}
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	data, _ := json.Marshal(struct {
+		ID string `json:"id"`
+		CallMetrics
+	}{randomID(), call})
+	_, _ = f.Write(append(data, '\n'))
+}
+
+type UsageAggregate struct {
+	Calls   int     `json:"calls"`
+	Tokens  int     `json:"tokens"`
+	CostUSD float64 `json:"estimated_cost_usd"`
+}
+
+func (a *Agent) UsageReport(now time.Time) (UsageAggregate, UsageAggregate, error) {
+	a.usageMu.Lock()
+	defer a.usageMu.Unlock()
+	data, err := os.ReadFile(filepath.Join(a.store.Dir, "usage.jsonl"))
+	if errors.Is(err, os.ErrNotExist) {
+		return UsageAggregate{}, UsageAggregate{}, nil
+	}
+	if err != nil {
+		return UsageAggregate{}, UsageAggregate{}, err
+	}
+	var hour, day UsageAggregate
+	dayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	for _, line := range bytes.Split(data, []byte{'\n'}) {
+		if len(line) == 0 {
+			continue
+		}
+		var v struct {
+			ID string `json:"id"`
+			CallMetrics
+		}
+		if err := json.Unmarshal(line, &v); err != nil {
+			return hour, day, err
+		}
+		t := v.StartedAt
+		if !t.Before(now.Add(-time.Hour)) && !t.After(now) {
+			hour.Calls++
+			hour.Tokens += v.Usage.TotalTokens
+			hour.CostUSD += v.CostUSD
+		}
+		if !t.Before(dayStart) && !t.After(now) {
+			day.Calls++
+			day.Tokens += v.Usage.TotalTokens
+			day.CostUSD += v.CostUSD
+		}
+	}
+	return hour, day, nil
 }
 func (a *Agent) logUsage(sessionID, operationID string, completion Completion, purpose string) {
 	u := completion.Metrics.Usage

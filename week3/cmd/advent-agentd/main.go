@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -44,7 +45,7 @@ func main() {
 		}
 		return
 	}
-	key := os.Getenv("DEEPSEEK_API_KEY")
+	key, _ := agent.DeepSeekAPIKey()
 	logger := agent.NewDebugLogger(cfg.Daemon, key)
 	logger.Log("daemon.start", "", "", fmt.Sprintf("daemon starting; API key present=%t", key != ""))
 	if err := os.MkdirAll(filepath.Dir(cfg.Daemon.SocketPath), 0700); err != nil {
@@ -72,8 +73,45 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
+	hub := agent.NewEventHub()
+	exe, _ := os.Executable()
+	budgetPath := filepath.Join(filepath.Dir(exe), "budget-mcp")
+	registered := false
+	for _, item := range a.MCP.List() {
+		if item.Name == "budget" {
+			registered = true
+			break
+		}
+	}
+	if !registered {
+		if info, e := os.Stat(budgetPath); e == nil && info.Mode()&0111 != 0 {
+			if a.MCP.Add("budget", "DeepSeek balance snapshots and spending reports", []string{budgetPath}) == nil {
+				registered = true
+			}
+		}
+	}
+	schedulePath := filepath.Join(cfg.ConfigDir, "schedules.toml")
+	_, scheduleFileErr := os.Stat(schedulePath)
+	scheduler, err := agent.NewScheduler(schedulePath, a.MCP, hub, time.Duration(cfg.Daemon.RequestTimeout), time.Duration(cfg.Scheduler.DefaultInterval), func(name, result string, runErr error) {
+		message := "job=" + name + " result=" + strings.ReplaceAll(result, "\n", " ")
+		if runErr != nil {
+			message = "job=" + name + " error=" + runErr.Error()
+		}
+		agent.LogSchedule(message, runErr != nil)
+	})
+	if err != nil {
+		fatal(err)
+	}
+	if registered && os.IsNotExist(scheduleFileErr) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		if e := scheduler.Add(ctx, agent.ScheduleJob{Name: "budget", Server: "budget", Tool: "capture_balance", ArgumentsJSON: "{}", Every: "default", Notify: true}); e != nil {
+			agent.LogSchedule("default budget schedule: "+e.Error(), true)
+		}
+		cancel()
+	}
+	scheduler.Start()
 	shutdownRequested := make(chan struct{}, 1)
-	handler := agent.Server{Agent: a, Shutdown: func() {
+	handler := agent.Server{Agent: a, Scheduler: scheduler, Events: hub, Shutdown: func() {
 		select {
 		case shutdownRequested <- struct{}{}:
 		default:
@@ -96,6 +134,7 @@ func main() {
 	shutdownContext, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
 	_ = server.Shutdown(shutdownContext)
 	cancelShutdown()
+	scheduler.Close()
 	a.Close()
 	_ = os.Remove(cfg.Daemon.SocketPath)
 }

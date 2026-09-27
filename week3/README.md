@@ -63,7 +63,7 @@ make build
 ```
 
 The exact runnable artifacts are `week3/advent-agent`, `week3/advent-agentd`,
-and `week3/homebox-mcp`. `make build` builds all three command packages and
+`week3/homebox-mcp`, and `week3/budget-mcp`. `make build` builds all four command packages and
 verifies their help commands, so demonstrations use newly rebuilt binaries.
 
 MCP administration and daemon startup work without `DEEPSEEK_API_KEY`. Export
@@ -355,6 +355,75 @@ feedback. Resume the session to inspect preserved decision history, and use a
 different profile or project to verify isolation.
 
 See `config.example.toml` for all harness settings.
+
+## Scheduled MCP calls and budget reports
+
+`advent-agentd` runs delayed and recurring calls to registered MCP tools. Jobs
+and their last results are saved in private `schedules.toml` under the user
+configuration directory. The first daemon start with the rebuilt `budget-mcp`
+next to `advent-agentd` registers that server and creates an hourly `budget`
+job. Set `[scheduler].default_interval` in `config.toml` to change the default
+interval; jobs using `default` adopt the new interval after their next run.
+Removing the budget job persists across daemon restarts.
+
+```sh
+./advent-agent schedule list
+./advent-agent schedule reload
+./advent-agent schedule run budget
+./advent-agent schedule add --server budget --tool get_report --every 6h --notify budget-six-hours
+./advent-agent schedule add --server budget --tool get_report --at 2026-10-01T09:00:00+03:00 budget-once
+./advent-agent schedule remove budget-six-hours
+```
+
+`--args '{"name":"value"}'` supplies tool arguments. A scheduled job is an
+explicit authorization for its future tool calls, including write-capable
+tools; the daemon validates the tool and arguments when the job is added.
+After editing `schedules.toml` by hand, run `./advent-agent schedule reload`.
+Changing `every` starts a new interval from reload time and writes the updated
+`next_run` back to TOML. Restarting the daemon also detects an interval change.
+After sleep or restart, an overdue recurring job runs once before resuming its
+interval. `schedule run` starts a job immediately. Results and errors are
+recorded in macOS unified logging under subsystem
+`dev.aiadvent.advent-agent`, category `scheduler`:
+
+```sh
+log show --last 1d --predicate 'subsystem == "dev.aiadvent.advent-agent" && category == "scheduler"'
+```
+
+The budget MCP stores balance samples in private
+`~/.local/state/advent-agent/budget/snapshots.json`. Its `capture_balance`
+tool queries DeepSeek and stores a sample; `get_report` reads the latest
+sample. Reports show balance in DeepSeek's currency, observed balance change
+between samples, and separately the daemon's estimated USD cost and tokens
+for the last hour and current local day. A balance increase is labeled an
+adjustment. The daemon keeps a separate private `usage.jsonl` ledger so
+deleting sessions does not erase these usage totals. Pre-existing calls are
+not backfilled into that ledger.
+
+Connected interactive chats receive new scheduled reports through a Unix-socket
+event stream. A reconnecting chat sees the latest report. Notices are gray on
+color terminals and stay out of conversation history and model context.
+
+On macOS, a per-user LaunchAgent can keep the daemon running after login and
+restart it if it exits. Store the DeepSeek API key in Keychain before installing
+the service; `service key set` reads it without echoing it or placing it in a
+command argument. `DEEPSEEK_API_KEY` remains supported for manually started
+daemon chat calls, while `budget-mcp` reads Keychain directly.
+
+```sh
+./advent-agent service key set
+./advent-agent service install
+./advent-agent service status
+./advent-agent service stop
+./advent-agent service start
+./advent-agent service uninstall
+```
+
+The installed plist is `~/Library/LaunchAgents/dev.aiadvent.advent-agent.plist`.
+`service stop` unloads the LaunchAgent so `KeepAlive` does not immediately
+restart it. Jobs remain in TOML across logout and reboot, and resume after the
+next login. The service uses the absolute path of the rebuilt `advent-agentd`
+at installation time; reinstall after moving the binaries.
 
 For a cross-SDK smoke test, register Everything as shown above, inspect its
 tool inventory, then run `./advent-agent` and ask for a task that finds,

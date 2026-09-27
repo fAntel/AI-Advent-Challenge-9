@@ -195,3 +195,54 @@ func (c *APIClient) Shutdown() error {
 	_, e := c.do("POST", "/v1/shutdown", "", nil, nil)
 	return e
 }
+func (c *APIClient) UsageReport() (UsageReportResponse, error) {
+	var v UsageReportResponse
+	_, err := c.do("GET", "/v1/usage", "", nil, &v)
+	return v, err
+}
+
+type UsageReportResponse struct {
+	LastHour    UsageAggregate `json:"last_hour"`
+	Today       UsageAggregate `json:"today"`
+	GeneratedAt time.Time      `json:"generated_at"`
+}
+
+func (c *APIClient) ScheduleAdd(j ScheduleJob) error {
+	_, err := c.do("POST", "/v1/schedules", "", j, nil)
+	return err
+}
+func (c *APIClient) ScheduleList() ([]ScheduleJob, error) {
+	var v []ScheduleJob
+	_, err := c.do("GET", "/v1/schedules", "", nil, &v)
+	return v, err
+}
+func (c *APIClient) ScheduleRemove(name string) error {
+	_, err := c.do("DELETE", "/v1/schedules/"+url.PathEscape(name), "", nil, nil)
+	return err
+}
+func (c *APIClient) ScheduleReload() ([]ScheduleJob, error) {
+	var jobs []ScheduleJob
+	_, err := c.do("POST", "/v1/schedules/reload", "", nil, &jobs)
+	return jobs, err
+}
+func (c *APIClient) ScheduleRun(name string) (ScheduleJob, error) {
+	var job ScheduleJob
+	_, err := c.do("POST", "/v1/schedules/"+url.PathEscape(name)+"/run", "", nil, &job)
+	return job, err
+}
+func (c *APIClient) Events(ctx context.Context) (io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", c.BaseURL+"/v1/events", nil)
+	if err != nil {
+		return nil, err
+	}
+	client := &http.Client{Transport: c.HTTP.Transport}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		resp.Body.Close()
+		return nil, fmt.Errorf("events returned HTTP %d", resp.StatusCode)
+	}
+	return resp.Body, nil
+}

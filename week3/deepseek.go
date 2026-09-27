@@ -22,7 +22,11 @@ const (
 func DeepSeekAPIKey() (string, error) {
 	key := os.Getenv("DEEPSEEK_API_KEY")
 	if key == "" {
-		return "", errors.New("DEEPSEEK_API_KEY is not set")
+		var err error
+		key, err = KeychainDeepSeekKey()
+		if err != nil {
+			return "", errors.New("DEEPSEEK_API_KEY is not set and no Keychain key is available")
+		}
 	}
 	return key, nil
 }

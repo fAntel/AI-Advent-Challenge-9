@@ -16,14 +16,15 @@ import (
 const DefaultProfile = "default"
 
 type Config struct {
-	Daemon    DaemonConfig   `toml:"daemon"`
-	Provider  ProviderConfig `toml:"provider"`
-	DeepSeek  DeepSeekConfig `toml:"deepseek"`
-	Agent     AgentConfig    `toml:"agent"`
-	Client    ClientConfig   `toml:"client"`
-	Profile   string         `toml:"-"`
-	ConfigDir string         `toml:"-"`
-	StateDir  string         `toml:"-"`
+	Daemon    DaemonConfig    `toml:"daemon"`
+	Provider  ProviderConfig  `toml:"provider"`
+	DeepSeek  DeepSeekConfig  `toml:"deepseek"`
+	Agent     AgentConfig     `toml:"agent"`
+	Client    ClientConfig    `toml:"client"`
+	Scheduler SchedulerConfig `toml:"scheduler"`
+	Profile   string          `toml:"-"`
+	ConfigDir string          `toml:"-"`
+	StateDir  string          `toml:"-"`
 }
 
 type Duration time.Duration
@@ -67,6 +68,9 @@ type ClientConfig struct {
 	PollInterval Duration `toml:"poll_interval"`
 	Autostart    bool     `toml:"autostart"`
 }
+type SchedulerConfig struct {
+	DefaultInterval Duration `toml:"default_interval"`
+}
 
 func xdgDir(env, fallback string) string {
 	if value := os.Getenv(env); filepath.IsAbs(value) {
@@ -90,6 +94,7 @@ func DefaultConfig() Config {
 		DeepSeek: DeepSeekConfig{Endpoint: "https://api.deepseek.com/chat/completions", Model: FlashModel, Reasoning: "none"},
 		Agent:    AgentConfig{ContextWindowTokens: 1_000_000, CompressionEnabled: true, RecentMessages: 5, SummaryBatchMessages: 5, ContextStrategy: "summary"},
 		Client:   ClientConfig{PollInterval: Duration(250 * time.Millisecond), Autostart: true}, ConfigDir: configDir, StateDir: stateDir, Profile: DefaultProfile,
+		Scheduler: SchedulerConfig{DefaultInterval: Duration(time.Hour)},
 	}
 }
 
@@ -173,6 +178,9 @@ func (c Config) Validate() error {
 	}
 	if c.Daemon.RequestTimeout <= 0 || c.Daemon.LeaseTimeout <= 0 || c.Daemon.EvictAfter < 0 || c.Client.PollInterval <= 0 {
 		return errors.New("timeouts and poll_interval must be positive")
+	}
+	if c.Scheduler.DefaultInterval <= 0 {
+		return errors.New("scheduler.default_interval must be positive")
 	}
 	if c.Daemon.LogMaxBytes <= 0 || c.Daemon.LogBackups < 0 {
 		return errors.New("invalid log rotation settings")

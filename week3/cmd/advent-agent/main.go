@@ -50,6 +50,14 @@ func main() {
 		runMCP(api, cfg, args[1:])
 		return
 	}
+	if len(args) > 0 && args[0] == "schedule" {
+		runSchedule(api, cfg, args[1:])
+		return
+	}
+	if len(args) > 0 && args[0] == "service" {
+		runService(cfg, args[1:])
+		return
+	}
 	if len(args) > 0 && args[0] == "delete" {
 		if len(args) != 2 {
 			fatal(errors.New("usage: advent-agent delete SESSION_ID"))
@@ -378,6 +386,9 @@ func runAttachedSession(api *agent.APIClient, cfg agent.Config, id, initial stri
 		}
 	}
 	printTaskState(os.Stderr, &current, false)
+	editor := &lineEditor{}
+	stopNotices := streamNotices(api, editor)
+	defer stopNotices()
 	done := make(chan struct{})
 	go func() {
 		t := time.NewTicker(time.Duration(cfg.Daemon.LeaseTimeout) / 3)
@@ -399,8 +410,7 @@ func runAttachedSession(api *agent.APIClient, cfg agent.Config, id, initial stri
 		}
 	}
 	for {
-		fmt.Print(speaker("You:", "36"), " ")
-		line, e := reader.ReadString('\n')
+		line, e := editor.read(reader, speaker("You:", "36")+" ")
 		if e != nil && len(line) == 0 {
 			return ""
 		}

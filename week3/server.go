@@ -6,11 +6,14 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type Server struct {
-	Agent    *Agent
-	Shutdown func()
+	Agent     *Agent
+	Shutdown  func()
+	Scheduler *Scheduler
+	Events    *EventHub
 }
 
 const maxRequestBodyBytes = 8 << 20
@@ -39,6 +42,87 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	if strings.HasPrefix(path, "v1/mcp") {
 		s.serveMCP(w, r, path)
+		return
+	}
+	if path == "v1/events" && r.Method == http.MethodGet {
+		if s.Events == nil {
+			w.WriteHeader(404)
+			return
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		w.Header().Set("Cache-Control", "no-cache")
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			w.WriteHeader(500)
+			return
+		}
+		ch, unsubscribe := s.Events.Subscribe()
+		defer unsubscribe()
+		w.WriteHeader(http.StatusOK)
+		flusher.Flush()
+		for {
+			select {
+			case <-r.Context().Done():
+				return
+			case n := <-ch:
+				data, _ := json.Marshal(n)
+				_, _ = w.Write([]byte("data: " + string(data) + "\n\n"))
+				flusher.Flush()
+			case <-time.After(25 * time.Second):
+				_, _ = w.Write([]byte(": keepalive\n\n"))
+				flusher.Flush()
+			}
+		}
+	}
+	if path == "v1/schedules" && s.Scheduler != nil {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(w, 200, s.Scheduler.List())
+		case http.MethodPost:
+			var j ScheduleJob
+			if e := decodeJSON(w, r, &j); e != nil {
+				s.respond(w, nil, e, 0)
+				return
+			}
+			ctx, cancel := context.WithTimeout(r.Context(), s.Agent.requestTimeout)
+			defer cancel()
+			s.respond(w, map[string]bool{"ok": true}, s.Scheduler.Add(ctx, j), 201)
+		default:
+			w.WriteHeader(405)
+		}
+		return
+	}
+	if path == "v1/schedules/reload" && s.Scheduler != nil && r.Method == http.MethodPost {
+		jobs, err := s.Scheduler.Reload()
+		s.respond(w, jobs, err, 200)
+		return
+	}
+	if strings.HasPrefix(path, "v1/schedules/") && s.Scheduler != nil {
+		name := strings.TrimPrefix(path, "v1/schedules/")
+		if r.Method == http.MethodDelete {
+			s.respond(w, map[string]bool{"ok": true}, s.Scheduler.Remove(name), 200)
+		} else if r.Method == http.MethodPost && strings.HasSuffix(name, "/run") {
+			name = strings.TrimSuffix(name, "/run")
+			if err := s.Scheduler.Run(name); err != nil {
+				s.respond(w, nil, err, 0)
+				return
+			}
+			for _, job := range s.Scheduler.List() {
+				if job.Name == name {
+					writeJSON(w, 200, job)
+					return
+				}
+			}
+			writeJSON(w, 200, map[string]bool{"completed": true})
+		} else {
+			w.WriteHeader(405)
+		}
+		return
+	}
+	if path == "v1/usage" && r.Method == http.MethodGet {
+		end := time.Now()
+		hour, day, err := s.Agent.UsageReport(end)
+		s.respond(w, map[string]any{"last_hour": hour, "today": day, "generated_at": end}, err, 200)
 		return
 	}
 	if path == "v1/shutdown" {

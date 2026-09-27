@@ -155,7 +155,7 @@ func (a *Agent) completeWithMCP(ctx context.Context, id, opID string, base []Mes
 				purpose = "unknown_tool"
 			}
 		}
-		recordCompletion(r.session, round.Completion, purpose)
+		a.recordCompletion(r.session, round.Completion, purpose)
 		r.session.Operation.ToolRounds = rounds
 		r.session.Operation.InternalCalls = calls
 		_ = a.store.Save(r.session)

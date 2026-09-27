@@ -35,3 +35,7 @@ summary_batch_messages = 5
 [client]
 poll_interval = "250ms"
 autostart = true
+
+[scheduler]
+# Used by `advent-agent schedule add --every default`.
+default_interval = "1h"

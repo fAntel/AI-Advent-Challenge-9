@@ -12,6 +12,8 @@ func writeCLIUsage(w io.Writer) {
   advent-agent delete SESSION_ID
   advent-agent profiles
   advent-agent mcp COMMAND
+  advent-agent schedule add|list|remove|run|reload ...
+  advent-agent service install|start|status|stop|uninstall|key set ...
 
 MCP commands:
   mcp add NAME [--description TEXT] -- COMMAND [ARG...]
