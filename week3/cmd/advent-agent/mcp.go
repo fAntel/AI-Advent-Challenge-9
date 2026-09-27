@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -38,8 +39,10 @@ func runMCP(api *agent.APIClient, cfg agent.Config, args []string) {
 		if i >= len(args)-1 {
 			fatal(errors.New("MCP command required after --"))
 		}
+		command, err := absoluteMCPCommand(args[i+1:])
+		fatalIf(err)
 		fatalIf(ensureDaemon(api, cfg))
-		fatalIf(api.MCPAdd(name, description, args[i+1:]))
+		fatalIf(api.MCPAdd(name, description, command))
 		fmt.Println("Added", name)
 	case "list":
 		if len(args) != 1 {
@@ -137,4 +140,19 @@ func runMCP(api *agent.APIClient, cfg agent.Config, args []string) {
 	default:
 		fatal(fmt.Errorf("unknown MCP command %q", args[0]))
 	}
+}
+
+// Resolve path-like executables at registration time. The daemon may later be
+// started by a service with a different working directory.
+func absoluteMCPCommand(command []string) ([]string, error) {
+	out := append([]string(nil), command...)
+	if len(out) == 0 || filepath.IsAbs(out[0]) || !strings.ContainsRune(out[0], os.PathSeparator) {
+		return out, nil
+	}
+	path, err := filepath.Abs(out[0])
+	if err != nil {
+		return nil, err
+	}
+	out[0] = path
+	return out, nil
 }

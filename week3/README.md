@@ -63,7 +63,7 @@ make build
 ```
 
 The exact runnable artifacts are `week3/advent-agent`, `week3/advent-agentd`,
-`week3/homebox-mcp`, `week3/budget-mcp`, and `week3/report-mcp`. `make build` builds all five command packages and
+`week3/homebox-mcp`, `week3/budget-mcp`, `week3/report-mcp`, and `week3/supplier-mcp`. `make build` builds all six command packages and
 verifies their help commands, so demonstrations use newly rebuilt binaries.
 
 MCP administration and daemon startup work without `DEEPSEEK_API_KEY`. Export
@@ -82,6 +82,8 @@ client starts the daemon automatically by default. Stop it with
 
 Definitions and cached tool metadata are stored globally under the daemon
 state directory in `mcp-catalog.json`, with private file permissions. `add`
+resolves path-like server executables against the CLI's current directory, so
+the daemon can launch them even when it runs from another directory. `add`
 does not launch the server. First discovery or invocation starts a long-lived
 stdio connection; removal and shutdown close it. `mcp tools` follows every
 server page and prints the total tool count after the inventory. Positive MCP TTLs allow cached discovery until expiry, while zero
@@ -144,8 +146,9 @@ go run ./testdata/homebox-mock --config /private/tmp/homebox-demo.json
 ```
 
 Then use the same `mcp add`, `mcp tools`, and chat commands above with
-`--config /private/tmp/homebox-demo.json`. The mock returns a `Desk lamp` with
-ID `item-1`. Stop the mock with Ctrl-C. The end-to-end Go test also verifies
+`--config /private/tmp/homebox-demo.json`. The mock returns a Desk lamp
+(`item-1`, quantity 1), LED bulb (`item-2`, quantity 0), and Floor lamp
+(`item-3`, quantity 4). Stop the mock with Ctrl-C. The end-to-end Go test also verifies
 the harness discovers the tool, calls the stdio server, and uses `Desk lamp`
 from the API result in its answer.
 
@@ -156,8 +159,13 @@ schemas, annotations, and results from servers are untrusted data. A tool
 explicitly marked read-only and not destructive is invoked automatically; write-capable or ambiguous
 tools pause for `Execute? [y/N]`. Denial is returned to the model. Piped or
 otherwise non-interactive input denies automatically. A pending approval
-survives daemon restart. The loop permits at most eight model rounds and
-sixteen internal calls, then requests a final answer with tools disabled.
+survives daemon restart. The loop permits at most twelve model rounds and
+thirty-two internal calls, then requests a final answer with tools disabled.
+
+Interactive sessions print numbered MCP events in tool order. They show the
+chosen server, tool, and status, without tool arguments or results. The current
+operation keeps these events after completion; a new request starts a new
+sequence.
 
 Interactive terminal labels use cyan `You:`, magenta `Agent:`, and yellow
 approval prompts. Redirected output, `TERM=dumb`, and any defined `NO_COLOR`
@@ -367,6 +375,45 @@ feedback. Resume the session to inspect preserved decision history, and use a
 different profile or project to verify isolation.
 
 See `config.example.toml` for all harness settings.
+
+## Three-server orchestration demonstration
+
+`supplier-mcp` is a read-only local offer catalog. Its `search_offers` tool
+returns matching offers with SKU, unit price, currency, available quantity,
+shipping cost, and delivery days. It does not rank or select an offer; the
+user's request supplies the selection rule. The fixture includes an unavailable
+low-priced Desk lamp offer so the agent must check stock as well as price.
+
+After `make test && make build`, start the HomeBox mock shown above, then
+register all three rebuilt MCP binaries from `week3/`:
+
+```sh
+./advent-agent mcp add homebox --description "HomeBox inventory and item quantities" -- "$PWD/homebox-mcp" --config /private/tmp/homebox-demo.json
+./advent-agent mcp add supplier --description "Read-only supplier offers with price, stock, shipping and delivery facts" -- "$PWD/supplier-mcp"
+./advent-agent mcp add report --description "Summarize inventory and save Markdown reports" -- "$PWD/report-mcp" --output-dir /private/tmp/advent-reports
+./advent-agent mcp tools --refresh homebox
+./advent-agent mcp tools --refresh supplier
+./advent-agent mcp tools --refresh report
+./advent-agent --chat
+```
+
+In chat, ask: `Inspect all HomeBox inventory. For each item with quantity below
+3, search supplier offers and recommend the cheapest available total cost for
+the quantity needed to reach 3 (unit price times quantity plus shipping).
+Summarize the inventory and save a replenishment report named
+replenishment.md. Do not change inventory or place an order.` Approve the
+`report.save_report` call when prompted. The terminal's numbered MCP events
+show discovery and calls across HomeBox, supplier, and report in order. Check
+`/private/tmp/advent-reports/replenishment.md` for the saved recommendation.
+
+The scripted end-to-end test uses the same three server types and checks tool
+routing, call order, report content, and approval handling. A live run shows
+the model's own tool choices; the scripted test verifies the harness mechanics.
+If `supplier` was registered before the binary was built, run `make build` and
+restart `advent-agentd` before retrying. Existing `./supplier-mcp` catalog
+entries can resolve the binary next to the rebuilt daemon. `mcp list` shows
+the stored command, and `mcp tools --refresh supplier` checks discovery before
+starting a chat.
 
 ## Configured MCP pipelines
 

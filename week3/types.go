@@ -71,6 +71,18 @@ type Operation struct {
 	ToolRounds    int              `json:"tool_rounds,omitempty"`
 	InternalCalls int              `json:"internal_calls,omitempty"`
 	InFlightTool  string           `json:"in_flight_tool,omitempty"`
+	MCPEvents     []MCPEvent       `json:"mcp_events,omitempty"`
+}
+
+// MCPEvent is a compact, ordered trace of model-directed MCP activity.
+// Tool arguments and results are deliberately omitted.
+type MCPEvent struct {
+	Sequence int       `json:"sequence"`
+	At       time.Time `json:"at"`
+	Action   string    `json:"action"`
+	Server   string    `json:"server,omitempty"`
+	Tool     string    `json:"tool,omitempty"`
+	Status   string    `json:"status"`
 }
 
 type PendingMCPCall struct {

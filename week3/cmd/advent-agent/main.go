@@ -437,6 +437,7 @@ func runAttachedSession(api *agent.APIClient, cfg agent.Config, id, initial stri
 	}
 }
 func wait(api *agent.APIClient, cfg agent.Config, id, lease string, settings agent.Settings, reader *bufio.Reader) string {
+	lastMCPEvent := 0
 	for {
 		time.Sleep(time.Duration(cfg.Client.PollInterval))
 		s, err := api.Get(id)
@@ -444,6 +445,7 @@ func wait(api *agent.APIClient, cfg agent.Config, id, lease string, settings age
 		if s.Operation == nil {
 			continue
 		}
+		printMCPEvents(os.Stderr, s.Operation.MCPEvents, &lastMCPEvent)
 		switch s.Operation.State {
 		case "running", "compressing":
 			continue

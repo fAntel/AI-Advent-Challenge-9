@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func main() {
@@ -19,6 +20,11 @@ func main() {
 	if *configFile == "" {
 		fmt.Fprintln(os.Stderr, "--config is required")
 		os.Exit(2)
+	}
+	items := []map[string]any{
+		{"id": "item-1", "name": "Desk lamp", "quantity": 1, "tagIds": []string{"tag-1"}},
+		{"id": "item-2", "name": "LED bulb", "quantity": 0, "tagIds": []string{"tag-1"}},
+		{"id": "item-3", "name": "Floor lamp", "quantity": 4, "tagIds": []string{"tag-1"}},
 	}
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Bearer demo-key" {
@@ -29,7 +35,14 @@ func main() {
 		switch r.URL.Path {
 		case "/api/v1/entities":
 			if r.Method == "GET" {
-				_, _ = w.Write([]byte(`{"items":[{"id":"item-1","name":"Desk lamp","quantity":1}],"page":1,"pageSize":20,"total":1}`))
+				matches := make([]map[string]any, 0)
+				query := strings.ToLower(r.URL.Query().Get("q"))
+				for _, item := range items {
+					if strings.Contains(strings.ToLower(item["name"].(string)), query) {
+						matches = append(matches, item)
+					}
+				}
+				_ = json.NewEncoder(w).Encode(map[string]any{"items": matches, "page": 1, "pageSize": 20, "total": len(matches)})
 				return
 			}
 			if r.Method == "POST" {
@@ -37,10 +50,12 @@ func main() {
 				_, _ = w.Write([]byte(`{"id":"item-2","name":"Created item"}`))
 				return
 			}
-		case "/api/v1/entities/item-1":
-			if r.Method == "GET" || r.Method == "PATCH" {
-				_, _ = w.Write([]byte(`{"id":"item-1","name":"Desk lamp","quantity":1}`))
-				return
+		case "/api/v1/entities/item-1", "/api/v1/entities/item-2", "/api/v1/entities/item-3":
+			for _, item := range items {
+				if strings.HasSuffix(r.URL.Path, item["id"].(string)) && (r.Method == "GET" || r.Method == "PATCH") {
+					_ = json.NewEncoder(w).Encode(item)
+					return
+				}
 			}
 		case "/api/v1/entity-types":
 			_, _ = w.Write([]byte(`[{"id":"type-1","name":"Item"}]`))

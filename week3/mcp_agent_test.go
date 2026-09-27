@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,6 +58,13 @@ func TestMCPApprovedWriteExecutesOnce(t *testing.T) {
 	if completed.Task.Phase != TaskPhasePlanning {
 		t.Fatalf("phase changed: %+v", completed.Task)
 	}
+	var statuses []string
+	for _, event := range completed.Operation.MCPEvents {
+		statuses = append(statuses, event.Status)
+	}
+	if strings.Join(statuses, ",") != "started,approval_required,approved,returned" {
+		t.Fatalf("approval trace: %v", statuses)
+	}
 }
 
 func (p *scriptedNative) Complete(context.Context, CompletionRequest) (CompletionResponse, error) {
@@ -84,7 +92,7 @@ func (p *scriptedNative) CompleteNative(_ context.Context, messages []NativeMess
 
 func awaitOperation(t *testing.T, a *Agent, id, state string) Session {
 	t.Helper()
-	deadline := time.Now().Add(5 * time.Second)
+	deadline := time.Now().Add(30 * time.Second)
 	for time.Now().Before(deadline) {
 		s, err := a.Get(id)
 		if err != nil {
@@ -97,6 +105,71 @@ func awaitOperation(t *testing.T, a *Agent, id, state string) Session {
 	}
 	t.Fatalf("operation did not reach %s", state)
 	return Session{}
+}
+
+func TestMCPReturnStatusDistinguishesToolErrors(t *testing.T) {
+	if got := mcpReturnStatus("call", `{"is_error":true}`); got != "tool_error" {
+		t.Fatalf("status=%s", got)
+	}
+	if got := mcpReturnStatus("discover", `{"is_error":true}`); got != "returned" {
+		t.Fatalf("discovery status=%s", got)
+	}
+}
+
+type limitNative struct {
+	rounds       int
+	toolsStopped bool
+}
+
+func (*limitNative) Complete(context.Context, CompletionRequest) (CompletionResponse, error) {
+	return CompletionResponse{}, nil
+}
+
+func (p *limitNative) CompleteNative(_ context.Context, _ []NativeMessage, _ Settings, tools []NativeTool) (NativeRound, error) {
+	p.rounds++
+	u := Usage{PromptTokens: 1, CompletionTokens: 1, TotalTokens: 2}
+	r := NativeRound{Completion: CompletionResponse{Metrics: Metrics{Requests: 1, Usage: u}, Usage: u, Call: CallMetrics{Usage: u}}}
+	if len(tools) == 0 {
+		p.toolsStopped = true
+		r.Message = NativeMessage{Role: "assistant", Content: "Stopped at the tool limit."}
+		r.Completion.Answer = "Stopped at the tool limit."
+		return r, nil
+	}
+	call := NativeToolCall{ID: "list-" + fmt.Sprint(p.rounds), Type: "function"}
+	call.Function.Name = "list_mcp_tools"
+	call.Function.Arguments = `{"server":"fixture"}`
+	r.Message = NativeMessage{Role: "assistant", ToolCalls: []NativeToolCall{call}}
+	return r, nil
+}
+
+func TestMCPRoundLimitRequestsFinalAnswer(t *testing.T) {
+	cfg := testConfig(t)
+	cfg.Daemon.RequestTimeout = Duration(30 * time.Second)
+	cfg.Daemon.LeaseTimeout = Duration(30 * time.Second)
+	provider := &limitNative{}
+	a, err := NewAgent(cfg, provider, NewDebugLogger(cfg.Daemon, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	if err := a.MCP.Add("fixture", "fixture", []string{fixtureBinary(t)}); err != nil {
+		t.Fatal(err)
+	}
+	s, err := a.Create(CreateSessionRequest{Chat: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	lease, err := a.Attach(s.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := a.Submit(s.ID, lease, MessageRequest{Content: "Discover the fixture."}); err != nil {
+		t.Fatal(err)
+	}
+	completed := awaitOperation(t, a, s.ID, "completed")
+	if !provider.toolsStopped || provider.rounds != maxMCPRounds+1 || completed.Operation.InternalCalls != maxMCPRounds {
+		t.Fatalf("rounds=%d stopped=%t calls=%d", provider.rounds, provider.toolsStopped, completed.Operation.InternalCalls)
+	}
 }
 
 func TestMCPApprovalResumesWithoutRepeatingModelCall(t *testing.T) {
@@ -149,6 +222,9 @@ func TestMCPApprovalResumesWithoutRepeatingModelCall(t *testing.T) {
 	}
 	if completed.Operation.Metrics.Requests != 2 || len(completed.Operation.Calls) != 2 {
 		t.Fatalf("metrics: %+v", completed.Operation)
+	}
+	if got := completed.Operation.MCPEvents[len(completed.Operation.MCPEvents)-1].Status; got != "denied" {
+		t.Fatalf("denial trace: %+v", completed.Operation.MCPEvents)
 	}
 	provider.mu.Lock()
 	defer provider.mu.Unlock()

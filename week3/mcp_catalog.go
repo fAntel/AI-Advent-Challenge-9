@@ -226,7 +226,7 @@ func (c *MCPCatalog) connectLocked(ctx context.Context, e *mcpEntry) error {
 		}
 		c.mu.Unlock()
 	}})
-	cmd := exec.Command(e.Command[0], e.Command[1:]...)
+	cmd := exec.Command(resolveMCPExecutable(e.Command[0]), e.Command[1:]...)
 	e.stderr = &stderrTail{}
 	cmd.Stderr = e.stderr
 	cmd.Env = withoutDeepSeekKey(os.Environ())
@@ -246,6 +246,30 @@ func (c *MCPCatalog) connectLocked(ctx context.Context, e *mcpEntry) error {
 		c.mu.Unlock()
 	}()
 	return nil
+}
+
+// Older catalogs may contain ./server paths registered before the CLI stored
+// absolute paths. Rebuilt MCP binaries are normally next to advent-agentd.
+func resolveMCPExecutable(command string) string {
+	daemon, _ := os.Executable()
+	return resolveMCPExecutableFrom(command, daemon)
+}
+
+func resolveMCPExecutableFrom(command, daemon string) string {
+	if filepath.IsAbs(command) || !strings.ContainsRune(command, os.PathSeparator) {
+		return command
+	}
+	if info, err := os.Stat(command); err == nil && !info.IsDir() {
+		return command
+	}
+	if daemon == "" {
+		return command
+	}
+	candidate := filepath.Join(filepath.Dir(daemon), command)
+	if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
+		return candidate
+	}
+	return command
 }
 func mcpDiagnostic(e *mcpEntry, phase string, err error) error {
 	if stderr := e.stderr.String(); stderr != "" {

@@ -17,6 +17,8 @@ import (
 var errToolApprovalPending = errors.New("MCP tool approval pending")
 
 const maxMCPBytes = 64 << 10
+const maxMCPRounds = 12
+const maxMCPCalls = 32
 
 func mcpNativeTools() []NativeTool {
 	definitions := []struct {
@@ -67,6 +69,7 @@ func (a *Agent) completeWithMCP(ctx context.Context, id, opID string, base []Mes
 	}
 	if inFlight != "" {
 		transcript = append(transcript, NativeMessage{Role: "tool", ToolCallID: inFlight, Content: "Tool invocation was interrupted; outcome unknown. It was not retried."})
+		a.recordMCPEvent(id, opID, "call", "", "", "interrupted")
 		a.saveToolProgress(id, opID, transcript, rounds, calls, "", nil, nil)
 	}
 	if pending == nil && len(queued) == 0 {
@@ -75,13 +78,22 @@ func (a *Agent) completeWithMCP(ctx context.Context, id, opID string, base []Mes
 	if pending != nil {
 		result := "Tool execution denied by the user."
 		if approved != nil && *approved {
+			a.recordMCPEvent(id, opID, "call", pending.Server, pending.Tool, "approved")
 			a.saveToolProgress(id, opID, transcript, rounds, calls, pending.CallID, nil, nil)
 			res, err := a.MCP.Call(ctx, pending.Server, pending.Tool, pending.Arguments)
 			if err != nil {
 				result = "Tool execution failed: " + err.Error()
+				a.recordMCPEvent(id, opID, "call", pending.Server, pending.Tool, "error")
 			} else {
 				result = compactMCPResult(res)
+				status := "returned"
+				if res != nil && res.IsError {
+					status = "tool_error"
+				}
+				a.recordMCPEvent(id, opID, "call", pending.Server, pending.Tool, status)
 			}
+		} else {
+			a.recordMCPEvent(id, opID, "call", pending.Server, pending.Tool, "denied")
 		}
 		transcript = append(transcript, NativeMessage{Role: "tool", ToolCallID: pending.CallID, Content: result})
 		pending = nil
@@ -93,15 +105,20 @@ func (a *Agent) completeWithMCP(ctx context.Context, id, opID string, base []Mes
 			call := queued[0]
 			queued = queued[1:]
 			calls++
-			if calls > 16 {
+			if calls > maxMCPCalls {
 				transcript = append(transcript, NativeMessage{Role: "tool", ToolCallID: call.ID, Content: "Internal tool-call limit reached."})
+				a.recordMCPEvent(id, opID, mcpEventAction(call.Function.Name), "", "", "limit")
 				continue
 			}
+			action, server, tool := mcpEventRoute(call)
+			a.recordMCPEvent(id, opID, action, server, tool, "started")
 			result, next, err := a.internalMCP(ctx, id, opID, transcript, rounds, calls, call)
 			if err != nil {
 				result = "Tool error: " + err.Error()
+				a.recordMCPEvent(id, opID, action, server, tool, "error")
 			}
 			if next != nil {
+				a.recordMCPEvent(id, opID, action, server, tool, "approval_required")
 				a.mu.Lock()
 				r = a.sessions[id]
 				if r == nil || r.session.Operation == nil || r.session.Operation.ID != opID {
@@ -121,14 +138,17 @@ func (a *Agent) completeWithMCP(ctx context.Context, id, opID string, base []Mes
 				a.mu.Unlock()
 				return CompletionResponse{}, errToolApprovalPending
 			}
+			if err == nil {
+				a.recordMCPEvent(id, opID, action, server, tool, mcpReturnStatus(action, result))
+			}
 			transcript = append(transcript, NativeMessage{Role: "tool", ToolCallID: call.ID, Content: boundedString(result)})
 			a.saveToolProgress(id, opID, transcript, rounds, calls, "", nil, queued)
 		}
-		if rounds >= 8 {
+		if rounds >= maxMCPRounds {
 			transcript = append(transcript, NativeMessage{Role: "system", Content: "Tool limit reached. Give a final answer now using available results."})
 		}
 		nativeTools := mcpNativeTools()
-		if rounds >= 8 || calls >= 16 {
+		if rounds >= maxMCPRounds || calls >= maxMCPCalls {
 			nativeTools = nil
 		}
 		round, err := a.native.CompleteNative(ctx, transcript, settings, nativeTools)
@@ -190,6 +210,61 @@ func unansweredToolCalls(messages []NativeMessage) []NativeToolCall {
 		}
 	}
 	return calls
+}
+
+func mcpEventAction(name string) string {
+	switch name {
+	case "list_mcp_tools":
+		return "discover"
+	case "describe_mcp_tool":
+		return "describe"
+	case "call_mcp_tool":
+		return "call"
+	default:
+		return "unknown"
+	}
+}
+
+func mcpEventRoute(call NativeToolCall) (action, server, tool string) {
+	action = mcpEventAction(call.Function.Name)
+	var args struct {
+		Server string `json:"server"`
+		Tool   string `json:"tool"`
+	}
+	_ = json.Unmarshal([]byte(call.Function.Arguments), &args)
+	return action, args.Server, args.Tool
+}
+
+func mcpReturnStatus(action, result string) string {
+	if action == "call" {
+		var value struct {
+			IsError bool `json:"is_error"`
+		}
+		if json.Unmarshal([]byte(result), &value) == nil && value.IsError {
+			return "tool_error"
+		}
+	}
+	return "returned"
+}
+
+func (a *Agent) recordMCPEvent(id, opID, action, server, tool, status string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	r := a.sessions[id]
+	if r == nil || r.session.Operation == nil || r.session.Operation.ID != opID {
+		return
+	}
+	op := r.session.Operation
+	op.MCPEvents = append(op.MCPEvents, MCPEvent{
+		Sequence: len(op.MCPEvents) + 1,
+		At:       time.Now().UTC(),
+		Action:   action,
+		Server:   server,
+		Tool:     tool,
+		Status:   status,
+	})
+	r.session.UpdatedAt = time.Now().UTC()
+	_ = a.store.Save(r.session)
 }
 
 func boundedString(s string) string {

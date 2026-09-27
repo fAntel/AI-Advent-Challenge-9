@@ -1413,6 +1413,7 @@ func cloneSession(s *Session) *Session {
 	if s.Operation != nil {
 		o := *s.Operation
 		o.Calls = append([]CallMetrics(nil), s.Operation.Calls...)
+		o.MCPEvents = append([]MCPEvent(nil), s.Operation.MCPEvents...)
 		o.TaskBefore = cloneTask(s.Operation.TaskBefore)
 		c.Operation = &o
 	}

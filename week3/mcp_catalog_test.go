@@ -20,6 +20,21 @@ func fixtureBinary(t *testing.T) string {
 	return bin
 }
 
+func TestLegacyRelativeMCPCommandUsesDaemonSibling(t *testing.T) {
+	dir := t.TempDir()
+	server := filepath.Join(dir, "unique-supplier-mcp")
+	if err := os.WriteFile(server, []byte("fixture"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	got := resolveMCPExecutableFrom("./unique-supplier-mcp", filepath.Join(dir, "advent-agentd"))
+	if got != server {
+		t.Fatalf("resolved=%q want=%q", got, server)
+	}
+	if got := resolveMCPExecutableFrom("npx", filepath.Join(dir, "advent-agentd")); got != "npx" {
+		t.Fatalf("PATH command changed: %q", got)
+	}
+}
+
 func TestMCPCatalogLazyPaginationPersistence(t *testing.T) {
 	dir := t.TempDir()
 	marker := filepath.Join(dir, "started")
