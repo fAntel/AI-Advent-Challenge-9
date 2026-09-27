@@ -63,7 +63,7 @@ make build
 ```
 
 The exact runnable artifacts are `week3/advent-agent`, `week3/advent-agentd`,
-`week3/homebox-mcp`, and `week3/budget-mcp`. `make build` builds all four command packages and
+`week3/homebox-mcp`, `week3/budget-mcp`, and `week3/report-mcp`. `make build` builds all five command packages and
 verifies their help commands, so demonstrations use newly rebuilt binaries.
 
 MCP administration and daemon startup work without `DEEPSEEK_API_KEY`. Export
@@ -87,6 +87,18 @@ stdio connection; removal and shutdown close it. `mcp tools` follows every
 server page and prints the total tool count after the inventory. Positive MCP TTLs allow cached discovery until expiry, while zero
 or missing TTLs require a new discovery. Refresh errors are shown and leave the
 last snapshot on disk. This task supports stdio commands only.
+
+Run a registered tool directly, without a model or a pipeline, to inspect its
+result in the terminal:
+
+```sh
+./advent-agent mcp call homebox list_tags
+./advent-agent mcp call homebox search_entities --args '{"tags":["TAG_ID"],"pageSize":100}'
+```
+
+The explicit `mcp call` command authorizes that call, including write-capable
+tools. The CLI validates arguments against the tool schema and prints text
+results as readable JSON when possible.
 
 ## HomeBox MCP server (HomeBox 0.26.2)
 
@@ -355,6 +367,41 @@ feedback. Resume the session to inspect preserved decision history, and use a
 different profile or project to verify isolation.
 
 See `config.example.toml` for all harness settings.
+
+## Configured MCP pipelines
+
+A named pipeline runs registered MCP tools in order without a model. Each step
+has literal JSON arguments and optional bindings from an earlier step's
+structured result. A binding uses `ARG=STEP:/json/pointer`; use
+`ARG=STEP:$text` to pass the first text result. Bindings replace top-level
+arguments and cannot conflict with literal arguments. A missing field, invalid
+resolved argument, or tool error stops the pipeline before later steps run.
+Definitions are stored in private `pipelines.toml` under the configuration
+directory. Pipeline runs and schedules explicitly authorize all configured
+steps, including write-capable tools.
+
+After `make test && make build`, register the rebuilt HomeBox and report MCP
+binaries. For the local HomeBox mock shown above, use its private config file:
+
+```sh
+./advent-agent mcp add homebox --description "HomeBox inventory" -- ./homebox-mcp --config /private/tmp/homebox-demo.json
+./advent-agent mcp add report --description "Inventory reports" -- ./report-mcp --output-dir /private/tmp/advent-reports
+./advent-agent pipeline add lamps
+./advent-agent pipeline step add --server homebox --tool search_entities --args '{"query":"lamp"}' lamps search
+./advent-agent pipeline step add --server report --tool summarize_inventory --bind 'items=search:/items' lamps summary
+./advent-agent pipeline step add --server report --tool save_report --args '{"filename":"lamps.md"}' --bind 'content=summary:/markdown' lamps save
+./advent-agent pipeline show lamps
+./advent-agent pipeline run lamps
+./advent-agent schedule add --pipeline lamps --every 1h lamp-report
+./advent-agent schedule run lamp-report
+```
+
+`pipeline list`, `pipeline step remove PIPELINE STEP`, and `pipeline remove NAME`
+manage definitions. A pipeline used by a schedule cannot be removed until the
+schedule is removed. Scheduled runs use the current pipeline definition. The
+report MCP server writes atomically inside its configured output directory and
+returns the saved file path. The mock pipeline writes
+`/private/tmp/advent-reports/lamps.md` containing `Desk lamp` and `item-1`.
 
 ## Scheduled MCP calls and budget reports
 

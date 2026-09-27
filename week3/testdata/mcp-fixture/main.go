@@ -52,6 +52,11 @@ func main() {
 		}
 		return &mcp.CallToolResult{Content: []mcp.Content{&mcp.TextContent{Text: "written"}}}, nil
 	})
+	if os.Getenv("ADVENT_MCP_ERROR_TOOL") == "1" {
+		server.AddTool(&mcp.Tool{Name: "tool_error", Description: "return a fixture MCP error", InputSchema: map[string]any{"type": "object"}, Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true}}, func(context.Context, *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			return &mcp.CallToolResult{IsError: true, Content: []mcp.Content{&mcp.TextContent{Text: "fixture failure"}}}, nil
+		})
+	}
 	if os.Getenv("ADVENT_MCP_DYNAMIC") == "1" {
 		server.AddTool(&mcp.Tool{Name: "trigger_change", Description: "invalidate tools", InputSchema: map[string]any{"type": "object"}, Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true}}, func(context.Context, *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 			server.AddTool(&mcp.Tool{Name: "added_after_change", Description: "new tool", InputSchema: map[string]any{"type": "object"}}, func(context.Context, *mcp.CallToolRequest) (*mcp.CallToolResult, error) {

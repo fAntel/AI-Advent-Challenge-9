@@ -22,6 +22,32 @@ func TestShutdownEndpointAcknowledgesAndSignals(t *testing.T) {
 	}
 }
 
+func TestDirectMCPCallValidatesAndReturnsResult(t *testing.T) {
+	cfg := testConfig(t)
+	a, err := NewAgent(cfg, &fakeCompleter{}, NewDebugLogger(cfg.Daemon, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	if err := a.MCP.Add("fixture", "fixture", []string{fixtureBinary(t)}); err != nil {
+		t.Fatal(err)
+	}
+	handler := Server{Agent: a}.Handler()
+	call := func(body string) *httptest.ResponseRecorder {
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, "/v1/mcp/call", strings.NewReader(body)))
+		return response
+	}
+	valid := call(`{"server":"fixture","tool":"read_00","arguments":{"item":"book"}}`)
+	if valid.Code != http.StatusOK || !strings.Contains(valid.Body.String(), `"ok":true`) {
+		t.Fatalf("valid call: %d %s", valid.Code, valid.Body.String())
+	}
+	invalid := call(`{"server":"fixture","tool":"read_00","arguments":{}}`)
+	if invalid.Code != http.StatusBadRequest || !strings.Contains(invalid.Body.String(), "invalid tool arguments") {
+		t.Fatalf("invalid call: %d %s", invalid.Code, invalid.Body.String())
+	}
+}
+
 func TestTaskTransitionEndpointsRunDaemonValidatedPhases(t *testing.T) {
 	cfg := testConfig(t)
 	a, _ := NewAgent(cfg, &fakeCompleter{answers: []string{"plan", "execution", "revised plan"}}, NewDebugLogger(cfg.Daemon, "secret"))

@@ -2,10 +2,14 @@ package main
 
 import (
 	agent "advent-agent"
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 func runMCP(api *agent.APIClient, cfg agent.Config, args []string) {
@@ -14,7 +18,7 @@ func runMCP(api *agent.APIClient, cfg agent.Config, args []string) {
 		return
 	}
 	if len(args) == 0 {
-		fatal(errors.New("usage: advent-agent mcp add|list|tools|remove"))
+		fatal(errors.New("usage: advent-agent mcp add|list|tools|call|remove"))
 	}
 	switch args[0] {
 	case "add":
@@ -85,6 +89,51 @@ func runMCP(api *agent.APIClient, cfg agent.Config, args []string) {
 		fatalIf(ensureDaemon(api, cfg))
 		fatalIf(api.MCPRemove(args[1]))
 		fmt.Println("Removed", args[1])
+	case "call":
+		arguments := "{}"
+		positional := []string{}
+		for i := 1; i < len(args); i++ {
+			if args[i] == "--args" && i+1 < len(args) {
+				arguments = args[i+1]
+				i++
+			} else {
+				positional = append(positional, args[i])
+			}
+		}
+		if len(positional) != 2 {
+			fatal(errors.New("usage: advent-agent mcp call SERVER TOOL [--args JSON]"))
+		}
+		var parsed map[string]any
+		if err := json.Unmarshal([]byte(arguments), &parsed); err != nil || parsed == nil {
+			fatal(errors.New("--args must be a JSON object"))
+		}
+		fatalIf(ensureDaemon(api, cfg))
+		result, err := api.MCPCall(positional[0], positional[1], parsed)
+		fatalIf(err)
+		printed := false
+		for _, part := range result.Content {
+			if value, ok := part.(*mcp.TextContent); ok {
+				if result.IsError {
+					fatal(errors.New(value.Text))
+				}
+				var pretty bytes.Buffer
+				if json.Indent(&pretty, []byte(value.Text), "", "  ") == nil {
+					fmt.Println(pretty.String())
+				} else {
+					fmt.Println(value.Text)
+				}
+				printed = true
+				break
+			}
+		}
+		if result.IsError {
+			fatal(errors.New("MCP tool returned an error"))
+		}
+		if !printed {
+			data, err := json.MarshalIndent(result.StructuredContent, "", "  ")
+			fatalIf(err)
+			fmt.Println(string(data))
+		}
 	default:
 		fatal(fmt.Errorf("unknown MCP command %q", args[0]))
 	}

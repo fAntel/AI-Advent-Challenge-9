@@ -5,14 +5,16 @@ build:
 	go build -buildmode=exe -o advent-agentd ./cmd/advent-agentd
 	go build -buildmode=exe -o homebox-mcp ./cmd/homebox-mcp
 	go build -buildmode=exe -o budget-mcp ./cmd/budget-mcp
+	go build -buildmode=exe -o report-mcp ./cmd/report-mcp
 	./advent-agent --help >/dev/null
 	./advent-agentd --help >/dev/null
 	./homebox-mcp --help >/dev/null
 	./budget-mcp --help >/dev/null
+	./report-mcp --help >/dev/null
 
 test:
 	go test ./...
 	go test -race ./...
 
 clean:
-	rm -f advent-agent advent-agentd homebox-mcp budget-mcp
+	rm -f advent-agent advent-agentd homebox-mcp budget-mcp report-mcp

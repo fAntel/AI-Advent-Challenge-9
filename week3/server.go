@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ type Server struct {
 	Agent     *Agent
 	Shutdown  func()
 	Scheduler *Scheduler
+	Pipelines *PipelineStore
 	Events    *EventHub
 }
 
@@ -42,6 +44,10 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	if strings.HasPrefix(path, "v1/mcp") {
 		s.serveMCP(w, r, path)
+		return
+	}
+	if strings.HasPrefix(path, "v1/pipelines") && s.Pipelines != nil {
+		s.servePipelines(w, r, path)
 		return
 	}
 	if path == "v1/events" && r.Method == http.MethodGet {
@@ -306,8 +312,117 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s Server) servePipelines(w http.ResponseWriter, r *http.Request, path string) {
+	parts := strings.Split(path, "/")
+	if len(parts) == 2 {
+		switch r.Method {
+		case http.MethodGet:
+			writeJSON(w, 200, s.Pipelines.List())
+		case http.MethodPost:
+			var input struct {
+				Name string `json:"name"`
+			}
+			if err := decodeJSON(w, r, &input); err != nil {
+				s.respond(w, nil, err, 0)
+				return
+			}
+			s.respond(w, map[string]bool{"ok": true}, s.Pipelines.Add(input.Name), 201)
+		default:
+			w.WriteHeader(405)
+		}
+		return
+	}
+	if len(parts) < 3 || len(parts) > 5 {
+		writeJSON(w, 404, ErrorResponse{"not found"})
+		return
+	}
+	name := parts[2]
+	if len(parts) == 3 {
+		switch r.Method {
+		case http.MethodGet:
+			item, err := s.Pipelines.Get(name)
+			s.respond(w, item, err, 200)
+		case http.MethodDelete:
+			if s.Scheduler != nil && s.Scheduler.UsesPipeline(name) {
+				s.respond(w, nil, fmt.Errorf("pipeline %q is used by a schedule", name), 0)
+				return
+			}
+			s.respond(w, map[string]bool{"ok": true}, s.Pipelines.Remove(name), 200)
+		default:
+			w.WriteHeader(405)
+		}
+		return
+	}
+	if len(parts) == 4 && parts[3] == "run" && r.Method == http.MethodPost {
+		ctx, cancel := context.WithTimeout(r.Context(), s.Agent.requestTimeout)
+		defer cancel()
+		run, err := s.Pipelines.Run(ctx, name)
+		s.respond(w, run, err, 200)
+		return
+	}
+	if len(parts) == 4 && parts[3] == "steps" && r.Method == http.MethodPost {
+		var step PipelineStep
+		if err := decodeJSON(w, r, &step); err != nil {
+			s.respond(w, nil, err, 0)
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), s.Agent.requestTimeout)
+		defer cancel()
+		s.respond(w, map[string]bool{"ok": true}, s.Pipelines.AddStep(ctx, name, step), 201)
+		return
+	}
+	if len(parts) == 5 && parts[3] == "steps" && r.Method == http.MethodDelete {
+		s.respond(w, map[string]bool{"ok": true}, s.Pipelines.RemoveStep(name, parts[4]), 200)
+		return
+	}
+	writeJSON(w, 404, ErrorResponse{"not found"})
+}
+
 func (s Server) serveMCP(w http.ResponseWriter, r *http.Request, path string) {
 	parts := strings.Split(path, "/")
+	if len(parts) == 3 && parts[2] == "call" && r.Method == http.MethodPost {
+		var input struct {
+			Server    string         `json:"server"`
+			Tool      string         `json:"tool"`
+			Arguments map[string]any `json:"arguments"`
+		}
+		if err := decodeJSON(w, r, &input); err != nil {
+			s.respond(w, nil, err, 0)
+			return
+		}
+		if input.Arguments == nil || !mcpName.MatchString(input.Server) || !mcpName.MatchString(input.Tool) {
+			s.respond(w, nil, errors.New("server, tool, and object arguments are required"), 0)
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), s.Agent.requestTimeout)
+		defer cancel()
+		tools, err := s.Agent.MCP.Tools(ctx, input.Server, false)
+		if err != nil {
+			s.respond(w, nil, err, 0)
+			return
+		}
+		var found bool
+		for _, tool := range tools {
+			if tool.Name == input.Tool {
+				found = true
+				if err := validateMCPArguments(tool.InputSchema, input.Arguments); err != nil {
+					s.respond(w, nil, err, 0)
+					return
+				}
+				break
+			}
+		}
+		if !found {
+			s.respond(w, nil, fmt.Errorf("MCP tool %s/%s not found", input.Server, input.Tool), 0)
+			return
+		}
+		result, err := s.Agent.MCP.Call(ctx, input.Server, input.Tool, input.Arguments)
+		if err == nil && result == nil {
+			err = errors.New("MCP tool returned no result")
+		}
+		s.respond(w, result, err, 200)
+		return
+	}
 	if len(parts) == 2 && r.Method == http.MethodGet {
 		writeJSON(w, 200, s.Agent.MCP.List())
 		return

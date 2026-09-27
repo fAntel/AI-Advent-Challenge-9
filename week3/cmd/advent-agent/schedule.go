@@ -27,7 +27,11 @@ func runSchedule(api *agent.APIClient, cfg agent.Config, args []string) {
 		jobs, err := api.ScheduleList()
 		fatalIf(err)
 		for _, j := range jobs {
-			fmt.Printf("%s  %s/%s  next=%s  last=%s  error=%s\n", j.Name, j.Server, j.Tool, j.NextRun, j.LastRun, j.LastError)
+			target := j.Server + "/" + j.Tool
+			if j.Pipeline != "" {
+				target = "pipeline:" + j.Pipeline
+			}
+			fmt.Printf("%s  %s  next=%s  last=%s  error=%s\n", j.Name, target, j.NextRun, j.LastRun, j.LastError)
 		}
 	case "remove":
 		if len(args) != 2 {
@@ -45,13 +49,14 @@ func runSchedule(api *agent.APIClient, cfg agent.Config, args []string) {
 		fs := flag.NewFlagSet("schedule add", flag.ExitOnError)
 		server := fs.String("server", "", "registered MCP server")
 		tool := fs.String("tool", "", "MCP tool name")
+		pipeline := fs.String("pipeline", "", "configured pipeline name")
 		arguments := fs.String("args", "{}", "JSON object of tool arguments")
 		every := fs.String("every", "", "recurring interval (for example 1h)")
 		at := fs.String("at", "", "one-time RFC3339 timestamp")
 		notify := fs.Bool("notify", false, "push result to connected chats")
 		fatalIf(fs.Parse(args[1:]))
 		if fs.NArg() != 1 {
-			fatal(errors.New("usage: schedule add [--server NAME] [--tool NAME] [--args JSON] [--every DURATION|--at RFC3339] [--notify] NAME"))
+			fatal(errors.New("usage: schedule add [--server NAME --tool NAME | --pipeline NAME] [--args JSON] [--every DURATION|--at RFC3339] [--notify] NAME"))
 		}
 		var parsed map[string]any
 		if err := json.Unmarshal([]byte(*arguments), &parsed); err != nil || parsed == nil {
@@ -60,7 +65,7 @@ func runSchedule(api *agent.APIClient, cfg agent.Config, args []string) {
 		if *every == "" && *at == "" {
 			*every = "default"
 		}
-		fatalIf(api.ScheduleAdd(agent.ScheduleJob{Name: fs.Arg(0), Server: *server, Tool: *tool, ArgumentsJSON: *arguments, Every: *every, At: *at, Notify: *notify}))
+		fatalIf(api.ScheduleAdd(agent.ScheduleJob{Name: fs.Arg(0), Pipeline: *pipeline, Server: *server, Tool: *tool, ArgumentsJSON: *arguments, Every: *every, At: *at, Notify: *notify}))
 	default:
 		fatal(errors.New("usage: advent-agent schedule add|list|remove|run|reload"))
 	}

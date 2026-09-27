@@ -38,6 +38,43 @@ func (c *APIClient) MCPRemove(name string) error {
 	_, e := c.do("DELETE", "/v1/mcp/"+url.PathEscape(name), "", nil, nil)
 	return e
 }
+func (c *APIClient) MCPCall(server, tool string, arguments map[string]any) (*mcp.CallToolResult, error) {
+	var out mcp.CallToolResult
+	_, err := c.do("POST", "/v1/mcp/call", "", map[string]any{"server": server, "tool": tool, "arguments": arguments}, &out)
+	return &out, err
+}
+
+func (c *APIClient) PipelineAdd(name string) error {
+	_, err := c.do("POST", "/v1/pipelines", "", map[string]string{"name": name}, nil)
+	return err
+}
+func (c *APIClient) PipelineList() ([]Pipeline, error) {
+	var out []Pipeline
+	_, err := c.do("GET", "/v1/pipelines", "", nil, &out)
+	return out, err
+}
+func (c *APIClient) PipelineGet(name string) (Pipeline, error) {
+	var out Pipeline
+	_, err := c.do("GET", "/v1/pipelines/"+url.PathEscape(name), "", nil, &out)
+	return out, err
+}
+func (c *APIClient) PipelineRemove(name string) error {
+	_, err := c.do("DELETE", "/v1/pipelines/"+url.PathEscape(name), "", nil, nil)
+	return err
+}
+func (c *APIClient) PipelineStepAdd(name string, step PipelineStep) error {
+	_, err := c.do("POST", "/v1/pipelines/"+url.PathEscape(name)+"/steps", "", step, nil)
+	return err
+}
+func (c *APIClient) PipelineStepRemove(name, step string) error {
+	_, err := c.do("DELETE", "/v1/pipelines/"+url.PathEscape(name)+"/steps/"+url.PathEscape(step), "", nil, nil)
+	return err
+}
+func (c *APIClient) PipelineRun(name string) (PipelineRun, error) {
+	var out PipelineRun
+	_, err := c.do("POST", "/v1/pipelines/"+url.PathEscape(name)+"/run", "", nil, &out)
+	return out, err
+}
 
 var ErrDaemonUnavailable = errors.New("advent-agentd is unavailable")
 

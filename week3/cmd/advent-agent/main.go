@@ -54,6 +54,10 @@ func main() {
 		runSchedule(api, cfg, args[1:])
 		return
 	}
+	if len(args) > 0 && args[0] == "pipeline" {
+		runPipeline(api, cfg, args[1:])
+		return
+	}
 	if len(args) > 0 && args[0] == "service" {
 		runService(cfg, args[1:])
 		return

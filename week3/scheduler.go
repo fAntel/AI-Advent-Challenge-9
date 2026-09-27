@@ -19,6 +19,7 @@ import (
 // ScheduleJob is a durable instruction to invoke a registered MCP tool.
 type ScheduleJob struct {
 	Name           string `toml:"name" json:"name"`
+	Pipeline       string `toml:"pipeline" json:"pipeline,omitempty"`
 	Server         string `toml:"server" json:"server"`
 	Tool           string `toml:"tool" json:"tool"`
 	ArgumentsJSON  string `toml:"arguments_json" json:"arguments_json"`
@@ -78,6 +79,7 @@ type Scheduler struct {
 	jobs            map[string]ScheduleJob
 	running         map[string]bool
 	mcp             *MCPCatalog
+	pipelines       *PipelineStore
 	hub             *EventHub
 	logger          func(string, string, error)
 	stop            chan struct{}
@@ -109,7 +111,8 @@ func NewScheduler(path string, catalog *MCPCatalog, hub *EventHub, timeout, defa
 			return nil, fmt.Errorf("unknown schedule key %s", u[0])
 		}
 		for _, j := range file.Jobs {
-			if j.Name == "" || j.Server == "" || j.Tool == "" || s.jobs[j.Name].Name != "" {
+			validTarget := (j.Pipeline == "" && j.Server != "" && j.Tool != "") || (j.Pipeline != "" && j.Server == "" && j.Tool == "")
+			if j.Name == "" || !validTarget || s.jobs[j.Name].Name != "" {
 				return nil, errors.New("invalid or duplicate schedule job")
 			}
 			if j.Every != "" {
@@ -143,6 +146,19 @@ func NewScheduler(path string, catalog *MCPCatalog, hub *EventHub, timeout, defa
 		}
 	}
 	return s, nil
+}
+
+func (s *Scheduler) SetPipelines(p *PipelineStore) { s.pipelines = p }
+
+func (s *Scheduler) UsesPipeline(name string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, j := range s.jobs {
+		if j.Pipeline == name {
+			return true
+		}
+	}
+	return false
 }
 
 // Reload applies manual schedules.toml edits. Changed intervals start a fresh
@@ -194,7 +210,7 @@ func (s *Scheduler) saveLocked() error {
 	for _, name := range names {
 		j := s.jobs[name]
 		b.WriteString("[[jobs]]\n")
-		for _, p := range [][2]string{{"name", j.Name}, {"server", j.Server}, {"tool", j.Tool}, {"arguments_json", j.ArgumentsJSON}, {"every", j.Every}, {"scheduled_every", j.ScheduledEvery}, {"at", j.At}, {"next_run", j.NextRun}, {"last_run", j.LastRun}, {"last_error", j.LastError}, {"last_result", j.LastResult}} {
+		for _, p := range [][2]string{{"name", j.Name}, {"pipeline", j.Pipeline}, {"server", j.Server}, {"tool", j.Tool}, {"arguments_json", j.ArgumentsJSON}, {"every", j.Every}, {"scheduled_every", j.ScheduledEvery}, {"at", j.At}, {"next_run", j.NextRun}, {"last_run", j.LastRun}, {"last_error", j.LastError}, {"last_result", j.LastResult}} {
 			fmt.Fprintf(&b, "%s = %s\n", p[0], quote(p[1]))
 		}
 		fmt.Fprintf(&b, "notify = %t\ndone = %t\n\n", j.Notify, j.Done)
@@ -232,8 +248,11 @@ func (s *Scheduler) List() []ScheduleJob {
 }
 
 func (s *Scheduler) Add(ctx context.Context, j ScheduleJob) error {
-	if !mcpName.MatchString(j.Name) || !mcpName.MatchString(j.Server) || !mcpName.MatchString(j.Tool) {
+	if !mcpName.MatchString(j.Name) || (j.Pipeline != "" && !mcpName.MatchString(j.Pipeline)) || (j.Pipeline == "" && (!mcpName.MatchString(j.Server) || !mcpName.MatchString(j.Tool))) {
 		return errors.New("invalid job, server, or tool name")
+	}
+	if !((j.Pipeline == "" && j.Server != "" && j.Tool != "") || (j.Pipeline != "" && j.Server == "" && j.Tool == "")) {
+		return errors.New("choose a pipeline or a server and tool")
 	}
 	if (j.Every == "") == (j.At == "") {
 		return errors.New("choose exactly one of every or at")
@@ -262,22 +281,34 @@ func (s *Scheduler) Add(ctx context.Context, j ScheduleJob) error {
 	if err := json.Unmarshal([]byte(j.ArgumentsJSON), &args); err != nil || args == nil {
 		return errors.New("arguments must be a JSON object")
 	}
-	tools, err := s.mcp.Tools(ctx, j.Server, false)
-	if err != nil {
-		return err
-	}
-	found := false
-	for _, tool := range tools {
-		if tool.Name == j.Tool {
-			found = true
-			if err := validateMCPArguments(tool.InputSchema, args); err != nil {
-				return err
-			}
-			break
+	if j.Pipeline != "" {
+		if s.pipelines == nil {
+			return errors.New("pipelines unavailable")
 		}
-	}
-	if !found {
-		return fmt.Errorf("MCP tool %s/%s not found", j.Server, j.Tool)
+		if len(args) != 0 {
+			return errors.New("pipeline schedule does not accept tool arguments")
+		}
+		if err := s.pipelines.Validate(ctx, j.Pipeline); err != nil {
+			return err
+		}
+	} else {
+		tools, err := s.mcp.Tools(ctx, j.Server, false)
+		if err != nil {
+			return err
+		}
+		found := false
+		for _, tool := range tools {
+			if tool.Name == j.Tool {
+				found = true
+				if err := validateMCPArguments(tool.InputSchema, args); err != nil {
+					return err
+				}
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf("MCP tool %s/%s not found", j.Server, j.Tool)
+		}
 	}
 	j.LastRun, j.LastResult, j.LastError = "", "", ""
 	j.Done = false
@@ -386,7 +417,19 @@ func (s *Scheduler) Run(name string) error {
 	defer cancel()
 	var args map[string]any
 	_ = json.Unmarshal([]byte(j.ArgumentsJSON), &args)
-	result, callErr := s.mcp.Call(ctx, j.Server, j.Tool, args)
+	var result *mcp.CallToolResult
+	var callErr error
+	if j.Pipeline != "" {
+		if s.pipelines == nil {
+			callErr = errors.New("pipelines unavailable")
+		} else {
+			run, err := s.pipelines.Run(ctx, j.Pipeline)
+			callErr = err
+			result = &mcp.CallToolResult{Content: []mcp.Content{&mcp.TextContent{Text: run.Result}}}
+		}
+	} else {
+		result, callErr = s.mcp.Call(ctx, j.Server, j.Tool, args)
+	}
 	message := ""
 	if callErr == nil && result == nil {
 		callErr = errors.New("MCP tool returned no result")

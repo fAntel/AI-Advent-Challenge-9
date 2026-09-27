@@ -91,6 +91,10 @@ func main() {
 		}
 	}
 	schedulePath := filepath.Join(cfg.ConfigDir, "schedules.toml")
+	pipelines, err := agent.NewPipelineStore(filepath.Join(cfg.ConfigDir, "pipelines.toml"), a.MCP)
+	if err != nil {
+		fatal(err)
+	}
 	_, scheduleFileErr := os.Stat(schedulePath)
 	scheduler, err := agent.NewScheduler(schedulePath, a.MCP, hub, time.Duration(cfg.Daemon.RequestTimeout), time.Duration(cfg.Scheduler.DefaultInterval), func(name, result string, runErr error) {
 		message := "job=" + name + " result=" + strings.ReplaceAll(result, "\n", " ")
@@ -102,6 +106,7 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
+	scheduler.SetPipelines(pipelines)
 	if registered && os.IsNotExist(scheduleFileErr) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		if e := scheduler.Add(ctx, agent.ScheduleJob{Name: "budget", Server: "budget", Tool: "capture_balance", ArgumentsJSON: "{}", Every: "default", Notify: true}); e != nil {
@@ -111,7 +116,7 @@ func main() {
 	}
 	scheduler.Start()
 	shutdownRequested := make(chan struct{}, 1)
-	handler := agent.Server{Agent: a, Scheduler: scheduler, Events: hub, Shutdown: func() {
+	handler := agent.Server{Agent: a, Scheduler: scheduler, Pipelines: pipelines, Events: hub, Shutdown: func() {
 		select {
 		case shutdownRequested <- struct{}{}:
 		default:
