@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kotlin-index"
+version = "0.1.0"
+description = "Reproducible Kotlin documentation indexing and chunking evaluation"
+requires-python = ">=3.11"
+dependencies = ["beautifulsoup4==4.14.3", "soupsieve==2.8.3", "typing-extensions==4.15.0", "numpy==2.4.3"]
+
+[project.scripts]
+kotlin-index = "kotlin_index.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["kotlin_index*"]

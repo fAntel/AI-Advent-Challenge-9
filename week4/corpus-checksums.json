@@ -1,0 +1,219 @@
+[
+  {
+    "id": "coding-conventions",
+    "url": "https://kotlinlang.org/docs/coding-conventions.html",
+    "retrieved_at": "2026-10-03T13:38:05Z",
+    "html_hash": "fc808cd26139e4177d3299d2329c3610173124825711640797f42d6e2d4d588a",
+    "text_hash": "e5069165e3d3b57d6f652f1cc086048777259b9b93b54c5de9759bd6e20e2268"
+  },
+  {
+    "id": "idioms",
+    "url": "https://kotlinlang.org/docs/idioms.html",
+    "retrieved_at": "2026-10-03T13:38:05Z",
+    "html_hash": "2039cf134bb1d046723b67f66e42def0cba65815ad68a8521cccbc929a40df52",
+    "text_hash": "51a81e636dc6230dd34fac8b18b9d67aa38110ba900fed3071acc68b7789940b"
+  },
+  {
+    "id": "null-safety",
+    "url": "https://kotlinlang.org/docs/null-safety.html",
+    "retrieved_at": "2026-10-03T13:38:05Z",
+    "html_hash": "8107217007bdeea2758b0bb03f266a05ccafaaa62a41714aae31db86c893e5ae",
+    "text_hash": "07584d70d024de6d67757ac7bcafbd1279d83e8c7c2fde773a8e9a5fc9a7e375"
+  },
+  {
+    "id": "collections-overview",
+    "url": "https://kotlinlang.org/docs/collections-overview.html",
+    "retrieved_at": "2026-10-03T13:38:06Z",
+    "html_hash": "e540768ad7517423d48ef0abbb7753bb86d0db1a2a7dcfc5880ff665869baf83",
+    "text_hash": "a56b97279eef198040d943eb1693aaddabf2caa8abf2d8af16b376dc902de17f"
+  },
+  {
+    "id": "collection-transformations",
+    "url": "https://kotlinlang.org/docs/collection-transformations.html",
+    "retrieved_at": "2026-10-03T13:38:06Z",
+    "html_hash": "cee7e7549daaaa05055eaff09f6b8275bb403521dcd4e89d299c43a81a67e0a2",
+    "text_hash": "6cf6fb4ea06232c3b833ec3f8b072aa7be773753b82fde8ca46a492a33b9980b"
+  },
+  {
+    "id": "sequences",
+    "url": "https://kotlinlang.org/docs/sequences.html",
+    "retrieved_at": "2026-10-03T13:38:06Z",
+    "html_hash": "92555f2d6ae2156b51112464d5780f48474a4d5cce7b3eb1c6b2d0243ecb9443",
+    "text_hash": "96343b832ab586ac261876f1d6e9fdf78bdc5eab6a68de32129a980e7d2bf941"
+  },
+  {
+    "id": "scope-functions",
+    "url": "https://kotlinlang.org/docs/scope-functions.html",
+    "retrieved_at": "2026-10-03T13:38:07Z",
+    "html_hash": "e6f8b7a0363cb56484d875c0b69f001ecbed52fc2c4c24ca2fa6033227f77a76",
+    "text_hash": "ff62165beb1cfb60c9b56c881f83bda3c31bfd2c5a2eecfc83e9c49fb2b77bd7"
+  },
+  {
+    "id": "context-parameters",
+    "url": "https://kotlinlang.org/docs/context-parameters.html",
+    "retrieved_at": "2026-10-03T13:38:07Z",
+    "html_hash": "050abb90c00ed7ff2dc03d84ad6cb82197f6b300dafd4edb78159cd583b9e6fb",
+    "text_hash": "2321cd77936bdbc3b2753f2b1a1b09b678efbc319eb91f0065d8fe24c0162e06"
+  },
+  {
+    "id": "inline-functions",
+    "url": "https://kotlinlang.org/docs/inline-functions.html",
+    "retrieved_at": "2026-10-03T13:38:07Z",
+    "html_hash": "a9228014c53bcf161897d39d820d5d114ffc4a9c73b20ae2fd2793653540c893",
+    "text_hash": "d72c7fbee25c0595488f6e992549fc3717e32acc33597ed9efd6c66593b25b4e"
+  },
+  {
+    "id": "extensions",
+    "url": "https://kotlinlang.org/docs/extensions.html",
+    "retrieved_at": "2026-10-03T13:38:07Z",
+    "html_hash": "c7c803ab6c42c69a9a03981e7126ea71edb9ebd7552cf8b5f1fb7e9d4f460b3e",
+    "text_hash": "263f2a08eb7d9372723605aa0eed7d726603cb8fb273a6bc05fbee89f24d0e61"
+  },
+  {
+    "id": "generics",
+    "url": "https://kotlinlang.org/docs/generics.html",
+    "retrieved_at": "2026-10-03T13:38:08Z",
+    "html_hash": "cf7ade1e8d062ab1a864e705b6a21e2f97dec2a9d631cd13e6ef8cfd96a25a63",
+    "text_hash": "901a3d80cecf7b0dda9bfeab59e77d6a50c3156f98e37a88be02b04c83371f32"
+  },
+  {
+    "id": "java-interop",
+    "url": "https://kotlinlang.org/docs/java-interop.html",
+    "retrieved_at": "2026-10-03T13:38:08Z",
+    "html_hash": "97d5c878fc3bf07a0573052399861eeadf7d3d03e27d50595ba77214f95946f0",
+    "text_hash": "942f9ff7858abe283e386cb240394a7f5994a1e44ce8f3a5b6bb2073a063c08b"
+  },
+  {
+    "id": "java-to-kotlin-interop",
+    "url": "https://kotlinlang.org/docs/java-to-kotlin-interop.html",
+    "retrieved_at": "2026-10-03T13:38:09Z",
+    "html_hash": "3f3f84099617b477941e56903ee0654774c898af868b0125bbddd52f7c825cc4",
+    "text_hash": "637c4973daa2d7e8ca5e2a6cc6f239f580c667b85fca80238e38333710dbb316"
+  },
+  {
+    "id": "multiplatform-expect-actual",
+    "url": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html",
+    "retrieved_at": "2026-10-03T13:38:09Z",
+    "html_hash": "1c3f84e92cb80f8bf57e4b3fdab086a5ea4e705e72a2728fa0046517527e9ba8",
+    "text_hash": "a9d1a6d14afed5e45d36f07e91d0ec3818585f76b61276570633421194298d33"
+  },
+  {
+    "id": "native-objc-interop",
+    "url": "https://kotlinlang.org/docs/native-objc-interop.html",
+    "retrieved_at": "2026-10-03T13:38:09Z",
+    "html_hash": "a2c480388e1d5d283103df36a975aea2f904eaa7e5ae750035df2d4d91d246f9",
+    "text_hash": "fba1ba86a0ca414f3a9ae9b928a8495924685996889f8f13fc72aca234fe417d"
+  },
+  {
+    "id": "native-swift-export",
+    "url": "https://kotlinlang.org/docs/native-swift-export.html",
+    "retrieved_at": "2026-10-03T13:38:14Z",
+    "html_hash": "47a10d8715983406d762af74e9fee33341b837f38386934d54be125154399a71",
+    "text_hash": "9ff1ce76fd34183b6d9c7510948d116cc3228fd85053b564e59d9c6f935c6068"
+  },
+  {
+    "id": "js-to-kotlin-interop",
+    "url": "https://kotlinlang.org/docs/js-to-kotlin-interop.html",
+    "retrieved_at": "2026-10-03T13:38:14Z",
+    "html_hash": "21021fee2acff007aa2f2ad422aae2e66c084371576910d759e97b65cb2acf9e",
+    "text_hash": "2bdbd5cbe48a06e70c7974370584c0ad43806c319f68235c898678ce10e324e3"
+  },
+  {
+    "id": "js-interop",
+    "url": "https://kotlinlang.org/docs/js-interop.html",
+    "retrieved_at": "2026-10-03T13:38:14Z",
+    "html_hash": "bc2f56da52aa679d510dea75c1ca4f5940eb4168ccb2e672f3cbec04d0e3b04b",
+    "text_hash": "32a85bfa1aa1234b73d9be3ce984a951d9aaaf9c73f9eb45fa322cc22dd5c0c8"
+  },
+  {
+    "id": "wasm-js-interop",
+    "url": "https://kotlinlang.org/docs/wasm-js-interop.html",
+    "retrieved_at": "2026-10-03T13:38:15Z",
+    "html_hash": "c7ba226d178089b018df95cf383bde417f4e913ee548f6e6d0bd91dbe2d0502c",
+    "text_hash": "ed8a0f1c81d26a2a843290ae5c00e1a5cb251eaa3e75cfd2ddbbfb8ffca4d958"
+  },
+  {
+    "id": "whatsnew21",
+    "url": "https://kotlinlang.org/docs/whatsnew21.html",
+    "retrieved_at": "2026-10-03T13:38:15Z",
+    "html_hash": "cb1fdd15fbcb350b72b0695176c826d68aedb015382f9f3fdeeb38844a13ed96",
+    "text_hash": "ce22f71b80be7e864c4324f8eac5a5422cdcc8845c88ae10e5f272a47fedd839"
+  },
+  {
+    "id": "whatsnew2120",
+    "url": "https://kotlinlang.org/docs/whatsnew2120.html",
+    "retrieved_at": "2026-10-03T13:38:15Z",
+    "html_hash": "3b14d9c97dfb21c7a88629977940e7af379e0271746795896e24738ddbf590ca",
+    "text_hash": "7bb74e7503d6d9297b4a76044cf1d3baa9f81138a5d38bc74d0671ad5539954a"
+  },
+  {
+    "id": "whatsnew22",
+    "url": "https://kotlinlang.org/docs/whatsnew22.html",
+    "retrieved_at": "2026-10-03T13:38:16Z",
+    "html_hash": "0c477feb0fad054cd9868a3b8be6efc7d669ecdc04595bd40543a48c34871013",
+    "text_hash": "72e276ce70cece9adbdb7aefc603e5f58a8b4643f45cc460d04c1e3491ab6749"
+  },
+  {
+    "id": "whatsnew2220",
+    "url": "https://kotlinlang.org/docs/whatsnew2220.html",
+    "retrieved_at": "2026-10-03T13:38:16Z",
+    "html_hash": "e419f31ffae71fbe7a5eb23fc71cb9903627995701f125e9f66ce3bfa51dd567",
+    "text_hash": "660ec3442068e4a4190ed95b07e7e2ebc1f977bd54d60711b0bdea592c5d54ab"
+  },
+  {
+    "id": "whatsnew23",
+    "url": "https://kotlinlang.org/docs/whatsnew23.html",
+    "retrieved_at": "2026-10-03T13:38:17Z",
+    "html_hash": "daf7d361e786962bbb4df5d4e6d2f692e1b712c2bde06395471a847f1dba19e5",
+    "text_hash": "f811334737d4851c2ab0e6b64abc4b1901282bfc26a7ae90edfd527df5c57ea7"
+  },
+  {
+    "id": "whatsnew2320",
+    "url": "https://kotlinlang.org/docs/whatsnew2320.html",
+    "retrieved_at": "2026-10-03T13:38:17Z",
+    "html_hash": "31ea0fdee0c626c85db64991d52e39280439d078b678e8b3422467c695fd73c5",
+    "text_hash": "715e01121ac75aa598996c7d034b4c17b078037dcbf5ed7f89e0e6e04cd8c72e"
+  },
+  {
+    "id": "whatsnew24",
+    "url": "https://kotlinlang.org/docs/whatsnew24.html",
+    "retrieved_at": "2026-10-03T13:38:17Z",
+    "html_hash": "d0cb7d0278b279917fcae24135a4bbf53bf2513b1aa5be0b6766bf0637bcea5a",
+    "text_hash": "2081daa797ffbbc5d2bbcbb0bda8efbd2f2b9fb8720b22da6ca2107b88e32bba"
+  },
+  {
+    "id": "whatsnew2420",
+    "url": "https://kotlinlang.org/docs/whatsnew2420.html",
+    "retrieved_at": "2026-10-03T13:38:18Z",
+    "html_hash": "e5bed30a7cba70a6a873aad64f4d2530bac75ebebd10215821d5c09071c69ce0",
+    "text_hash": "c3b073164d3fa6da16dcba7cd038ae8e8c1ec528e901bc47ff30f578710c07d0"
+  },
+  {
+    "id": "compatibility-guide-21",
+    "url": "https://kotlinlang.org/docs/compatibility-guide-21.html",
+    "retrieved_at": "2026-10-03T13:38:18Z",
+    "html_hash": "1bc225a96d06679cdd1b3fbbfdf2a9518a5823556898c5b32494453393021db6",
+    "text_hash": "9fa7c0d73d41c1a7068b586a2faee17ca3f6b0d4b02893e329537909da4d2d48"
+  },
+  {
+    "id": "compatibility-guide-22",
+    "url": "https://kotlinlang.org/docs/compatibility-guide-22.html",
+    "retrieved_at": "2026-10-03T13:38:18Z",
+    "html_hash": "a5b4e7297738fc78f8b9e87a42822dc463592f341e2d96dda2cf65bd242945ac",
+    "text_hash": "56397c5f6ccabd0b3abac71a738505daaf048625e44f10fa2bd8982fc7a870ce"
+  },
+  {
+    "id": "compatibility-guide-23",
+    "url": "https://kotlinlang.org/docs/compatibility-guide-23.html",
+    "retrieved_at": "2026-10-03T13:38:19Z",
+    "html_hash": "fc773a36e6ed6c9bd0afe906e2df2252a6dd02c6cb6559204ee61df3b0e8942b",
+    "text_hash": "859a65b32343fea27214a2a8e15bde319cf73a1bd84f636bb8b5d867f797e8a1"
+  },
+  {
+    "id": "compatibility-guide-24",
+    "url": "https://kotlinlang.org/docs/compatibility-guide-24.html",
+    "retrieved_at": "2026-10-03T13:38:19Z",
+    "html_hash": "5b4240d62cc9657431644b01ebc77f1acb63e02bd2060014bc2005d7f03a2e53",
+    "text_hash": "3b26d94799685feac8fb5d060a7710149b3e0657e7e3538b06b1b2c3f9b33d02"
+  }
+]

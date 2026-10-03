@@ -1,0 +1,223 @@
+{
+  "labeling": "Manual source-section inspection, before retrieval evaluation; section overlap is a proxy for relevance.",
+  "questions": [
+    {
+      "id": "q01",
+      "query": "How can a function require an implicit service and how is that service resolved?",
+      "relevant": [
+        {
+          "document_id": "context-parameters",
+          "section": "Context parameters resolution"
+        }
+      ]
+    },
+    {
+      "id": "q02",
+      "query": "What is the Elvis operator and how can I return early when a nullable value is absent?",
+      "relevant": [
+        {
+          "document_id": "null-safety",
+          "section": "Elvis operator"
+        }
+      ]
+    },
+    {
+      "id": "q03",
+      "query": "Which operations on Kotlin sequences are lazy, and which ones trigger processing?",
+      "relevant": [
+        {
+          "document_id": "sequences",
+          "section": "Sequence operations"
+        }
+      ]
+    },
+    {
+      "id": "q04",
+      "query": "Which scope function should I use to configure an object and return that same object?",
+      "relevant": [
+        {
+          "document_id": "scope-functions",
+          "section": "apply"
+        }
+      ]
+    },
+    {
+      "id": "q05",
+      "query": "How can I perform a side effect in a call chain while retaining the original object?",
+      "relevant": [
+        {
+          "document_id": "scope-functions",
+          "section": "also"
+        }
+      ]
+    },
+    {
+      "id": "q06",
+      "query": "How do I combine two collections into pairs?",
+      "relevant": [
+        {
+          "document_id": "collection-transformations",
+          "section": "Zip"
+        }
+      ]
+    },
+    {
+      "id": "q07",
+      "query": "How can an inline generic function access its type argument at runtime?",
+      "relevant": [
+        {
+          "document_id": "inline-functions",
+          "section": "Reified type parameters"
+        }
+      ]
+    },
+    {
+      "id": "q08",
+      "query": "How do in and out make a generic Kotlin interface safely consume or produce values?",
+      "relevant": [
+        {
+          "document_id": "generics",
+          "section": "Declaration-site variance"
+        }
+      ]
+    },
+    {
+      "id": "q09",
+      "query": "How should Kotlin handle Java references whose nullability is not known?",
+      "relevant": [
+        {
+          "document_id": "java-interop",
+          "section": "Null-safety and platform types"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "query": "How can Java callers use a Kotlin function with default parameters without passing every argument?",
+      "relevant": [
+        {
+          "document_id": "java-to-kotlin-interop",
+          "section": "Overloads generation"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "query": "Where should expect and actual declarations live and which parts must match?",
+      "relevant": [
+        {
+          "document_id": "multiplatform-expect-actual",
+          "section": "Rules for expected and actual declarations"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "query": "Can I satisfy a common expected class using an existing platform type instead of wrapping it?",
+      "relevant": [
+        {
+          "document_id": "multiplatform-expect-actual",
+          "section": "Using type aliases to satisfy actual declarations"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "query": "How are Kotlin exceptions exposed to Swift and Objective-C callers?",
+      "relevant": [
+        {
+          "document_id": "native-objc-interop",
+          "section": "Errors and exceptions"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "query": "How does Swift export expose Kotlin suspend functions?",
+      "relevant": [
+        {
+          "document_id": "native-swift-export",
+          "section": "Suspending functions"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "query": "How do I make a Kotlin declaration accessible to JavaScript callers?",
+      "relevant": [
+        {
+          "document_id": "js-to-kotlin-interop",
+          "section": "@JsExport annotation"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "query": "How do I declare an existing JavaScript API so Kotlin can call it without providing an implementation?",
+      "relevant": [
+        {
+          "document_id": "js-interop",
+          "section": "external modifier"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "query": "How can Kotlin Wasm hold a reference to a Kotlin object on the JavaScript side?",
+      "relevant": [
+        {
+          "document_id": "wasm-js-interop",
+          "section": "JsReference type"
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "query": "When did the common Kotlin UUID API become stable?",
+      "relevant": [
+        {
+          "document_id": "whatsnew24",
+          "section": "Stable UUID API in the common Kotlin standard library"
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "query": "What changed in Kotlin 2.4.20 for exporting suspending lambdas to JavaScript?",
+      "relevant": [
+        {
+          "document_id": "whatsnew2420",
+          "section": "Support for exporting suspending lambdas as async functions"
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "query": "Which Kotlin 2.4.20 feature permits Swift implementations to extend exported Kotlin types?",
+      "relevant": [
+        {
+          "document_id": "whatsnew2420",
+          "section": "Cross-language inheritance in Swift export"
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "query": "What is the internal production API endpoint for my company payroll service?",
+      "relevant": [],
+      "unanswerable": true
+    },
+    {
+      "id": "q22",
+      "query": "What breaking changes will Kotlin 3.0 ship with?",
+      "relevant": [],
+      "unanswerable": true
+    },
+    {
+      "id": "q23",
+      "query": "How do I configure a PostgreSQL replication slot for Debezium?",
+      "relevant": [],
+      "unanswerable": true
+    }
+  ]
+}

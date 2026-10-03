@@ -1,0 +1,3522 @@
+{
+  "metadata": {
+    "schema_version": 1,
+    "embedding": {
+      "model": "embeddinggemma:300m",
+      "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+      "ollama": "0.35.1",
+      "format": "title: TITLE | text: BODY; task: search result | query: QUERY"
+    },
+    "dimensions": 768,
+    "config": {
+      "fixed_size": 1800,
+      "overlap": 200,
+      "minimum": 600,
+      "maximum": 2400,
+      "threshold": 0.65
+    },
+    "corpus": {
+      "documents": 31,
+      "unique_prose_words": 83701,
+      "equivalent_pages": 167.402,
+      "code_characters": 158940
+    },
+    "build": {
+      "fixed": {
+        "seconds": 61.6228052080005,
+        "embedding_calls": 481,
+        "chunks": 481
+      },
+      "semantic": {
+        "seconds": 166.45155058399996,
+        "embedding_calls": 6940,
+        "chunks": 1342
+      }
+    }
+  },
+  "index_bytes": 12738560,
+  "strategies": {
+    "fixed": {
+      "chunk_count": 481,
+      "characters_min": 218,
+      "characters_median": 1800.0,
+      "characters_p95": 1800.0,
+      "characters_max": 1800,
+      "chunks_with_split_code": 183,
+      "vector_bytes": 1477632,
+      "seconds": 61.6228052080005,
+      "embedding_calls": 481,
+      "chunks": 481,
+      "averages": {
+        "hit_at_5": 0.8,
+        "recall_at_5": 0.8,
+        "reciprocal_rank": 0.6463510101010101,
+        "coverage_at_6000_chars": 0.608305833339521
+      }
+    },
+    "semantic": {
+      "chunk_count": 1342,
+      "characters_min": 5,
+      "characters_median": 538.0,
+      "characters_p95": 1195.6000000000004,
+      "characters_max": 2346,
+      "chunks_with_split_code": 0,
+      "vector_bytes": 4122624,
+      "seconds": 166.45155058399996,
+      "embedding_calls": 6940,
+      "chunks": 1342,
+      "averages": {
+        "hit_at_5": 0.9,
+        "recall_at_5": 0.9,
+        "reciprocal_rank": 0.7180714285714286,
+        "coverage_at_6000_chars": 0.663241881284775
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "query": "How can a function require an implicit service and how is that service resolved?",
+      "relevant": [
+        {
+          "document_id": "context-parameters",
+          "section": "Context parameters resolution"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.9925233644859813
+          },
+          "top5": [
+            {
+              "document_id": "context-parameters",
+              "sections": [
+                "Context parameters",
+                "Context parameters > Context parameters resolution"
+              ],
+              "score": 0.4091591238975525,
+              "line_start": 38,
+              "line_end": 90,
+              "preview": "        }\n    }\n\n    context(users) {\n        outputMessage(\"Looking up the first user\")\n        println(firstUser)\n        // User 1\n    }\n}\n\nYou can use _ as a context parameter name when you don't need to refer to the parameter directly.",
+              "source": "https://kotlinlang.org/docs/context-parameters.html"
+            },
+            {
+              "document_id": "extensions",
+              "sections": [
+                "Extensions > Declaring extensions as members"
+              ],
+              "score": 0.4041876196861267,
+              "line_start": 314,
+              "line_end": 361,
+              "preview": "er. Extensions like this have multiple implicit receivers . An implicit receiver is an object whose members you can access without qualifying them with this :\n\nThe class where you declare the extension is the dispatch receiver .\n\nThe extens",
+              "source": "https://kotlinlang.org/docs/extensions.html"
+            },
+            {
+              "document_id": "context-parameters",
+              "sections": [
+                "Context parameters > Context parameters resolution",
+                "Context parameters > Context parameters resolution > Pass context arguments explicitly"
+              ],
+              "score": 0.3935270309448242,
+              "line_start": 87,
+              "line_end": 147,
+              "preview": "h serviceA and serviceB match the expected UserService type at the call site\n    context(serviceA, serviceB) {\n        // This results in an ambiguity error\n        outputMessage(\"This will not compile\")\n    }\n}\n\nPass context arguments expl",
+              "source": "https://kotlinlang.org/docs/context-parameters.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Functions > run",
+                "Scope functions > Functions > apply"
+              ],
+              "score": 0.38693034648895264,
+              "line_start": 363,
+              "line_end": 419,
+              "preview": "request: String): String = \"Result for query '$request'\"\n}\n\nfun main() {\n//sampleStart\n    val service = MultiportService(\"https://example.kotlinlang.org\", 80)\n\n    val result = service.run {\n        port = 8080\n        query(prepareRequest",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "context-parameters",
+              "sections": [
+                "Context parameters"
+              ],
+              "score": 0.373224139213562,
+              "line_start": 1,
+              "line_end": 48,
+              "preview": "Context parameters\n\nContext parameters replace an older experimental feature called context receivers . You can find their main differences in the design document for context parameters . To migrate from context receivers to context paramet",
+              "source": "https://kotlinlang.org/docs/context-parameters.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.3333333333333333,
+            "coverage_at_6000_chars": 0.39850467289719627
+          },
+          "top5": [
+            {
+              "document_id": "context-parameters",
+              "sections": [
+                "Context parameters"
+              ],
+              "score": 0.4301805794239044,
+              "line_start": 48,
+              "line_end": 59,
+              "preview": "You can use _ as a context parameter name when you don't need to refer to the parameter directly. An anonymous context parameter can still satisfy the context parameters required by called functions, but you can't access it by name. To acce",
+              "source": "https://kotlinlang.org/docs/context-parameters.html"
+            },
+            {
+              "document_id": "whatsnew24",
+              "sections": [
+                "What's new in Kotlin 2.4.0 > Standard library > New map fallback functions to distinguish null values and missing keys"
+              ],
+              "score": 0.41104018688201904,
+              "line_start": 475,
+              "line_end": 509,
+              "preview": "Here's an example:\n\ndata class Response(val body: String)\n\nclass Service {\n    var queryCount = 0\n\n    fun query(key: String): Response? {\n        queryCount += 1\n        return null\n    }\n}\n\n//sampleStart\n@OptIn(ExperimentalStdlibApi::clas",
+              "source": "https://kotlinlang.org/docs/whatsnew24.html"
+            },
+            {
+              "document_id": "context-parameters",
+              "sections": [
+                "Context parameters > Context parameters resolution"
+              ],
+              "score": 0.3833654522895813,
+              "line_start": 61,
+              "line_end": 92,
+              "preview": "Context parameters resolution\n\nKotlin resolves context parameters at the call site by searching for matching context values in the current scope. Kotlin matches them by their type. If multiple compatible values exist at the same scope level",
+              "source": "https://kotlinlang.org/docs/context-parameters.html"
+            },
+            {
+              "document_id": "extensions",
+              "sections": [
+                "Extensions > Extension functions > Anonymous extension functions"
+              ],
+              "score": 0.3777945935726166,
+              "line_start": 206,
+              "line_end": 221,
+              "preview": "Anonymous extension functions\n\nYou can define extension functions without giving them a name. This is useful when you want to avoid cluttering the global namespace or when you need to pass some extension behavior as a parameter.\n\nFor exampl",
+              "source": "https://kotlinlang.org/docs/extensions.html"
+            },
+            {
+              "document_id": "context-parameters",
+              "sections": [
+                "Context parameters"
+              ],
+              "score": 0.37169545888900757,
+              "line_start": 1,
+              "line_end": 46,
+              "preview": "Context parameters\n\nContext parameters replace an older experimental feature called context receivers . You can find their main differences in the design document for context parameters . To migrate from context receivers to context paramet",
+              "source": "https://kotlinlang.org/docs/context-parameters.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q02",
+      "query": "What is the Elvis operator and how can I return early when a nullable value is absent?",
+      "relevant": [
+        {
+          "document_id": "null-safety",
+          "section": "Elvis operator"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Safe call operator",
+                "Null safety > Elvis operator",
+                "Null safety > Not-null assertion operator"
+              ],
+              "score": 0.6944277286529541,
+              "line_start": 188,
+              "line_end": 235,
+              "preview": "getManager()\n}\n\nElvis operator\n\nWhen working with nullable types, you can check for null and provide an alternative value. For example, if b is not null , access b.length . Otherwise, return an alternative value:\n\nfun main() {\n//sampleStart",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Safe call operator",
+                "Null safety > Elvis operator"
+              ],
+              "score": 0.6118205785751343,
+              "line_start": 162,
+              "line_end": 193,
+              "preview": "h)\n    // null\n//sampleEnd\n}\n\nThe b?.length expression checks for nullability and returns b.length if b is non-null, or null otherwise. The type of this expression is Int? .\n\nYou can use the ?. operator with both var and val variables in Ko",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Elvis operator",
+                "Null safety > Not-null assertion operator",
+                "Null safety > Nullable receiver"
+              ],
+              "score": 0.6095528602600098,
+              "line_start": 227,
+              "line_end": 271,
+              "preview": "on(\"name expected\")\n    // ...\n}\n\nNot-null assertion operator\n\nThe not-null assertion operator !! converts any value to a non-nullable type.\n\nWhen you apply the !! operator to a variable whose value is not null , it's safely handled as a no",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Nullable receiver",
+                "Null safety > Let function"
+              ],
+              "score": 0.4661046266555786,
+              "line_start": 269,
+              "line_end": 312,
+              "preview": "nsion function on a nullable receiver type, you can handle null values within the function itself instead of checking for null at every place where you call the function.\n\nFor example, the .toString() extension function can be called on a n",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Nullable receiver",
+                "Null safety > Let function",
+                "Null safety > Safe casts",
+                "Null safety > Collections of a nullable type"
+              ],
+              "score": 0.4501352906227112,
+              "line_start": 308,
+              "line_end": 361,
+              "preview": " accessing properties or functions of objects that might be null .\n\nLet function\n\nTo handle null values and perform operations only on non-null types, you can use the safe call operator ?. together with the let function .\n\nThis combination ",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.9987623762376238
+          },
+          "top5": [
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Elvis operator"
+              ],
+              "score": 0.7458476424217224,
+              "line_start": 219,
+              "line_end": 229,
+              "preview": "If the expression to the left of ?: is not null , the Elvis operator returns it. Otherwise, the Elvis operator returns the expression to the right. The expression on the right-hand side is evaluated only if the left-hand side is null .\n\nSin",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Elvis operator"
+              ],
+              "score": 0.7332091331481934,
+              "line_start": 191,
+              "line_end": 217,
+              "preview": "Elvis operator\n\nWhen working with nullable types, you can check for null and provide an alternative value. For example, if b is not null , access b.length . Otherwise, return an alternative value:\n\nfun main() {\n//sampleStart\n    // Assigns ",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Nullable types and non-nullable types"
+              ],
+              "score": 0.5360631942749023,
+              "line_start": 89,
+              "line_end": 107,
+              "preview": "In the example above, the compiler requires you to use safe calls to check for nullability before accessing properties or performing operations. There are several ways to handle nullables:\n\nCheck for null with the if conditional\n\nSafe call ",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Not-null assertion operator"
+              ],
+              "score": 0.5075587034225464,
+              "line_start": 250,
+              "line_end": 263,
+              "preview": "When b is null and the !! operator makes it return its non-null value, and an NPE occurs:\n\nfun main() {\n//sampleStart\n    // Assigns null to a nullable variable  \n    val b: String? = null\n    // Treats b as non-null and tries to access its",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "extensions",
+              "sections": [
+                "Extensions > Extension properties"
+              ],
+              "score": 0.49616706371307373,
+              "line_start": 293,
+              "line_end": 293,
+              "preview": "In this example, the getter uses the Elvis operator to return the house number if it exists in the houseNumbers map or 1 . To learn more about how to write getters and setters, see Custom getters and setters .",
+              "source": "https://kotlinlang.org/docs/extensions.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q03",
+      "query": "Which operations on Kotlin sequences are lazy, and which ones trigger processing?",
+      "relevant": [
+        {
+          "document_id": "sequences",
+          "section": "Sequence operations"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.5,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences",
+                "Sequences > Construct",
+                "Sequences > Construct > From elements",
+                "Sequences > Construct > From an Iterable",
+                "Sequences > Construct > From a function"
+              ],
+              "score": 0.6742663383483887,
+              "line_start": 1,
+              "line_end": 28,
+              "preview": "Sequences\n\nAlong with collections, the Kotlin standard library contains another type – sequences ( Sequence<T> ). Unlike collections, sequences don't contain elements, they produce them while iterating. Sequences offer the same functions as",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences > Construct > From chunks",
+                "Sequences > Sequence operations",
+                "Sequences > Sequence processing example",
+                "Sequences > Sequence processing example > Iterable"
+              ],
+              "score": 0.6124528646469116,
+              "line_start": 49,
+              "line_end": 86,
+              "preview": "ble object, an Iterator , or another Sequence . A Sequence argument of yieldAll() can be infinite. However, such a call must be the last: all subsequent calls will never be executed.\n\nfun main() {\n//sampleStart\n    val oddNumbers = sequence",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences > Sequence processing example > Iterable",
+                "Sequences > Sequence processing example > Sequence"
+              ],
+              "score": 0.6105360984802246,
+              "line_start": 80,
+              "line_end": 122,
+              "preview": "ur such words.\n\nfun main() {    \n//sampleStart\n    val words = \"The quick brown fox jumps over the lazy dog\".split(\" \")\n    val lengthsList = words.filter { println(\"filter: $it\"); it.length > 3 }\n        .map { println(\"length: ${it.length",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences > Sequence processing example > Sequence"
+              ],
+              "score": 0.576876699924469,
+              "line_start": 118,
+              "line_end": 122,
+              "preview": "sing stops because it's the largest possible size that take(4) can return.\n\nThe sequence processing goes like this:\n\nIn this example, the lazy processing of elements and stopping after finding four items reduces the number of operations com",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Checked exceptions",
+                "Calling Java from Kotlin > Object methods",
+                "Calling Java from Kotlin > Object methods > wait() and notify()"
+              ],
+              "score": 0.505776047706604,
+              "line_start": 587,
+              "line_end": 635,
+              "preview": "ked , meaning that the compiler does not force you to catch any of them. So, when you call a Java method that declares a checked exception, Kotlin does not force you to do anything:\n\nfun render(list: List<*>, to: Appendable) {\n    for (item",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.25,
+            "coverage_at_6000_chars": 0.7976570820021299
+          },
+          "top5": [
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences"
+              ],
+              "score": 0.7147315740585327,
+              "line_start": 1,
+              "line_end": 9,
+              "preview": "Sequences\n\nAlong with collections, the Kotlin standard library contains another type – sequences ( Sequence<T> ). Unlike collections, sequences don't contain elements, they produce them while iterating. Sequences offer the same functions as",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences > Sequence processing example > Sequence"
+              ],
+              "score": 0.5717030167579651,
+              "line_start": 120,
+              "line_end": 122,
+              "preview": "The sequence processing goes like this:\n\nIn this example, the lazy processing of elements and stopping after finding four items reduces the number of operations compared to using a list approach.",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences > Sequence processing example > Sequence"
+              ],
+              "score": 0.5696676969528198,
+              "line_start": 98,
+              "line_end": 118,
+              "preview": "Sequence\n\nNow let's write the same with sequences:\n\nfun main() {\n//sampleStart\n    val words = \"The quick brown fox jumps over the lazy dog\".split(\" \")\n    //convert the List to a Sequence\n    val wordsSequence = words.asSequence()\n\n    val",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "sequences",
+              "sections": [
+                "Sequences > Sequence operations"
+              ],
+              "score": 0.5648065209388733,
+              "line_start": 62,
+              "line_end": 70,
+              "preview": "Sequence operations\n\nThe sequence operations can be classified into the following groups regarding their state requirements:\n\nStateless operations require no state and process each element independently, for example, map() or filter() . Sta",
+              "source": "https://kotlinlang.org/docs/sequences.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Kotlin types in JavaScript"
+              ],
+              "score": 0.5129562616348267,
+              "line_start": 331,
+              "line_end": 343,
+              "preview": "Additionally, it is important to know that:\n\nKotlin preserves overflow semantics for kotlin.Int , kotlin.Byte , kotlin.Short , kotlin.Char and kotlin.Long .\n\nKotlin cannot distinguish between numeric types at runtime (except for kotlin.Long",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q04",
+      "query": "Which scope function should I use to configure an object and return that same object?",
+      "relevant": [
+        {
+          "document_id": "scope-functions",
+          "section": "apply"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 0.0,
+            "recall_at_5": 0.0,
+            "reciprocal_rank": 0.1111111111111111,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions",
+                "Scope functions > Function selection",
+                "Scope functions > Distinctions"
+              ],
+              "score": 0.5868682861328125,
+              "line_start": 42,
+              "line_end": 80,
+              "preview": " and readable.\n\nDue to the many similarities between scope functions, choosing the right one for your use case can be tricky. The choice mainly depends on your intent and the consistency of use in your project. Below, we provide detailed de",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Function selection",
+                "Scope functions > Distinctions",
+                "Scope functions > Distinctions > Context object: this or it",
+                "Scope functions > Distinctions > Context object: this or it > this"
+              ],
+              "score": 0.5647768974304199,
+              "line_start": 78,
+              "line_end": 112,
+              "preview": "ad to errors. We also recommend that you avoid nesting scope functions and be careful when chaining them because it's easy to get confused about the current context object and value of this or it .\n\nDistinctions\n\nBecause scope functions are",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions > Context object: this or it > it",
+                "Scope functions > Distinctions > Return value",
+                "Scope functions > Distinctions > Return value > Context object",
+                "Scope functions > Distinctions > Return value > Lambda result"
+              ],
+              "score": 0.5632548332214355,
+              "line_start": 159,
+              "line_end": 229,
+              "preview": " {\n        return Random.nextInt(100).also { value ->\n            writeToLog(\"getRandomInt() generated value $value\")\n        }\n    }\n    \n    val i = getRandomInt()\n    println(i)\n//sampleEnd\n}\n\nReturn value\n\nScope functions differ by the ",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions"
+              ],
+              "score": 0.5442891120910645,
+              "line_start": 1,
+              "line_end": 44,
+              "preview": "Scope functions\n\nThe Kotlin standard library contains several functions whose sole purpose is to execute a block of code within the context of an object. When you call such a function on an object with a lambda expression provided, it forms",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions > Return value > Lambda result",
+                "Scope functions > Functions",
+                "Scope functions > Functions > let"
+              ],
+              "score": 0.537763237953186,
+              "line_start": 221,
+              "line_end": 280,
+              "preview": "ations on the result, and so on.\n\nfun main() {\n//sampleStart\n    val numbers = mutableListOf(\"one\", \"two\", \"three\")\n    val countEndsWithE = numbers.run { \n        add(\"four\")\n        add(\"five\")\n        count { it.endsWith(\"e\") }\n    }\n   ",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.3333333333333333,
+            "coverage_at_6000_chars": 0.8660477453580901
+          },
+          "top5": [
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions > Return value"
+              ],
+              "score": 0.6084924340248108,
+              "line_start": 170,
+              "line_end": 178,
+              "preview": "Return value\n\nScope functions differ by the result they return:\n\napply and also return the context object.\n\nlet , run , and with return the lambda result.\n\nYou should consider carefully what return value you want based on what you want to d",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Function selection"
+              ],
+              "score": 0.5809004306793213,
+              "line_start": 62,
+              "line_end": 78,
+              "preview": "Executing a lambda on non-nullable objects: let\n\nIntroducing an expression as a variable in local scope: let\n\nObject configuration: apply\n\nObject configuration and computing the result: run\n\nRunning statements where an expression is require",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Functions > apply"
+              ],
+              "score": 0.5801593661308289,
+              "line_start": 403,
+              "line_end": 421,
+              "preview": "apply\n\nThe context object is available as a receiver ( this ).\n\nThe return value is the object itself.\n\nAs apply returns the context object itself, we recommend that you use it for code blocks that don't return a value and that mainly opera",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions"
+              ],
+              "score": 0.5714073181152344,
+              "line_start": 80,
+              "line_end": 86,
+              "preview": "Distinctions\n\nBecause scope functions are similar in nature, it's important to understand the differences between them. There are two main differences between each scope function:\n\nThe way they refer to the context object.\n\nTheir return val",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions > Context object: this or it"
+              ],
+              "score": 0.566758394241333,
+              "line_start": 88,
+              "line_end": 104,
+              "preview": "Context object: this or it\n\nInside the lambda passed to a scope function, the context object is available by a short reference instead of its actual name. Each scope function uses one of two ways to reference the context object: as a lambda",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q05",
+      "query": "How can I perform a side effect in a call chain while retaining the original object?",
+      "relevant": [
+        {
+          "document_id": "scope-functions",
+          "section": "also"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 0.0,
+            "recall_at_5": 0.0,
+            "reciprocal_rank": 0.1,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Inline value classes > Inherited functions"
+              ],
+              "score": 0.4162706434726715,
+              "line_start": 547,
+              "line_end": 559,
+              "preview": "for the transformId() function\n@OptIn(ExperimentalStdlibApi::class)\n@JvmExposeBoxed\nclass LightweightTransformer : IdTransformer\n\n// Generates a boxed representation for the transformId() function\n@OptIn(ExperimentalStdlibApi::class)\n@JvmEx",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin",
+                "Calling Java from Kotlin > Getters and setters",
+                "Calling Java from Kotlin > Java synthetic property references"
+              ],
+              "score": 0.40953993797302246,
+              "line_start": 1,
+              "line_end": 43,
+              "preview": "Calling Java from Kotlin\n\nKotlin is designed with Java interoperability in mind. Existing Java code can be called from Kotlin in a natural way, and Kotlin code can be used from Java rather smoothly as well. In this section, we describe some",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "idioms",
+              "sections": [
+                "Idioms > Single-expression functions",
+                "Idioms > Call multiple methods on an object instance (with)",
+                "Idioms > Configure properties of an object (apply)",
+                "Idioms > Java 7's try-with-resources",
+                "Idioms > Generic function that requires the generic type information",
+                "Idioms > Swap two variables",
+                "Idioms > Mark code as incomplete (TODO)"
+              ],
+              "score": 0.3992406129837036,
+              "line_start": 239,
+              "line_end": 311,
+              "preview": "uivalent to\n\nfun theAnswer(): Int {\n    return 42\n}\n\nThis can be effectively combined with other idioms, leading to shorter code. For example, with the when expression:\n\nfun transform(color: String): Int = when (color) {\n    \"Red\" -> 0\n    ",
+              "source": "https://kotlinlang.org/docs/idioms.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions > Context object: this or it > this",
+                "Scope functions > Distinctions > Context object: this or it > it",
+                "Scope functions > Distinctions > Return value"
+              ],
+              "score": 0.3778001070022583,
+              "line_start": 110,
+              "line_end": 170,
+              "preview": "ng the context object as a receiver ( this ) is recommended for lambdas that mainly operate on the object's members by calling its functions or assigning values to properties.\n\ndata class Person(var name: String, var age: Int = 0, var city:",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Getters and setters",
+                "Calling Java from Kotlin > Java synthetic property references",
+                "Calling Java from Kotlin > Java synthetic property references > How to enable Java synthetic property references"
+              ],
+              "score": 0.3763663172721863,
+              "line_start": 39,
+              "line_end": 91,
+              "preview": " that if the Java class only has a setter, it isn't visible as a property in Kotlin because Kotlin doesn't support set-only properties.\n\nJava synthetic property references\n\nThis feature is Experimental . It may be dropped or changed at any ",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 0.0,
+            "recall_at_5": 0.0,
+            "reciprocal_rank": 0.04,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety > Safe call operator"
+              ],
+              "score": 0.5190420150756836,
+              "line_start": 179,
+              "line_end": 189,
+              "preview": "This chain returns null if any of its properties are null .\n\nYou can also place a safe call on the left side of an assignment:\n\nperson?.department?.head = managersPool.getManager()\n\nIn the example above, if one of the receivers in the safe ",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Distinctions > Return value > Context object"
+              ],
+              "score": 0.46324875950813293,
+              "line_start": 180,
+              "line_end": 217,
+              "preview": "Context object\n\nThe return value of apply and also is the context object itself. Hence, they can be included into call chains as side steps : you can continue chaining function calls on the same object, one after another.\n\nfun main() {\n//sa",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            },
+            {
+              "document_id": "coding-conventions",
+              "sections": [
+                "Coding conventions > Formatting > Wrap chained calls"
+              ],
+              "score": 0.44399482011795044,
+              "line_start": 463,
+              "line_end": 472,
+              "preview": "Wrap chained calls\n\nWhen wrapping chained calls, put the . character or the ?. operator on the next line, with a single indent:\n\nval anchor = owner\n    ?.firstChild!!\n    .siblings(forward = true)\n    .dropWhile { it is PsiComment || it is ",
+              "source": "https://kotlinlang.org/docs/coding-conventions.html"
+            },
+            {
+              "document_id": "idioms",
+              "sections": [
+                "Idioms > Call multiple methods on an object instance (with)"
+              ],
+              "score": 0.41709887981414795,
+              "line_start": 254,
+              "line_end": 271,
+              "preview": "Call multiple methods on an object instance (with)\n\nclass Turtle {\n    fun penDown()\n    fun penUp()\n    fun turn(degrees: Double)\n    fun forward(pixels: Double)\n}\n\nval myTurtle = Turtle()\nwith(myTurtle) { //draw a 100 pix square\n    penDo",
+              "source": "https://kotlinlang.org/docs/idioms.html"
+            },
+            {
+              "document_id": "scope-functions",
+              "sections": [
+                "Scope functions > Functions > apply"
+              ],
+              "score": 0.4142800271511078,
+              "line_start": 423,
+              "line_end": 423,
+              "preview": "Another use case for apply is to include apply in multiple call chains for more complex processing.",
+              "source": "https://kotlinlang.org/docs/scope-functions.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q06",
+      "query": "How do I combine two collections into pairs?",
+      "relevant": [
+        {
+          "document_id": "collection-transformations",
+          "section": "Zip"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Zip",
+                "Collection transformation operations > Associate"
+              ],
+              "score": 0.4836800992488861,
+              "line_start": 63,
+              "line_end": 106,
+              "preview": "val animals = listOf(\"fox\", \"bear\", \"wolf\")\n    \n    println(colors.zip(animals) { color, animal -> \"The ${animal.replaceFirstChar { it.uppercase() }} is $color\"})\n//sampleEnd\n}\n\nWhen you have a List of Pair s, you can do the reverse transf",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Associate",
+                "Collection transformation operations > Flatten"
+              ],
+              "score": 0.45582711696624756,
+              "line_start": 103,
+              "line_end": 142,
+              "preview": "umbers = listOf(\"one\", \"two\", \"three\", \"four\")\n\n    println(numbers.associateBy { it.first().uppercaseChar() })\n    println(numbers.associateBy(keySelector = { it.first().uppercaseChar() }, valueTransform = { it.length }))\n//sampleEnd\n}\n\nAn",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Map",
+                "Collection transformation operations > Zip"
+              ],
+              "score": 0.4556451439857483,
+              "line_start": 27,
+              "line_end": 69,
+              "preview": "h functions use the transformations that take a map entry as an argument, so you can operate both its key and value.\n\nfun main() {\n//sampleStart\n    val numbersMap = mapOf(\"key1\" to 1, \"key2\" to 2, \"key3\" to 3, \"key11\" to 11)\n    println(nu",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collections-overview",
+              "sections": [
+                "Collections overview > Collection types > Map",
+                "Collections overview > Collection types > ArrayDeque"
+              ],
+              "score": 0.39842015504837036,
+              "line_start": 177,
+              "line_end": 219,
+              "preview": "aining the equal pairs are equal regardless of the pair order.\n\nfun main() {\n//sampleStart\n    val numbersMap = mapOf(\"key1\" to 1, \"key2\" to 2, \"key3\" to 3, \"key4\" to 1)    \n    val anotherMap = mapOf(\"key2\" to 2, \"key1\" to 1, \"key4\" to 1, ",
+              "source": "https://kotlinlang.org/docs/collections-overview.html"
+            },
+            {
+              "document_id": "collections-overview",
+              "sections": [
+                "Collections overview"
+              ],
+              "score": 0.39356252551078796,
+              "line_start": 1,
+              "line_end": 17,
+              "preview": "Collections overview\n\nThe Kotlin standard library provides a comprehensive set of tools for managing collections – groups of a variable number of items (possibly zero) that are significant to the problem being solved and are commonly operat",
+              "source": "https://kotlinlang.org/docs/collections-overview.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.5,
+            "coverage_at_6000_chars": 0.9978563772775991
+          },
+          "top5": [
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Associate"
+              ],
+              "score": 0.5622918605804443,
+              "line_start": 132,
+              "line_end": 132,
+              "preview": "Here we call a transform function on an element first, and then build a pair from the properties of that function's result.",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Zip"
+              ],
+              "score": 0.5273081660270691,
+              "line_start": 37,
+              "line_end": 56,
+              "preview": "Zip\n\nZipping transformation is building pairs from elements with the same positions in both collections. In the Kotlin standard library, this is done by the zip() extension function.\n\nWhen called on a collection or an array with another col",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Zip"
+              ],
+              "score": 0.521194577217102,
+              "line_start": 75,
+              "line_end": 82,
+              "preview": "To unzip a list of pairs, call unzip() .\n\nfun main() {\n//sampleStart\n    val numberPairs = listOf(\"one\" to 1, \"two\" to 2, \"three\" to 3, \"four\" to 4)\n    println(numberPairs.unzip())\n//sampleEnd\n}",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Zip"
+              ],
+              "score": 0.5160177946090698,
+              "line_start": 58,
+              "line_end": 73,
+              "preview": "You can also call zip() with a transformation function that takes two parameters: the receiver element and the argument element. In this case, the result List contains the return values of the transformation function called on pairs of the ",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            },
+            {
+              "document_id": "collection-transformations",
+              "sections": [
+                "Collection transformation operations > Associate"
+              ],
+              "score": 0.48041075468063354,
+              "line_start": 97,
+              "line_end": 110,
+              "preview": "For building maps with collection elements as values, there is the function associateBy() . It takes a function that returns a key based on an element's value. If two elements' keys are equal, only the last one remains in the map.\n\nassociat",
+              "source": "https://kotlinlang.org/docs/collection-transformations.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q07",
+      "query": "How can an inline generic function access its type argument at runtime?",
+      "relevant": [
+        {
+          "document_id": "inline-functions",
+          "section": "Reified type parameters"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Reified type parameters",
+                "Inline functions > Inline properties",
+                "Inline functions > Restrictions for public API inline functions"
+              ],
+              "score": 0.5883541107177734,
+              "line_start": 124,
+              "line_end": 169,
+              "preview": "fType<MyTreeNode>()\n\nTo enable this, inline functions support reified type parameters , so you can write something like this:\n\ninline fun <reified T> TreeNode.findParentOfType(): T? {\n    var p = parent\n    while (p != null && p !is T) {\n  ",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            },
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Type erasure > Generics type checks and casts"
+              ],
+              "score": 0.5557740926742554,
+              "line_start": 304,
+              "line_end": 334,
+              "preview": "against a star-projected type:\n\nif (something is List<*>) {\n    something.forEach { println(it) } // The items are typed as `Any?`\n}\n\nSimilarly, when you already have the type arguments of an instance checked statically (at compile time), y",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Non-local jump expressions > Returns",
+                "Inline functions > Non-local jump expressions > Break and continue",
+                "Inline functions > Reified type parameters"
+              ],
+              "score": 0.5247368812561035,
+              "line_start": 81,
+              "line_end": 129,
+              "preview": "may call the lambdas passed to them as parameters not directly from the function body, but from another execution context, such as a local object or a nested function. In such cases, non-local control flow is also not allowed in the lambdas",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            },
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Underscore operator for type arguments"
+              ],
+              "score": 0.5242156386375427,
+              "line_start": 395,
+              "line_end": 407,
+              "preview": "s.java.getDeclaredConstructor().newInstance().execute()\n    }\n}\n\nfun main() {\n    // T is inferred as String because SomeImplementation derives from SomeClass<String>\n    val s = Runner.run<SomeImplementation, _>()\n    assert(s == \"Test\")\n\n",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions",
+                "Inline functions > noinline"
+              ],
+              "score": 0.5116597414016724,
+              "line_start": 1,
+              "line_end": 34,
+              "preview": "Inline functions\n\nUsing higher-order functions imposes certain runtime penalties: each function is an object, and it captures a closure. A closure is a scope of variables that can be accessed in the body of the function. Memory allocations ",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.9977362761743067
+          },
+          "top5": [
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Reified type parameters"
+              ],
+              "score": 0.6091029644012451,
+              "line_start": 126,
+              "line_end": 144,
+              "preview": "To enable this, inline functions support reified type parameters , so you can write something like this:\n\ninline fun <reified T> TreeNode.findParentOfType(): T? {\n    var p = parent\n    while (p != null && p !is T) {\n        p = p.parent\n  ",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            },
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Reified type parameters"
+              ],
+              "score": 0.5887479782104492,
+              "line_start": 146,
+              "line_end": 146,
+              "preview": "Normal functions (not marked as inline) cannot have reified parameters. A type that does not have a run-time representation (for example, a non-reified type parameter or a fictitious type like Nothing ) cannot be used as an argument for a r",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            },
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Type erasure > Generics type checks and casts"
+              ],
+              "score": 0.5866263508796692,
+              "line_start": 318,
+              "line_end": 345,
+              "preview": "The same syntax but with the type arguments omitted can be used for casts that do not take type arguments into account: list as ArrayList .\n\nThe type arguments of generic function calls are also only checked at compile time. Inside the func",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Generic functions"
+              ],
+              "score": 0.5681490898132324,
+              "line_start": 225,
+              "line_end": 243,
+              "preview": "Generic functions\n\nClasses aren't the only declarations that can have type parameters. Functions can, too. Type parameters are placed before the name of the function:\n\nfun <T> singletonList(item: T): List<T> {\n    // ...\n}\n\nfun <T> T.basicT",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Reified type parameters"
+              ],
+              "score": 0.5650914907455444,
+              "line_start": 105,
+              "line_end": 124,
+              "preview": "Reified type parameters\n\nSometimes you need to access a type passed as a parameter:\n\nfun <T> TreeNode.findParentOfType(clazz: Class<T>): T? {\n    var p = parent\n    while (p != null && !clazz.isInstance(p)) {\n        p = p.parent\n    }\n    ",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q08",
+      "query": "How do in and out make a generic Kotlin interface safely consume or produce values?",
+      "relevant": [
+        {
+          "document_id": "generics",
+          "section": "Declaration-site variance"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 0.0,
+            "recall_at_5": 0.0,
+            "reciprocal_rank": 0.09090909090909091,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Type projections > Captured types",
+                "Generics: in, out, where > Generic functions",
+                "Generics: in, out, where > Generic constraints"
+              ],
+              "score": 0.5746796131134033,
+              "line_start": 203,
+              "line_end": 247,
+              "preview": "er uses the captured type's upper bound for read operations and its lower bound to determine which values are type-safe for write operations:\n\n// The projected type is Array<out CharSequence>\nval array: Array<out CharSequence> = arrayOf(\"Ko",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Inline value classes",
+                "Calling Kotlin from Java > Inline value classes > Inherited functions"
+              ],
+              "score": 0.567639172077179,
+              "line_start": 507,
+              "line_end": 553,
+              "preview": " code fails:\n\nMyInt input = new MyInt(5);\n\nYou can use the @JvmExposeBoxed annotation so that Kotlin generates a public constructor that you can call from Java directly. You can apply the annotation at the following levels to ensure fine-gr",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Variant generics",
+                "Calling Kotlin from Java > Variant generics > Translation of type Nothing",
+                "Calling Kotlin from Java > Inline value classes"
+              ],
+              "score": 0.5627959966659546,
+              "line_start": 478,
+              "line_end": 511,
+              "preview": "fun boxDerived(value: Derived): Box<@JvmWildcard Derived> = Box(value)\n// is translated to \n// Box<? extends Derived> boxDerived(Derived value) { ... }\n\nIn the opposite case, if you don't need wildcards where they are generated, use @JvmSup",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Overloads generation",
+                "Calling Kotlin from Java > Checked exceptions",
+                "Calling Kotlin from Java > Null-safety",
+                "Calling Kotlin from Java > Variant generics"
+              ],
+              "score": 0.5602208375930786,
+              "line_start": 407,
+              "line_end": 458,
+              "preview": " Secondary constructors , if a class has default values for all constructor parameters, a public constructor with no arguments is generated for it. This works even if the @JvmOverloads annotation is not specified.\n\nChecked exceptions\n\nKotli",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Mapped types",
+                "Calling Java from Kotlin > Java generics in Kotlin"
+              ],
+              "score": 0.5593216419219971,
+              "line_start": 482,
+              "line_end": 518,
+              "preview": "ameter is mapped to a platform type: for example, List<java.lang.Integer> becomes a List<Int!> in Kotlin.\n\nCollection types may be read-only or mutable in Kotlin, so Java's collections are mapped as follows (all Kotlin types in this table r",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.5,
+            "coverage_at_6000_chars": 0.3124328197778574
+          },
+          "top5": [
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where"
+              ],
+              "score": 0.6080002784729004,
+              "line_start": 1,
+              "line_end": 15,
+              "preview": "Generics: in, out, where\n\nClasses in Kotlin can have type parameters, just like in Java:\n\nclass Box<T>(t: T) {\n    var value = t\n}\n\nTo create an instance of such a class, simply provide the type arguments:\n\nval box: Box<Int> = Box<Int>(1)\n\n",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Variance > Declaration-site variance"
+              ],
+              "score": 0.5890016555786133,
+              "line_start": 98,
+              "line_end": 111,
+              "preview": "In Kotlin, there is a way to explain this sort of thing to the compiler. This is called declaration-site variance : you can annotate the type parameter T of Source to make sure that it is only returned (produced) from members of Source<T> ,",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "generics",
+              "sections": [
+                "Generics: in, out, where > Type projections > Star-projections"
+              ],
+              "score": 0.5757178068161011,
+              "line_start": 171,
+              "line_end": 181,
+              "preview": "Star-projections\n\nSometimes you want to say that you know nothing about the type argument, but you still want to use it in a safe way. The safe way here is to define such a projection of the generic type, that every concrete instantiation o",
+              "source": "https://kotlinlang.org/docs/generics.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Inline value classes"
+              ],
+              "score": 0.5753114223480225,
+              "line_start": 498,
+              "line_end": 511,
+              "preview": "Inline value classes\n\nIf you want Java code to work smoothly with Kotlin's inline value classes , you can use the @JvmExposeBoxed annotation or the -Xjvm-expose-boxed compiler option. These approaches ensure Kotlin generates the necessary b",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Java generics in Kotlin"
+              ],
+              "score": 0.568454384803772,
+              "line_start": 504,
+              "line_end": 522,
+              "preview": "Java generics in Kotlin\n\nKotlin's generics are a little different from Java's (see Generics ). When importing Java types to Kotlin, the following conversions are done:\n\nJava's wildcards are converted into type projections:\n\nFoo<? extends Ba",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q09",
+      "query": "How should Kotlin handle Java references whose nullability is not known?",
+      "relevant": [
+        {
+          "document_id": "java-interop",
+          "section": "Null-safety and platform types"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.33179286645337125
+          },
+          "top5": [
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types",
+                "Calling Java from Kotlin > Null-safety and platform types > Notation for platform types"
+              ],
+              "score": 0.6740132570266724,
+              "line_start": 115,
+              "line_end": 135,
+              "preview": " them are the same as in Java (see more below ). Consider the following examples:\n\nval list = ArrayList<String>() // non-null (constructor result)\nlist.add(\"Item\")\nval size = list.size // non-null (primitive int)\nval item = list[0] // platf",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types > Notation for platform types",
+                "Calling Java from Kotlin > Null-safety and platform types > Nullability annotations"
+              ],
+              "score": 0.6615198254585266,
+              "line_start": 135,
+              "line_end": 179,
+              "preview": "licitly in the program, so there's no syntax for them in the language. Nevertheless, the compiler and IDE need to display them sometimes (for example, in error messages or parameter info), so there is a mnemonic notation for them:\n\nT! means",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types > Annotating type arguments and type parameters > Type arguments",
+                "Calling Java from Kotlin > Null-safety and platform types > Annotating type arguments and type parameters > Type parameters"
+              ],
+              "score": 0.652538537979126,
+              "line_start": 216,
+              "line_end": 260,
+              "preview": "en the @NotNull annotation is missing from a type argument, you get a platform type instead:\n\nfun toSet(elements: (Mutable)Collection<String!>) : (Mutable)Set<String!> { ... }\n\nKotlin also takes into account nullability annotations on type ",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types > Annotating type arguments and type parameters > Type parameters",
+                "Calling Java from Kotlin > Null-safety and platform types > JSpecify support"
+              ],
+              "score": 0.6501851081848145,
+              "line_start": 258,
+              "line_end": 291,
+              "preview": " passing nullable type as a type argument or type parameter produces a warning.\n\nAnnotating type arguments and type parameters works with the Java 8 target or higher. The feature requires that the nullability annotations support the TYPE_US",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "null-safety",
+              "sections": [
+                "Null safety",
+                "Null safety > Nullable types and non-nullable types"
+              ],
+              "score": 0.6494554281234741,
+              "line_start": 27,
+              "line_end": 68,
+              "preview": "ring> , which would require MutableList<String?> to handle it properly.\n\nOther issues caused by external Java code.\n\nBesides NPE, another exception related to null safety is UninitializedPropertyAccessException . Kotlin throws this exceptio",
+              "source": "https://kotlinlang.org/docs/null-safety.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.2891337836236521
+          },
+          "top5": [
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types"
+              ],
+              "score": 0.70038902759552,
+              "line_start": 107,
+              "line_end": 120,
+              "preview": "Null-safety and platform types\n\nAny reference in Java may be null , which makes Kotlin's requirements of strict null-safety impractical for objects coming from Java. Types of Java declarations are treated in Kotlin as non-denotable and call",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types"
+              ],
+              "score": 0.6919096112251282,
+              "line_start": 122,
+              "line_end": 131,
+              "preview": "When you call methods on variables of platform types, Kotlin does not issue nullability errors at compile time, but the call may fail at runtime, because of a null-pointer exception or an assertion that Kotlin generates to prevent nulls fro",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types > JSpecify support"
+              ],
+              "score": 0.6621593236923218,
+              "line_start": 264,
+              "line_end": 278,
+              "preview": "JSpecify support\n\nKotlin supports the JSpecify nullability annotations, which provide a unified set of annotations for Java nullability. JSpecify allows you to provide detailed nullability information for Java declarations, helping Kotlin m",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types > Annotating type arguments and type parameters > Type parameters"
+              ],
+              "score": 0.6592364311218262,
+              "line_start": 238,
+              "line_end": 252,
+              "preview": "Type parameters\n\nBy default, the nullability of plain type parameters in both Kotlin and Java is undefined. In Java, you can specify it using nullability annotations. Let's annotate the type parameter of the Base class:\n\npublic class Base<@",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Null-safety and platform types > JSpecify support"
+              ],
+              "score": 0.6551307439804077,
+              "line_start": 280,
+              "line_end": 308,
+              "preview": "Consider the following Java class with JSpecify annotations:\n\n// Java\nimport org.jspecify.annotations.*;\n\n@NullMarked\npublic class InventoryService {\n    public String notNull() { return \"\"; }\n    public @Nullable String nullable() { return",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q10",
+      "query": "How can Java callers use a Kotlin function with default parameters without passing every argument?",
+      "relevant": [
+        {
+          "document_id": "java-to-kotlin-interop",
+          "section": "Overloads generation"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.6986136226642555
+          },
+          "top5": [
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Overloads generation",
+                "Calling Kotlin from Java > Checked exceptions",
+                "Calling Kotlin from Java > Null-safety",
+                "Calling Kotlin from Java > Variant generics"
+              ],
+              "score": 0.6575031280517578,
+              "line_start": 407,
+              "line_end": 458,
+              "preview": " Secondary constructors , if a class has default values for all constructor parameters, a public constructor with no arguments is generated for it. This works even if the @JvmOverloads annotation is not specified.\n\nChecked exceptions\n\nKotli",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Static methods",
+                "Calling Kotlin from Java > Default methods in interfaces",
+                "Calling Kotlin from Java > Default methods in interfaces > Compatibility modes for default methods"
+              ],
+              "score": 0.6424629092216492,
+              "line_start": 205,
+              "line_end": 259,
+              "preview": "       }\n    }\n}\n\nYou can also apply the @JvmStatic annotation to the property of an object or a companion object, making its getter and setter methods static members in that object or the class containing the companion object.\n\nDefault met",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Handling signature clashes with @JvmName",
+                "Calling Kotlin from Java > Overloads generation"
+              ],
+              "score": 0.6274777054786682,
+              "line_start": 327,
+              "line_end": 380,
+              "preview": "se @get:JvmName and @set:JvmName :\n\n@get:JvmName(\"x\")\n@set:JvmName(\"changeX\")\nvar x: Int = 23\n\nOverloads generation\n\nNormally, if you write a Kotlin function with default parameter values, it's visible in Java only as a full signature, with",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Overloads generation"
+              ],
+              "score": 0.6146376132965088,
+              "line_start": 364,
+              "line_end": 407,
+              "preview": ",\n    onClick: () -> Unit\n)\n\n// Version 1.1\nButton(\n    label: String,\n    color: Color,\n    borderColor: Color,\n    onClick: () -> Unit\n)\n\n// Version 1.2\nButton(\n    label: String,\n    color: Color,\n    borderColor: Color,\n    borderStyle:",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Java arrays",
+                "Calling Java from Kotlin > Java varargs",
+                "Calling Java from Kotlin > Operators",
+                "Calling Java from Kotlin > Checked exceptions"
+              ],
+              "score": 0.6136059761047363,
+              "line_start": 533,
+              "line_end": 589,
+              "preview": "dices(int[] indices) {\n        // code here...\n    }\n}\n\nTo pass an array of primitive values, you can do the following in Kotlin:\n\nval javaObj = JavaArrayExample()\nval array = intArrayOf(0, 1, 2, 3)\njavaObj.removeIndices(array)  // passes i",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.5072332730560579
+          },
+          "top5": [
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Overloads generation"
+              ],
+              "score": 0.6737396717071533,
+              "line_start": 333,
+              "line_end": 341,
+              "preview": "Overloads generation\n\nNormally, if you write a Kotlin function with default parameter values, it's visible in Java only as a full signature, with all parameters present.\n\nYou can use the @IntroducedAt annotation or the @JvmOverloads annotat",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Overloads generation"
+              ],
+              "score": 0.668662428855896,
+              "line_start": 386,
+              "line_end": 403,
+              "preview": "If you want to expose multiple overloads to Java callers, you can also use the @JvmOverloads annotation.\n\nThe annotation also works for constructors, static methods, and so on. It can't be used on abstract methods, including methods defined",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "js-interop",
+              "sections": [
+                "Use JavaScript code from Kotlin > external modifier > Declare parameters with default values"
+              ],
+              "score": 0.6639763116836548,
+              "line_start": 87,
+              "line_end": 97,
+              "preview": "Declare parameters with default values\n\nIf you are writing an external declaration for a JavaScript function which has a parameter with a default value, use definedExternally . This delegates the generation of the default values to the Java",
+              "source": "https://kotlinlang.org/docs/js-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Default methods in interfaces"
+              ],
+              "score": 0.6587392091751099,
+              "line_start": 211,
+              "line_end": 235,
+              "preview": "Default methods in interfaces\n\nWhen targeting the JVM, Kotlin compiles functions declared in interfaces to default methods unless configured otherwise . These are concrete methods in interfaces that Java classes can inherit directly, withou",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin"
+              ],
+              "score": 0.6453452110290527,
+              "line_start": 1,
+              "line_end": 19,
+              "preview": "Calling Java from Kotlin\n\nKotlin is designed with Java interoperability in mind. Existing Java code can be called from Kotlin in a natural way, and Kotlin code can be used from Java rather smoothly as well. In this section, we describe some",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q11",
+      "query": "Where should expect and actual declarations live and which parts must match?",
+      "relevant": [
+        {
+          "document_id": "multiplatform-expect-actual",
+          "section": "Rules for expected and actual declarations"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations",
+                "Expected and actual declarations > Rules for expected and actual declarations"
+              ],
+              "score": 0.6223229169845581,
+              "line_start": 1,
+              "line_end": 25,
+              "preview": "Expected and actual declarations\n\nExpected and actual declarations allow you to access platform-specific APIs from Kotlin Multiplatform modules. You can provide platform-agnostic APIs in the common code.\n\nThis article describes the language",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Rules for expected and actual declarations",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual functions"
+              ],
+              "score": 0.5807639956474304,
+              "line_start": 23,
+              "line_end": 49,
+              "preview": "ch as org.mygroup.myapp.MyType .\n\nWhile generating the resulting code for different platforms, the Kotlin compiler merges the expected and actual declarations that correspond to each other. It generates one declaration with its actual imple",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Advanced use cases",
+                "Expected and actual declarations > Advanced use cases > Using type aliases to satisfy actual declarations",
+                "Expected and actual declarations > Advanced use cases > Expanded visibility in actual declarations"
+              ],
+              "score": 0.5237733721733093,
+              "line_start": 309,
+              "line_end": 343,
+              "preview": "f special cases regarding expected and actual declarations.\n\nUsing type aliases to satisfy actual declarations\n\nThe implementation of an actual declaration does not have to be written from scratch. It can be an existing type, such as a clas",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Inheritance from platform classes",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Application in frameworks",
+                "Expected and actual declarations > Advanced use cases",
+                "Expected and actual declarations > Advanced use cases > Using type aliases to satisfy actual declarations"
+              ],
+              "score": 0.5201082229614258,
+              "line_start": 260,
+              "line_end": 313,
+              "preview": "e platform-specific base class:\n\nactual class CommonIdentity : Identity() {\n    actual val userName = login\n    actual val processID = pid\n}\n\nHere, the CommonIdentity type is compatible with your own design while taking advantage of the exi",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Advanced use cases > Additional enumeration entries on actualization",
+                "Expected and actual declarations > Advanced use cases > Expected annotation classes"
+              ],
+              "score": 0.5196311473846436,
+              "line_start": 375,
+              "line_end": 412,
+              "preview": "th those in the common code. Therefore, the compiler requires you to handle all additional cases.\n\nThe function that implements the when construction on Department requires an else clause:\n\n// An else clause is required:\nfun matchOnDepartme",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.8582709891936825
+          },
+          "top5": [
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Rules for expected and actual declarations"
+              ],
+              "score": 0.670235812664032,
+              "line_start": 7,
+              "line_end": 15,
+              "preview": "Rules for expected and actual declarations\n\nTo define expected and actual declarations, follow these rules:\n\nIn the common source set, declare a standard Kotlin construct. This can be a function, property, class, interface, enumeration, or ",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Rules for expected and actual declarations"
+              ],
+              "score": 0.6233387589454651,
+              "line_start": 17,
+              "line_end": 27,
+              "preview": "During compilation for a specific target, the compiler tries to match each actual declaration it finds with the corresponding expected declaration in the common code. The compiler ensures that:\n\nEvery expected declaration in the common sour",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations"
+              ],
+              "score": 0.5343557596206665,
+              "line_start": 1,
+              "line_end": 5,
+              "preview": "Expected and actual declarations\n\nExpected and actual declarations allow you to access platform-specific APIs from Kotlin Multiplatform modules. You can provide platform-agnostic APIs in the common code.\n\nThis article describes the language",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes"
+              ],
+              "score": 0.5330041646957397,
+              "line_start": 196,
+              "line_end": 218,
+              "preview": "Expected and actual classes\n\nExpected and actual classes are in Beta . They are almost stable, but migration steps may be required in the future. We'll do our best to minimize any further changes for you to make.\n\nYou can use expected and a",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Advanced use cases > Expected annotation classes"
+              ],
+              "score": 0.5292308330535889,
+              "line_start": 389,
+              "line_end": 404,
+              "preview": "Expected annotation classes\n\nExpected and actual declarations can be used with annotations. For example, you can declare an @XmlSerializable annotation, which must have a corresponding actual declaration in each platform source set:\n\n@Targe",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q12",
+      "query": "Can I satisfy a common expected class using an existing platform type instead of wrapping it?",
+      "relevant": [
+        {
+          "document_id": "multiplatform-expect-actual",
+          "section": "Using type aliases to satisfy actual declarations"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.5,
+            "coverage_at_6000_chars": 0.10692307692307693
+          },
+          "top5": [
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Inheritance from platform classes"
+              ],
+              "score": 0.632512092590332,
+              "line_start": 222,
+              "line_end": 267,
+              "preview": "o one implementation per target platform. Also, it's much easier to substitute a fake implementation in tests or provide multiple implementations on a single platform.\n\nAs a general rule, rely on standard language constructs wherever possib",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Inheritance from platform classes",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Application in frameworks",
+                "Expected and actual declarations > Advanced use cases",
+                "Expected and actual declarations > Advanced use cases > Using type aliases to satisfy actual declarations"
+              ],
+              "score": 0.60878586769104,
+              "line_start": 260,
+              "line_end": 313,
+              "preview": "e platform-specific base class:\n\nactual class CommonIdentity : Identity() {\n    actual val userName = login\n    actual val processID = pid\n}\n\nHere, the CommonIdentity type is compatible with your own design while taking advantage of the exi",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions > Expected and actual properties"
+              ],
+              "score": 0.5920016765594482,
+              "line_start": 92,
+              "line_end": 151,
+              "preview": "the common interface:\n\nIn commonMain , define the Identity interface and the buildIdentity() factory function:\n\n// In the commonMain source set:\nexpect fun buildIdentity(): Identity\n\ninterface Identity {\n    val userName: String\n    val pro",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions > Recommendations on dependency injection",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes"
+              ],
+              "score": 0.5871948003768921,
+              "line_start": 190,
+              "line_end": 224,
+              "preview": "a component can express its dependencies using regular Kotlin interfaces . The DI framework can then be configured to inject a platform-specific implementation, for example, from the JVM or an iOS module.\n\nThis means that expected and actua",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Rules for expected and actual declarations",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual functions"
+              ],
+              "score": 0.5209382176399231,
+              "line_start": 23,
+              "line_end": 49,
+              "preview": "ch as org.mygroup.myapp.MyType .\n\nWhile generating the resulting code for different platforms, the Kotlin compiler merges the expected and actual declarations that correspond to each other. It generates one declaration with its actual imple",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.3333333333333333,
+            "coverage_at_6000_chars": 0.3446153846153846
+          },
+          "top5": [
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Inheritance from platform classes"
+              ],
+              "score": 0.6460654735565186,
+              "line_start": 235,
+              "line_end": 251,
+              "preview": "Inheritance from platform classes\n\nThere are special cases when using the expect keyword with classes may be the best approach. Let's say that the Identity type already exists on the JVM:\n\nopen class Identity {\n    val login: String = Syste",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes > Inheritance from platform classes"
+              ],
+              "score": 0.6152203679084778,
+              "line_start": 253,
+              "line_end": 267,
+              "preview": "In nativeMain , provide an actual declaration that implements the functionality:\n\nactual class CommonIdentity {\n    actual val userName = getlogin()?.toKString() ?: \"None\"\n    actual val processID = getpid().toLong()\n}\n\nIn jvmMain , provide",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Advanced use cases > Using type aliases to satisfy actual declarations"
+              ],
+              "score": 0.5917391180992126,
+              "line_start": 330,
+              "line_end": 337,
+              "preview": "Instead, you can use type aliases to connect the expected declarations and the platform-specific types:\n\nactual typealias Month = java.time.Month\nactual typealias MyDate = java.time.LocalDate\n\nIn this case, define the typealias declaration ",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Advanced use cases > Expanded visibility in actual declarations"
+              ],
+              "score": 0.5744972229003906,
+              "line_start": 351,
+              "line_end": 356,
+              "preview": "You can use the following actual implementation in a platform-specific source set as well:\n\n@Suppress(\"ACTUAL_WITHOUT_EXPECT\")\npublic actual typealias Messenger = MyMessenger\n\nHere, an internal expected class has an actual implementation wi",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual classes"
+              ],
+              "score": 0.5516653656959534,
+              "line_start": 220,
+              "line_end": 233,
+              "preview": "You might have already seen this approach in demonstration materials. However, using classes in simple cases where interfaces would be sufficient is not recommended .\n\nWith interfaces, you don't limit your design to one implementation per t",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q13",
+      "query": "How are Kotlin exceptions exposed to Swift and Objective-C callers?",
+      "relevant": [
+        {
+          "document_id": "native-objc-interop",
+          "section": "Errors and exceptions"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Method names translation",
+                "Interoperability with Swift/Objective-C > Mappings > Errors and exceptions"
+              ],
+              "score": 0.7290138006210327,
+              "line_start": 197,
+              "line_end": 226,
+              "preview": "this case, the clashing methods can be called from Kotlin using named arguments, for example:\n\n[player moveTo:LEFT byMeters:17]\n[player moveTo:UP byInches:42]\n\nIn Kotlin, it's:\n\nplayer.moveTo(LEFT, byMeters = 17)\nplayer.moveTo(UP, byInches ",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Errors and exceptions",
+                "Interoperability with Swift/Objective-C > Mappings > Enums",
+                "Interoperability with Swift/Objective-C > Mappings > Suspending functions"
+              ],
+              "score": 0.6505433320999146,
+              "line_start": 224,
+              "line_end": 267,
+              "preview": "tive-C are considered unhandled and cause program termination.\n\nsuspend functions without @Throws propagate only CancellationException (as NSError ). Non- suspend functions without @Throws don't propagate Kotlin exceptions at all.\n\nNote tha",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Suspending functions",
+                "Interoperability with Swift/Objective-C > Mappings > Extensions and category members",
+                "Interoperability with Swift/Objective-C > Mappings > Kotlin singletons"
+              ],
+              "score": 0.6326236128807068,
+              "line_start": 263,
+              "line_end": 313,
+              "preview": " issue for details.\n\nLearn more about the async / await mechanism in the Swift documentation .\n\nSee an example and recommendations on third-party libraries that implement the same functionality in the Kotlin-Swift interopedia .\n\nExtensions ",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Checked exceptions",
+                "Calling Java from Kotlin > Object methods",
+                "Calling Java from Kotlin > Object methods > wait() and notify()"
+              ],
+              "score": 0.626335620880127,
+              "line_start": 587,
+              "line_end": 635,
+              "preview": "ked , meaning that the compiler does not force you to catch any of them. So, when you call a Java method that declares a checked exception, Kotlin does not force you to do anything:\n\nfun render(list: List<*>, to: Appendable) {\n    for (item",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Classes > Strong linking",
+                "Interoperability with Swift/Objective-C > Mappings > Initializers",
+                "Interoperability with Swift/Objective-C > Mappings > Setters",
+                "Interoperability with Swift/Objective-C > Mappings > Top-level functions and properties",
+                "Interoperability with Swift/Objective-C > Mappings > Method names translation"
+              ],
+              "score": 0.624106764793396,
+              "line_start": 160,
+              "line_end": 204,
+              "preview": "rapper that checks if the class is actually available. See how this workaround was implemented in the Compose Multiplatform framework .\n\nInitializers\n\nA Swift/Objective-C initializer is imported to Kotlin as constructors or as factory metho",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.9985559566787003
+          },
+          "top5": [
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Errors and exceptions"
+              ],
+              "score": 0.7598251700401306,
+              "line_start": 218,
+              "line_end": 228,
+              "preview": "Errors and exceptions\n\nAll Kotlin exceptions are unchecked, meaning that errors are caught at runtime. However, Swift has only checked errors that are handled at compile time. So, if Swift or Objective-C code calls a Kotlin method that thro",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Errors and exceptions"
+              ],
+              "score": 0.6564737558364868,
+              "line_start": 230,
+              "line_end": 230,
+              "preview": "See an example in the Kotlin-Swift interopedia .",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "java-to-kotlin-interop",
+              "sections": [
+                "Calling Kotlin from Java > Checked exceptions"
+              ],
+              "score": 0.6480138897895813,
+              "line_start": 409,
+              "line_end": 437,
+              "preview": "Checked exceptions\n\nKotlin does not have checked exceptions. So, normally the Java signatures of Kotlin functions do not declare exceptions thrown. Thus, if you have a function in Kotlin like this:\n\n// example.kt\npackage demo\n\nfun writeToFi",
+              "source": "https://kotlinlang.org/docs/java-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "java-interop",
+              "sections": [
+                "Calling Java from Kotlin > Checked exceptions"
+              ],
+              "score": 0.636290431022644,
+              "line_start": 585,
+              "line_end": 593,
+              "preview": "Checked exceptions\n\nIn Kotlin, all exceptions are unchecked , meaning that the compiler does not force you to catch any of them. So, when you call a Java method that declares a checked exception, Kotlin does not force you to do anything:\n\nf",
+              "source": "https://kotlinlang.org/docs/java-interop.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Using Kotlin in Swift/Objective-C > Hide Kotlin declarations from Objective-C and Swift"
+              ],
+              "score": 0.6310576796531677,
+              "line_start": 33,
+              "line_end": 39,
+              "preview": "Hide Kotlin declarations from Objective-C and Swift\n\nTo make your Kotlin code more Swift/Objective-C-friendly, use the @HiddenFromObjC annotation to hide a Kotlin declaration from Objective-C and Swift. It disables the function or property ",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q14",
+      "query": "How does Swift export expose Kotlin suspend functions?",
+      "relevant": [
+        {
+          "document_id": "native-swift-export",
+          "section": "Suspending functions"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "native-swift-export",
+              "sections": [
+                "Interoperability with Swift using Swift export > Mappings > Packages",
+                "Interoperability with Swift using Swift export > Mappings > Concurrency",
+                "Interoperability with Swift using Swift export > Mappings > Concurrency > Suspending functions",
+                "Interoperability with Swift using Swift export > Mappings > Concurrency > Flows",
+                "Interoperability with Swift using Swift export > Mappings > Concurrency > Coroutine dispatchers",
+                "Interoperability with Swift using Swift export > Cross-language inheritance"
+              ],
+              "score": 0.7345298528671265,
+              "line_start": 366,
+              "line_end": 433,
+              "preview": "/ Kotlin\n// bar.kt file in foo.bar package\nfun callMeMaybe() {}\n\n// Kotlin\n// baz.kt file in foo.baz package\nfun callMeMaybe() {}\n\n// Swift\npublic extension foo.bar {\n    public func callMeMaybe() {}\n}\n\npublic extension foo.baz {\n    public",
+              "source": "https://kotlinlang.org/docs/native-swift-export.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Errors and exceptions",
+                "Interoperability with Swift/Objective-C > Mappings > Enums",
+                "Interoperability with Swift/Objective-C > Mappings > Suspending functions"
+              ],
+              "score": 0.6830399036407471,
+              "line_start": 224,
+              "line_end": 267,
+              "preview": "tive-C are considered unhandled and cause program termination.\n\nsuspend functions without @Throws propagate only CancellationException (as NSError ). Non- suspend functions without @Throws don't propagate Kotlin exceptions at all.\n\nNote tha",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "native-swift-export",
+              "sections": [
+                "Interoperability with Swift using Swift export",
+                "Interoperability with Swift using Swift export > Enable Swift export"
+              ],
+              "score": 0.6664910912513733,
+              "line_start": 1,
+              "line_end": 27,
+              "preview": "Interoperability with Swift using Swift export\n\nKotlin's interoperability with Swift through Swift export is currently in Alpha. Swift export allows you to export Kotlin sources directly and call Kotlin code from Swift idiomatically, elimin",
+              "source": "https://kotlinlang.org/docs/native-swift-export.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Kotlin/JS > New export of suspend function with JsExport",
+                "What's new in Kotlin 2.3.0 > Kotlin/JS > Usage of the BigInt64Array type to represent Kotlin's LongArray type"
+              ],
+              "score": 0.653356671333313,
+              "line_start": 398,
+              "line_end": 442,
+              "preview": "rone to errors.\n\nStarting with Kotlin 2.3.0, suspend functions can be exported directly to JavaScript using the @JsExport annotation.\n\nEnabling suspend function exports reduces boilerplate and improves interoperability between Kotlin/JS and",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "native-swift-export",
+              "sections": [
+                "Interoperability with Swift using Swift export > Mappings > Declarations > Functions",
+                "Interoperability with Swift using Swift export > Mappings > Declarations > Properties",
+                "Interoperability with Swift using Swift export > Mappings > Declarations > Constructors",
+                "Interoperability with Swift using Swift export > Mappings > Types",
+                "Interoperability with Swift using Swift export > Mappings > Types > kotlin.Nothing",
+                "Interoperability with Swift using Swift export > Mappings > Types > Classifier types",
+                "Interoperability with Swift using Swift export > Mappings > Packages"
+              ],
+              "score": 0.6464509963989258,
+              "line_start": 264,
+              "line_end": 377,
+              "preview": "..\n}\n\npublic func baz() -> Swift.Int64 {\n    // ...\n}\n\nFor Kotlin's extension functions, the receiver parameter becomes an ordinary Swift parameter in the first position:\n\n// Kotlin\nfun Int.foo(): Unit = TODO()\n\n// Swift\nfunc foo(_ receiver",
+              "source": "https://kotlinlang.org/docs/native-swift-export.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "native-swift-export",
+              "sections": [
+                "Interoperability with Swift using Swift export > Mappings > Concurrency > Suspending functions"
+              ],
+              "score": 0.8088442087173462,
+              "line_start": 391,
+              "line_end": 402,
+              "preview": "Suspending functions\n\nYou can call suspending Kotlin code from Swift. Kotlin suspending functions and suspending functional types are exported as Swift's async counterparts:\n\n// Kotlin\nsuspend fun hello(): String {\n    delay(1000)\n    retur",
+              "source": "https://kotlinlang.org/docs/native-swift-export.html"
+            },
+            {
+              "document_id": "whatsnew24",
+              "sections": [
+                "What's new in Kotlin 2.4.0 > Kotlin/Native > Swift export goes Alpha with improved concurrency support > Support for structured concurrency"
+              ],
+              "score": 0.7227659225463867,
+              "line_start": 592,
+              "line_end": 603,
+              "preview": "Support for structured concurrency\n\nYou can now seamlessly call suspending Kotlin code from Swift. Kotlin suspend functions and suspend functional types are exported as Swift's idiomatic async counterparts:\n\n// Kotlin\nsuspend fun hello(): S",
+              "source": "https://kotlinlang.org/docs/whatsnew24.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Kotlin/JS > New export of suspend function with JsExport"
+              ],
+              "score": 0.7224036455154419,
+              "line_start": 404,
+              "line_end": 425,
+              "preview": "To enable this feature, add the following compiler option to your build.gradle.kts file:\n\nkotlin {\n    compilerOptions {\n        freeCompilerArgs.add(\"-Xenable-suspend-function-exporting\")\n    }\n}\n\nOnce enabled, classes and functions marked",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "native-objc-interop",
+              "sections": [
+                "Interoperability with Swift/Objective-C > Mappings > Suspending functions"
+              ],
+              "score": 0.7172480821609497,
+              "line_start": 259,
+              "line_end": 267,
+              "preview": "Suspending functions\n\nKotlin's suspending functions ( suspend ) are presented in the generated Objective-C headers as functions with callbacks, or completion handlers in Swift/Objective-C terminology.\n\nStarting from Swift 5.5, Kotlin's susp",
+              "source": "https://kotlinlang.org/docs/native-objc-interop.html"
+            },
+            {
+              "document_id": "native-swift-export",
+              "sections": [
+                "Interoperability with Swift using Swift export > Mappings > Concurrency > Coroutine dispatchers"
+              ],
+              "score": 0.6948889493942261,
+              "line_start": 420,
+              "line_end": 429,
+              "preview": "Coroutine dispatchers\n\nBy default, when you call a Kotlin suspending function from Swift or use the asAsyncSequence function, Kotlin creates a coroutine context that uses the Dispatchers.Default dispatcher and executes the exported code the",
+              "source": "https://kotlinlang.org/docs/native-swift-export.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q15",
+      "query": "How do I make a Kotlin declaration accessible to JavaScript callers?",
+      "relevant": [
+        {
+          "document_id": "js-to-kotlin-interop",
+          "section": "@JsExport annotation"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.25,
+            "coverage_at_6000_chars": 0.03626373626373627
+          },
+          "top5": [
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > External type hierarchy",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > Callable JavaScript objects with @nativeInvoke",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > Kotlin functions with JavaScript code"
+              ],
+              "score": 0.7147746086120605,
+              "line_start": 121,
+              "line_end": 168,
+              "preview": "milar to regular classes and interfaces, you can declare external declarations to extend other external classes and implement external interfaces. However, you can't mix external and non-external declarations in the same type hierarchy.\n\nCa",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript",
+                "Use Kotlin code from JavaScript > Isolating declarations in a separate JavaScript object in plain mode",
+                "Use Kotlin code from JavaScript > Package structure"
+              ],
+              "score": 0.6971381902694702,
+              "line_start": 1,
+              "line_end": 33,
+              "preview": "Use Kotlin code from JavaScript\n\nDepending on the selected JavaScript Module system, the Kotlin/JS compiler generates different output. But in general, the Kotlin compiler generates normal JavaScript classes, functions, and properties, whic",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "js-interop",
+              "sections": [
+                "Use JavaScript code from Kotlin",
+                "Use JavaScript code from Kotlin > Inline JavaScript",
+                "Use JavaScript code from Kotlin > external modifier"
+              ],
+              "score": 0.6783689260482788,
+              "line_start": 1,
+              "line_end": 49,
+              "preview": "Use JavaScript code from Kotlin\n\nKotlin was first designed for easy interoperation with the Java platform: it sees Java classes as Kotlin classes, and Java sees Kotlin classes as Java classes.\n\nHowever, JavaScript is a dynamically typed lan",
+              "source": "https://kotlinlang.org/docs/js-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Package structure > @JsName annotation",
+                "Use Kotlin code from JavaScript > Package structure > @JsExport annotation",
+                "Use Kotlin code from JavaScript > Package structure > @JsExport annotation > Export value classes"
+              ],
+              "score": 0.6720985174179077,
+              "line_start": 68,
+              "line_end": 111,
+              "preview": "es in which the Kotlin compiler does not apply mangling:\n\nexternal declarations are not mangled.\n\nAny overridden functions in non- external classes inheriting from external classes are not mangled.\n\nThe parameter of @JsName is required to b",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript functions",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript properties",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript classes"
+              ],
+              "score": 0.6706693172454834,
+              "line_start": 1,
+              "line_end": 64,
+              "preview": "Interoperability with JavaScript\n\nKotlin/Wasm allows you to use both JavaScript code in Kotlin and Kotlin code in JavaScript.\n\nAs with Kotlin/JS , the Kotlin/Wasm compiler also has interoperability with JavaScript. If you are familiar with ",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.31465201465201464
+          },
+          "top5": [
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Package structure > @JsExport annotation"
+              ],
+              "score": 0.7488382458686829,
+              "line_start": 79,
+              "line_end": 98,
+              "preview": "@JsExport annotation\n\nBy applying the @JsExport annotation to a top-level declaration (like a class, interface, or function), you can make Kotlin declarations available from JavaScript or TypeScript. The annotation exports all nested declar",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations"
+              ],
+              "score": 0.7256603837013245,
+              "line_start": 13,
+              "line_end": 15,
+              "preview": "External declarations\n\nExternal JavaScript code is not visible in Kotlin by default. To use JavaScript code in Kotlin, you can describe its API with external declarations.",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Isolating declarations in a separate JavaScript object in plain mode"
+              ],
+              "score": 0.7017791271209717,
+              "line_start": 5,
+              "line_end": 17,
+              "preview": "Isolating declarations in a separate JavaScript object in plain mode\n\nIf you have explicitly set your module kind to be plain , Kotlin creates an object that contains all Kotlin declarations from the current module. This is done to prevent ",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > Callable JavaScript objects with @nativeInvoke"
+              ],
+              "score": 0.6956753730773926,
+              "line_start": 123,
+              "line_end": 142,
+              "preview": "Callable JavaScript objects with @nativeInvoke\n\nYou can use the @nativeInvoke annotation on a Kotlin member function of an external declaration (a class or an interface) to make it callable as a JavaScript function.\n\nWith this annotation, e",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "js-interop",
+              "sections": [
+                "Use JavaScript code from Kotlin"
+              ],
+              "score": 0.6934939026832581,
+              "line_start": 1,
+              "line_end": 5,
+              "preview": "Use JavaScript code from Kotlin\n\nKotlin was first designed for easy interoperation with the Java platform: it sees Java classes as Kotlin classes, and Java sees Kotlin classes as Java classes.\n\nHowever, JavaScript is a dynamically typed lan",
+              "source": "https://kotlinlang.org/docs/js-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q16",
+      "query": "How do I declare an existing JavaScript API so Kotlin can call it without providing an implementation?",
+      "relevant": [
+        {
+          "document_id": "js-interop",
+          "section": "external modifier"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 0.0,
+            "recall_at_5": 0.0,
+            "reciprocal_rank": 0.125,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > External type hierarchy",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > Callable JavaScript objects with @nativeInvoke",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > Kotlin functions with JavaScript code"
+              ],
+              "score": 0.6532604098320007,
+              "line_start": 121,
+              "line_end": 168,
+              "preview": "milar to regular classes and interfaces, you can declare external declarations to extend other external classes and implement external interfaces. However, you can't mix external and non-external declarations in the same type hierarchy.\n\nCa",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Package structure > @JsExport annotation > Export suspending lambdas",
+                "Use Kotlin code from JavaScript > Package structure > @JsNoRuntime annotation",
+                "Use Kotlin code from JavaScript > Package structure > @JsStatic"
+              ],
+              "score": 0.6096099019050598,
+              "line_start": 167,
+              "line_end": 221,
+              "preview": "\nconsole.log(result); // \"done\"\n\n@JsNoRuntime annotation\n\nYou can export Kotlin interfaces to JavaScript/TypeScript with the @JsNoRuntime annotation. It allows for direct mapping to regular TypeScript interfaces.\n\nTo export a Kotlin interfa",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > Kotlin functions with JavaScript code",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > JavaScript modules",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > Array interoperability"
+              ],
+              "score": 0.6095906496047974,
+              "line_start": 164,
+              "line_end": 217,
+              "preview": "lls to the js() function in a special way, and the implementation has some restrictions:\n\nA js() function call must be provided with a string literal argument.\n\nA js() function call must be the only expression in the function body.\n\nThe js(",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript",
+                "Use Kotlin code from JavaScript > Isolating declarations in a separate JavaScript object in plain mode",
+                "Use Kotlin code from JavaScript > Package structure"
+              ],
+              "score": 0.6013367772102356,
+              "line_start": 1,
+              "line_end": 33,
+              "preview": "Use Kotlin code from JavaScript\n\nDepending on the selected JavaScript Module system, the Kotlin/JS compiler generates different output. But in general, the Kotlin compiler generates normal JavaScript classes, functions, and properties, whic",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript functions",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript properties",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript classes"
+              ],
+              "score": 0.6002167463302612,
+              "line_start": 1,
+              "line_end": 64,
+              "preview": "Interoperability with JavaScript\n\nKotlin/Wasm allows you to use both JavaScript code in Kotlin and Kotlin code in JavaScript.\n\nAs with Kotlin/JS , the Kotlin/Wasm compiler also has interoperability with JavaScript. If you are familiar with ",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 0.0,
+            "recall_at_5": 0.0,
+            "reciprocal_rank": 0.07142857142857142,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations"
+              ],
+              "score": 0.6941910982131958,
+              "line_start": 13,
+              "line_end": 15,
+              "preview": "External declarations\n\nExternal JavaScript code is not visible in Kotlin by default. To use JavaScript code in Kotlin, you can describe its API with external declarations.",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Package structure > @JsExport annotation"
+              ],
+              "score": 0.6648645401000977,
+              "line_start": 79,
+              "line_end": 98,
+              "preview": "@JsExport annotation\n\nBy applying the @JsExport annotation to a top-level declaration (like a class, interface, or function), you can make Kotlin declarations available from JavaScript or TypeScript. The annotation exports all nested declar",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Package structure > @JsNoRuntime annotation"
+              ],
+              "score": 0.647697925567627,
+              "line_start": 170,
+              "line_end": 194,
+              "preview": "@JsNoRuntime annotation\n\nYou can export Kotlin interfaces to JavaScript/TypeScript with the @JsNoRuntime annotation. It allows for direct mapping to regular TypeScript interfaces.\n\nTo export a Kotlin interface, for example, from a Kotlin Mu",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > Callable JavaScript objects with @nativeInvoke"
+              ],
+              "score": 0.6393057107925415,
+              "line_start": 123,
+              "line_end": 142,
+              "preview": "Callable JavaScript objects with @nativeInvoke\n\nYou can use the @nativeInvoke annotation on a Kotlin member function of an external declaration (a class or an interface) to make it callable as a JavaScript function.\n\nWith this annotation, e",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "whatsnew2320",
+              "sections": [
+                "What's new in Kotlin 2.3.20 > Kotlin/JS > Implementing Kotlin interfaces from JavaScript/TypeScript > How to enable"
+              ],
+              "score": 0.6378606557846069,
+              "line_start": 705,
+              "line_end": 719,
+              "preview": "How to enable\n\nIn your build file, add the new compiler option:\n\nkotlin { \n    js {\n        // ...\n        generateTypeScriptDefinitions()\n        compilerOptions {\n            freeCompilerArgs.add(\"-Xenable-implementing-interfaces-from-typ",
+              "source": "https://kotlinlang.org/docs/whatsnew2320.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q17",
+      "query": "How can Kotlin Wasm hold a reference to a Kotlin object on the JavaScript side?",
+      "relevant": [
+        {
+          "document_id": "wasm-js-interop",
+          "section": "JsReference type"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.5,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > External type hierarchy",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > Callable JavaScript objects with @nativeInvoke",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > Kotlin functions with JavaScript code"
+              ],
+              "score": 0.6735694408416748,
+              "line_start": 121,
+              "line_end": 168,
+              "preview": "milar to regular classes and interfaces, you can declare external declarations to extend other external classes and implement external interfaces. However, you can't mix external and non-external declarations in the same type hierarchy.\n\nCa",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Type correspondence",
+                "Interoperability with JavaScript > Type correspondence > JsAny type",
+                "Interoperability with JavaScript > Type correspondence > JsReference type",
+                "Interoperability with JavaScript > Type correspondence > Type parameters",
+                "Interoperability with JavaScript > Exception handling"
+              ],
+              "score": 0.6671700477600098,
+              "line_start": 296,
+              "line_end": 357,
+              "preview": "types | Not supported\n\nYou can use nullable versions of these types as well.\n\nJsAny type\n\nJavaScript values are represented in Kotlin using the JsAny type and its subtypes.\n\nThe Kotlin/Wasm standard library provides representation for some ",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript functions",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript properties",
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > JavaScript classes"
+              ],
+              "score": 0.6486673355102539,
+              "line_start": 1,
+              "line_end": 64,
+              "preview": "Interoperability with JavaScript\n\nKotlin/Wasm allows you to use both JavaScript code in Kotlin and Kotlin code in JavaScript.\n\nAs with Kotlin/JS , the Kotlin/Wasm compiler also has interoperability with JavaScript. If you are familiar with ",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Exception handling",
+                "Interoperability with JavaScript > Kotlin/Wasm and Kotlin/JS interoperability differences"
+              ],
+              "score": 0.6442986726760864,
+              "line_start": 355,
+              "line_end": 401,
+              "preview": "ch expressions to catch JavaScript exceptions in Kotlin/Wasm code. Exception handling works as follows:\n\nExceptions thrown from JavaScript: detailed information is available on the Kotlin side. If such an exception propagates back to JavaSc",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Kotlin/Wasm and Kotlin/JS interoperability differences",
+                "Interoperability with JavaScript > Web-related browser APIs"
+              ],
+              "score": 0.6429188251495361,
+              "line_start": 408,
+              "line_end": 453,
+              "preview": " code below). | Supports the dynamic type.\n\nKotlin/JS dynamic type for interoperability with untyped or loosely typed objects is not supported in Kotlin/Wasm. Instead of the dynamic type, you can use the JsAny type:\n\n// Kotlin/JS\nfun proces",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.9978425026968716
+          },
+          "top5": [
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Type correspondence > JsReference type"
+              ],
+              "score": 0.7269506454467773,
+              "line_start": 318,
+              "line_end": 338,
+              "preview": "JsReference type\n\nKotlin values can be passed to JavaScript as opaque references using the JsReference type.\n\nFor example, if you want to expose this Kotlin class User to JavaScript:\n\nclass User(var name: String)\n\nYou can use the toJsRefere",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > External objects"
+              ],
+              "score": 0.6724529266357422,
+              "line_start": 99,
+              "line_end": 117,
+              "preview": "External objects\n\nConsider these JavaScript variables holding an object:\n\nlet Counter = {\n    value: 0,\n    step: 1,\n    increment () {\n        this.value += this.step;\n    }\n};\n\nYou can use them in Kotlin as an external object:\n\nexternal o",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > External declarations > Callable JavaScript objects with @nativeInvoke"
+              ],
+              "score": 0.6584686040878296,
+              "line_start": 123,
+              "line_end": 142,
+              "preview": "Callable JavaScript objects with @nativeInvoke\n\nYou can use the @nativeInvoke annotation on a Kotlin member function of an external declaration (a class or an interface) to make it callable as a JavaScript function.\n\nWith this annotation, e",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Use JavaScript code in Kotlin > Kotlin functions with JavaScript code"
+              ],
+              "score": 0.6563889384269714,
+              "line_start": 164,
+              "line_end": 176,
+              "preview": "Kotlin/Wasm treats calls to the js() function in a special way, and the implementation has some restrictions:\n\nA js() function call must be provided with a string literal argument.\n\nA js() function call must be the only expression in the fu",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            },
+            {
+              "document_id": "wasm-js-interop",
+              "sections": [
+                "Interoperability with JavaScript > Type correspondence > JsReference type"
+              ],
+              "score": 0.6515027284622192,
+              "line_start": 340,
+              "line_end": 345,
+              "preview": "You can create a class and change its name from JavaScript:\n\nimport UserLib from \"./userlib.mjs\"\n\nlet user = UserLib.createUser(\"Bob\");\nUserLib.setUserName(user, \"Alice\");",
+              "source": "https://kotlinlang.org/docs/wasm-js-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q18",
+      "query": "When did the common Kotlin UUID API become stable?",
+      "relevant": [
+        {
+          "document_id": "whatsnew24",
+          "section": "Stable UUID API in the common Kotlin standard library"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.25,
+            "coverage_at_6000_chars": 0.0
+          },
+          "top5": [
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing",
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing > Support for returning null when parsing invalid UUIDs"
+              ],
+              "score": 0.6521458625793457,
+              "line_start": 588,
+              "line_end": 641,
+              "preview": "in 2.3.0 introduces several improvements for the UUID API, including:\n\nSupport for returning null when parsing invalid UUIDs\n\nNew functions to generate v4 and v7 UUIDs\n\nSupport for generating v7 UUIDs for specific timestamps\n\nUUID support i",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing > Support for returning null when parsing invalid UUIDs",
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing > New functions to generate v4 and v7 UUIDs",
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing > Support for generating v7 UUIDs for specific timestamps"
+              ],
+              "score": 0.62229323387146,
+              "line_start": 634,
+              "line_end": 692,
+              "preview": "dApi\nimport kotlin.uuid.Uuid\n\n@OptIn(ExperimentalUuidApi::class)\nfun main() {\n    val valid = Uuid.parseOrNull(\"550e8400-e29b-41d4-a716-446655440000\")\n    println(valid)\n    // 550e8400-e29b-41d4-a716-446655440000\n\n    val invalid = Uuid.pa",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew2120",
+              "sections": [
+                "What's new in Kotlin 2.1.20 > Standard library > Changes in UUID parsing, formatting, and comparability",
+                "What's new in Kotlin 2.1.20 > Standard library > New time tracking functionality"
+              ],
+              "score": 0.6219108700752258,
+              "line_start": 329,
+              "line_end": 369,
+              "preview": "format in this release:\n\nparseHexDash() parses UUIDs from the hex-and-dash format.\n\ntoHexDashString() converts a Uuid into a String in the hex-and-dash format (mirroring the functionality of toString() ).\n\nThese functions work similarly to ",
+              "source": "https://kotlinlang.org/docs/whatsnew2120.html"
+            },
+            {
+              "document_id": "whatsnew24",
+              "sections": [
+                "What's new in Kotlin 2.4.0 > Language > New @IntroducedAt annotation to generate version-based overloads for optional parameters",
+                "What's new in Kotlin 2.4.0 > Standard library",
+                "What's new in Kotlin 2.4.0 > Standard library > Stable UUID API in the common Kotlin standard library",
+                "What's new in Kotlin 2.4.0 > Standard library > Support for checking sorted order"
+              ],
+              "score": 0.6216697096824646,
+              "line_start": 357,
+              "line_end": 400,
+              "preview": "nit\n) {\n    // Function body\n}\n\nIn this example, the compiler generates hidden overloads for the older versions of the Button() function.\n\nSince both @IntroducedAt and @JvmOverloads generate overloads, using them together can cause conflict",
+              "source": "https://kotlinlang.org/docs/whatsnew24.html"
+            },
+            {
+              "document_id": "whatsnew2120",
+              "sections": [
+                "What's new in Kotlin 2.1.20 > Standard library > Common atomic types",
+                "What's new in Kotlin 2.1.20 > Standard library > Changes in UUID parsing, formatting, and comparability"
+              ],
+              "score": 0.5750111937522888,
+              "line_start": 296,
+              "line_end": 333,
+              "preview": "  println(\"Total processed items: ${processedItems.load()}\")\n}\n\nTo enable seamless interoperability between Kotlin's atomic types and Java's java.util.concurrent.atomic atomic types, the API provides the .asJavaAtomic() and .asKotlinAtomic(",
+              "source": "https://kotlinlang.org/docs/whatsnew2120.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "whatsnew24",
+              "sections": [
+                "What's new in Kotlin 2.4.0 > Standard library > Stable UUID API in the common Kotlin standard library"
+              ],
+              "score": 0.7811592817306519,
+              "line_start": 370,
+              "line_end": 382,
+              "preview": "Stable UUID API in the common Kotlin standard library\n\nKotlin 2.0.20 introduced a class for generating UUIDs (universally unique identifiers) and added support for converting between Kotlin and Java UUIDs. Later releases gradually improved ",
+              "source": "https://kotlinlang.org/docs/whatsnew24.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing"
+              ],
+              "score": 0.6572505831718445,
+              "line_start": 586,
+              "line_end": 616,
+              "preview": "Improved UUID generation and parsing\n\nKotlin 2.3.0 introduces several improvements for the UUID API, including:\n\nSupport for returning null when parsing invalid UUIDs\n\nNew functions to generate v4 and v7 UUIDs\n\nSupport for generating v7 UUI",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew2120",
+              "sections": [
+                "What's new in Kotlin 2.1.20 > Standard library > Changes in UUID parsing, formatting, and comparability"
+              ],
+              "score": 0.601076066493988,
+              "line_start": 323,
+              "line_end": 365,
+              "preview": "Changes in UUID parsing, formatting, and comparability\n\nThe JetBrains team continues to improve the support for UUIDs introduced to the standard library in 2.0.20 .\n\nPreviously, the parse() function only accepted UUIDs in the hex-and-dash f",
+              "source": "https://kotlinlang.org/docs/whatsnew2120.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing > New functions to generate v4 and v7 UUIDs"
+              ],
+              "score": 0.5963402390480042,
+              "line_start": 658,
+              "line_end": 684,
+              "preview": "New functions to generate v4 and v7 UUIDs\n\nKotlin 2.3.0 introduces two new functions for generating UUIDs: Uuid.generateV4() and Uuid.generateV7() .\n\nUse the Uuid.generateV4() function to generate version 4 UUIDs, or the Uuid.generateV7() f",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Standard library > Improved UUID generation and parsing > Support for generating v7 UUIDs for specific timestamps"
+              ],
+              "score": 0.5953193306922913,
+              "line_start": 686,
+              "line_end": 708,
+              "preview": "Support for generating v7 UUIDs for specific timestamps\n\nKotlin 2.3.0 introduces the new Uuid.generateV7NonMonotonicAt() function, which you can use to generate a version 7 UUID for a specific moment in time.\n\nUnlike Uuid.generateV7() , Uui",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q19",
+      "query": "What changed in Kotlin 2.4.20 for exporting suspending lambdas to JavaScript?",
+      "relevant": [
+        {
+          "document_id": "whatsnew2420",
+          "section": "Support for exporting suspending lambdas as async functions"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/JS > Support for exporting suspending lambdas as async functions",
+                "What's new in Kotlin 2.4.20 > Gradle",
+                "What's new in Kotlin 2.4.20 > Gradle > Improved reporting in Problems API"
+              ],
+              "score": 0.797819197177887,
+              "line_start": 509,
+              "line_end": 556,
+              "preview": "ons containing suspending lambdas from Kotlin/JS libraries. Now the Kotlin compiler automatically handles the bridging between Kotlin's suspend functions and JavaScript's native async / await model, which is useful for mixed Kotlin/TypeScri",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/Wasm > New compilation modes",
+                "What's new in Kotlin 2.4.20 > Kotlin/Wasm > Reduced binary size for lambdas and functional interfaces",
+                "What's new in Kotlin 2.4.20 > Kotlin/JS",
+                "What's new in Kotlin 2.4.20 > Kotlin/JS > Consistent exportability of synthetic functions on exported data classes"
+              ],
+              "score": 0.7054425477981567,
+              "line_start": 408,
+              "line_end": 438,
+              "preview": "educes recompilation time during development and produces the smallest output for production builds.\n\nTo use this configuration, add the following property to your gradle.properties file:\n\nkotlin.wasm.compilationMode=multimodule-closed-worl",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/JS > A new DSL for browser testing",
+                "What's new in Kotlin 2.4.20 > Kotlin/JS > Support for exporting suspending lambdas as async functions"
+              ],
+              "score": 0.6971766352653503,
+              "line_start": 464,
+              "line_end": 509,
+              "preview": "\nimport kotlin.time.Duration.Companion.seconds\n\nkotlin {\n    js {\n        browser {\n            // Add and configure the new test {} block\n            @OptIn(ExperimentalJsTestDsl::class)\n            test {\n                // Configure defa",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20",
+                "What's new in Kotlin 2.4.20 > Update to Kotlin 2.4.20",
+                "What's new in Kotlin 2.4.20 > New features"
+              ],
+              "score": 0.6501786708831787,
+              "line_start": 1,
+              "line_end": 41,
+              "preview": "What's new in Kotlin 2.4.20\n\nReleased: September 7, 2026\n\nKotlin 2.4.20 is out! Here are the release highlights:\n\nStandard library: Support for coroutine stack trace recovery, new functions for checking the equality and uniqueness of collec",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2220",
+              "sections": [
+                "What's new in Kotlin 2.2.20",
+                "What's new in Kotlin 2.2.20 > IDE support",
+                "What's new in Kotlin 2.2.20 > Language",
+                "What's new in Kotlin 2.2.20 > Language > Improved overload resolution for lambdas with suspend function types"
+              ],
+              "score": 0.6477633714675903,
+              "line_start": 1,
+              "line_end": 33,
+              "preview": "What's new in Kotlin 2.2.20\n\nReleased: September 10, 2025\n\nThe Kotlin 2.2.20 release is out, delivering important changes for web development. Kotlin/Wasm is now Beta , with improvements to exception handling in JavaScript interop , npm dep",
+              "source": "https://kotlinlang.org/docs/whatsnew2220.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.9984802431610942
+          },
+          "top5": [
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/JS > Support for exporting suspending lambdas as async functions"
+              ],
+              "score": 0.8257632255554199,
+              "line_start": 505,
+              "line_end": 523,
+              "preview": "Support for exporting suspending lambdas as async functions\n\nWith Kotlin 2.4.20, you can now export suspending lambda expressions as JavaScript async functions.\n\nPreviously, there was no way to export declarations containing suspending lamb",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/JS"
+              ],
+              "score": 0.7742435932159424,
+              "line_start": 424,
+              "line_end": 426,
+              "preview": "Kotlin/JS\n\nKotlin 2.4.20 improves exportability of data classes, introduces a new experimental DSL for browser testing, and adds support for exporting suspending lambdas as JavaScript async functions.",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/JS > Support for exporting suspending lambdas as async functions"
+              ],
+              "score": 0.7232275605201721,
+              "line_start": 525,
+              "line_end": 544,
+              "preview": "Then, mark the relevant declarations with @JsExport :\n\n// Kotlin\n@JsExport\nclass TaskRunner {\n    suspend fun runTask(task: suspend () -> String): String {\n        return task()\n    }\n}\n\nFrom the TypeScript side, the suspending lambda appea",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Kotlin/JS > New export of suspend function with JsExport"
+              ],
+              "score": 0.678449273109436,
+              "line_start": 396,
+              "line_end": 402,
+              "preview": "New export of suspend function with JsExport\n\nPreviously, the @JsExport annotation did not allow exporting suspend functions (or classes and interfaces containing such functions) to JavaScript. You had to manually wrap each suspend function",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "js-to-kotlin-interop",
+              "sections": [
+                "Use Kotlin code from JavaScript > Package structure > @JsExport annotation > Export suspending lambdas"
+              ],
+              "score": 0.6780751347541809,
+              "line_start": 133,
+              "line_end": 159,
+              "preview": "Export suspending lambdas\n\nYou can export Kotlin's suspending lambda expressions as JavaScript async functions :\n\nTo enable this feature, add the following compiler option to your build.gradle.kts file:\n\nkotlin {\n    js {\n        compilatio",
+              "source": "https://kotlinlang.org/docs/js-to-kotlin-interop.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q20",
+      "query": "Which Kotlin 2.4.20 feature permits Swift implementations to extend exported Kotlin types?",
+      "relevant": [
+        {
+          "document_id": "whatsnew2420",
+          "section": "Cross-language inheritance in Swift export"
+        }
+      ],
+      "results": {
+        "fixed": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 0.5,
+            "coverage_at_6000_chars": 1.0
+          },
+          "top5": [
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Standard library > New overloads for kotlin.test assertion functions",
+                "What's new in Kotlin 2.4.20 > Kotlin/Native",
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > Generated Package.swift for SwiftPM dependencies",
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features",
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features > Sealed classes"
+              ],
+              "score": 0.7275873422622681,
+              "line_start": 208,
+              "line_end": 252,
+              "preview": "nless the assertion fails\n    assertEquals(expected, actual) { \"Unexpected value for items: ${items.joinToString()}\" }\n}\n\nFor more information, see the feature's KEEP .\n\nKotlin/Native\n\nKotlin 2.4.20 brings automatic generation of Package.sw",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features > Sealed classes",
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features > Cross-language inheritance in Swift export"
+              ],
+              "score": 0.7255872488021851,
+              "line_start": 243,
+              "line_end": 287,
+              "preview": "angle : Shape {\n    override fun toString(): String = \"Rectangle\"\n}\n\nfun createCircle(): Shape = Circle()\n\nOn the Swift side, you can use an exhaustive switch without a default case:\n\n// Swift\nlet shape = createCircle()\n\nlet name = switch s",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features > Cross-language inheritance in Swift export",
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > Improved incremental compilation of klib artifacts",
+                "What's new in Kotlin 2.4.20 > Kotlin/Wasm",
+                "What's new in Kotlin 2.4.20 > Kotlin/Wasm > Changes to top-level require() calls in @JsFun declarations"
+              ],
+              "score": 0.6957971453666687,
+              "line_start": 281,
+              "line_end": 318,
+              "preview": " class, implement the interface using a pure Swift library, and pass the object back to Kotlin:\n\n// Swift\nimport CryptoKit\n\nfinal class IosCryptoProvider: SwiftBase, CryptoProvider {\n    func hashMD5(input: String) -> String {\n        guard",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2220",
+              "sections": [
+                "What's new in Kotlin 2.2.20 > Kotlin Multiplatform > Swift export available by default",
+                "What's new in Kotlin 2.2.20 > Kotlin Multiplatform > Swift export available by default > How to enable Swift export"
+              ],
+              "score": 0.6689702868461609,
+              "line_start": 434,
+              "line_end": 464,
+              "preview": "m Swift idiomatically, eliminating the need for Objective-C headers.\n\nThis should significantly improve multiplatform development for Apple targets. For example, if you have a Kotlin module with top-level functions, Swift export enables cle",
+              "source": "https://kotlinlang.org/docs/whatsnew2220.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20",
+                "What's new in Kotlin 2.4.20 > Update to Kotlin 2.4.20",
+                "What's new in Kotlin 2.4.20 > New features"
+              ],
+              "score": 0.6615907549858093,
+              "line_start": 1,
+              "line_end": 41,
+              "preview": "What's new in Kotlin 2.4.20\n\nReleased: September 7, 2026\n\nKotlin 2.4.20 is out! Here are the release highlights:\n\nStandard library: Support for coroutine stack trace recovery, new functions for checking the equality and uniqueness of collec",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": {
+            "hit_at_5": 1.0,
+            "recall_at_5": 1.0,
+            "reciprocal_rank": 1.0,
+            "coverage_at_6000_chars": 0.5870561282932417
+          },
+          "top5": [
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features > Cross-language inheritance in Swift export"
+              ],
+              "score": 0.7301411628723145,
+              "line_start": 262,
+              "line_end": 279,
+              "preview": "Cross-language inheritance in Swift export\n\nKotlin 2.4.20 introduces cross-language inheritance support in Swift export.\n\nA common use case for this feature is the reverse import pattern, where you define a contract in Kotlin and provide pl",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/Native"
+              ],
+              "score": 0.7277576327323914,
+              "line_start": 214,
+              "line_end": 216,
+              "preview": "Kotlin/Native\n\nKotlin 2.4.20 brings automatic generation of Package.swift files for SwiftPM dependencies in Kotlin Multiplatform projects, new Swift export features, including support for sealed classes and cross-language inheritance, and i",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > Kotlin/Native > New Swift export features > Sealed classes"
+              ],
+              "score": 0.7080387473106384,
+              "line_start": 226,
+              "line_end": 247,
+              "preview": "Sealed classes\n\nKotlin 2.4.20 adds support for sealed classes and interfaces to Swift export.\n\nPreviously, you had to write a default case for every switch statement over a sealed type. Now, sealed hierarchies defined in Kotlin are mapped t",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            },
+            {
+              "document_id": "whatsnew2220",
+              "sections": [
+                "What's new in Kotlin 2.2.20 > Kotlin Multiplatform > Swift export available by default"
+              ],
+              "score": 0.6876893043518066,
+              "line_start": 432,
+              "line_end": 452,
+              "preview": "Swift export available by default\n\nKotlin 2.2.20 introduces experimental support for Swift export. It allows you to export Kotlin sources directly and call Kotlin code from Swift idiomatically, eliminating the need for Objective-C headers.\n",
+              "source": "https://kotlinlang.org/docs/whatsnew2220.html"
+            },
+            {
+              "document_id": "whatsnew2420",
+              "sections": [
+                "What's new in Kotlin 2.4.20 > New features"
+              ],
+              "score": 0.6673752069473267,
+              "line_start": 39,
+              "line_end": 59,
+              "preview": "New features\n\nThe following pre-stable features are available in this release, including those with Beta , Alpha , and Experimental status:\n\nStandard library: Support for coroutine stack trace recovery\n\nStandard library: New functions to ch",
+              "source": "https://kotlinlang.org/docs/whatsnew2420.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q21",
+      "query": "What is the internal production API endpoint for my company payroll service?",
+      "relevant": [],
+      "unanswerable": true,
+      "results": {
+        "fixed": {
+          "metrics": null,
+          "top5": [
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Inline properties",
+                "Inline functions > Restrictions for public API inline functions"
+              ],
+              "score": 0.25906673073768616,
+              "line_start": 165,
+              "line_end": 175,
+              "preview": "sors are inlined as regular inline functions.\n\nRestrictions for public API inline functions\n\nWhen an inline function is public or protected but is not a part of a private or internal declaration, it is considered a module 's public API. It ",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            },
+            {
+              "document_id": "whatsnew22",
+              "sections": [
+                "What's new in Kotlin 2.2.0 > New experimental build tools API",
+                "What's new in Kotlin 2.2.0 > New experimental build tools API > Improved \"in process\" compiler execution strategy"
+              ],
+              "score": 0.24285492300987244,
+              "line_start": 881,
+              "line_end": 907,
+              "preview": " Maven, Amper, and others. However, integrating Kotlin into each system to support the full feature set, such as incremental compilation and compatibility with Kotlin compiler plugins, daemons, and Kotlin Multiplatform, requires significant",
+              "source": "https://kotlinlang.org/docs/whatsnew22.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Expected and actual functions",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions"
+              ],
+              "score": 0.2335725873708725,
+              "line_start": 45,
+              "line_end": 99,
+              "preview": "rrent process ID. The project has the commonMain , jvmMain , and nativeMain source sets to make the application work on the JVM and in native environments like iOS.\n\nExpected and actual functions\n\nYou can define an Identity type and a facto",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "whatsnew21",
+              "sections": [
+                "What's new in Kotlin 2.1.0 > Gradle improvements > Compiler symbols hidden from the Kotlin Gradle plugin API",
+                "What's new in Kotlin 2.1.0 > Gradle improvements > Compiler symbols hidden from the Kotlin Gradle plugin API > Using the Gradle Workers API"
+              ],
+              "score": 0.21301838755607605,
+              "line_start": 966,
+              "line_end": 1005,
+              "preview": "ains.kotlin:kotlin-compiler-embeddable than the one bundled with KGP, it can lead to conflicts and runtime exceptions.\n\nTo prevent such issues, KGP now shows a warning if org.jetbrains.kotlin:kotlin-compiler-embeddable is present in the bui",
+              "source": "https://kotlinlang.org/docs/whatsnew21.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions > Expected and actual properties",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions > Expected and actual objects",
+                "Expected and actual declarations > Different approaches for using expected and actual declarations > Interfaces with expected and actual functions > Recommendations on dependency injection"
+              ],
+              "score": 0.20363301038742065,
+              "line_start": 144,
+              "line_end": 190,
+              "preview": " : Identity\n\n//In nativeMain source set:\nactual val identity: Identity = NativeIdentity()\n\nclass NativeIdentity(\n    override val userName: String = getlogin()?.toKString() ?: \"None\",\n    override val processID: Long = getpid().toLong()\n) :",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": null,
+          "top5": [
+            {
+              "document_id": "inline-functions",
+              "sections": [
+                "Inline functions > Restrictions for public API inline functions"
+              ],
+              "score": 0.2751717269420624,
+              "line_start": 167,
+              "line_end": 175,
+              "preview": "Restrictions for public API inline functions\n\nWhen an inline function is public or protected but is not a part of a private or internal declaration, it is considered a module 's public API. It can be called in other modules and is inlined a",
+              "source": "https://kotlinlang.org/docs/inline-functions.html"
+            },
+            {
+              "document_id": "multiplatform-expect-actual",
+              "sections": [
+                "Expected and actual declarations > What's next?"
+              ],
+              "score": 0.2526802718639374,
+              "line_start": 420,
+              "line_end": 422,
+              "preview": "What's next?\n\nFor general recommendations on different ways to use platform-specific APIs, see Use platform-specific APIs .",
+              "source": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"
+            },
+            {
+              "document_id": "extensions",
+              "sections": [
+                "Extensions > Extensions and visibility modifiers"
+              ],
+              "score": 0.23784083127975464,
+              "line_start": 478,
+              "line_end": 484,
+              "preview": "If an extension is marked as internal , it's only accessible within its module :\n\n// Networking module\n// JsonParser.kt\ninternal fun String.parseJson(): Map<String, Any> {\n    return mapOf(\"fakeKey\" to \"fakeValue\")\n}",
+              "source": "https://kotlinlang.org/docs/extensions.html"
+            },
+            {
+              "document_id": "whatsnew22",
+              "sections": [
+                "What's new in Kotlin 2.2.0 > New experimental build tools API"
+              ],
+              "score": 0.22060558199882507,
+              "line_start": 889,
+              "line_end": 901,
+              "preview": "The KGP, add the following property to your gradle.properties file:\n\nkotlin.compiler.runViaBuildToolsApi=true\n\nMaven, you don't need to do anything. It's enabled by default.\n\nThe BTA currently has no direct benefits for the Maven plugin, bu",
+              "source": "https://kotlinlang.org/docs/whatsnew22.html"
+            },
+            {
+              "document_id": "compatibility-guide-23",
+              "sections": [
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate testApi configuration"
+              ],
+              "score": 0.21980178356170654,
+              "line_start": 325,
+              "line_end": 337,
+              "preview": "Deprecate testApi configuration\n\nIssue : KT-63285\n\nComponent : Gradle\n\nIncompatible change type : source\n\nShort summary : Kotlin 2.3.0 deprecates the testApi configuration. This configuration exposed test dependencies and sources to other m",
+              "source": "https://kotlinlang.org/docs/compatibility-guide-23.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q22",
+      "query": "What breaking changes will Kotlin 3.0 ship with?",
+      "relevant": [],
+      "unanswerable": true,
+      "results": {
+        "fixed": {
+          "metrics": null,
+          "top5": [
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Breaking changes and deprecations",
+                "What's new in Kotlin 2.3.0 > Documentation updates",
+                "What's new in Kotlin 2.3.0 > How to update to Kotlin 2.3.0"
+              ],
+              "score": 0.6253429651260376,
+              "line_start": 757,
+              "line_end": 797,
+              "preview": "er necessary. New diagnostic messages are available to help you migrate. If you use older AGP versions, you see a deprecation warning.\n\nSupport for the Ant build system is no longer available.\n\nDocumentation updates\n\nKotlin Multiplatform do",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0",
+                "What's new in Kotlin 2.3.0 > IDE support",
+                "What's new in Kotlin 2.3.0 > Language",
+                "What's new in Kotlin 2.3.0 > Language > Stable features"
+              ],
+              "score": 0.6134463548660278,
+              "line_start": 1,
+              "line_end": 43,
+              "preview": "What's new in Kotlin 2.3.0\n\nReleased: December 16, 2025\n\nThe Kotlin 2.3.0 release is out! Here are the main highlights:\n\nLanguage : More stable and default features, unused return value checker, explicit backing fields, and changes to conte",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Compose compiler: Stack traces for minified Android applications",
+                "What's new in Kotlin 2.3.0 > Breaking changes and deprecations",
+                "What's new in Kotlin 2.3.0 > Documentation updates"
+              ],
+              "score": 0.6034184694290161,
+              "line_start": 741,
+              "line_end": 761,
+              "preview": "ms encountered to the Google IssueTracker .\n\nBreaking changes and deprecations\n\nThis section highlights important breaking changes and deprecations. For a complete overview, see our Compatibility guide .\n\nStarting with Kotlin 2.3.0, the com",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Language > Changes to context-sensitive resolution",
+                "What's new in Kotlin 2.3.0 > Kotlin/JVM: Support for Java 25",
+                "What's new in Kotlin 2.3.0 > Kotlin/Native",
+                "What's new in Kotlin 2.3.0 > Kotlin/Native > Improved interop through Swift export"
+              ],
+              "score": 0.5947479009628296,
+              "line_start": 223,
+              "line_end": 263,
+              "preview": "eedback:\n\nThe sealed and enclosing supertypes of the current type are now considered part of the contextual scope of the search. No other supertype scopes are considered. See the KT-77823 YouTrack issue for motivation and examples.\n\nWhen ty",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew2320",
+              "sections": [
+                "What's new in Kotlin 2.3.20",
+                "What's new in Kotlin 2.3.20 > Update to Kotlin 2.3.20",
+                "What's new in Kotlin 2.3.20 > New features",
+                "What's new in Kotlin 2.3.20 > New features > Simplified setup for Kotlin projects",
+                "What's new in Kotlin 2.3.20 > New features > Simplified setup for Kotlin projects > How to enable"
+              ],
+              "score": 0.5929558277130127,
+              "line_start": 1,
+              "line_end": 47,
+              "preview": "What's new in Kotlin 2.3.20\n\nReleased: March 16, 2026\n\nThe Kotlin 2.3.20 release is out! Here are the main highlights:\n\nGradle : Compatibility with Gradle 9.3.0 and Kotlin/JVM compilation uses BTA by default\n\nMaven : Simplified setup for Ko",
+              "source": "https://kotlinlang.org/docs/whatsnew2320.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": null,
+          "top5": [
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0"
+              ],
+              "score": 0.6356984972953796,
+              "line_start": 1,
+              "line_end": 19,
+              "preview": "What's new in Kotlin 2.3.0\n\nReleased: December 16, 2025\n\nThe Kotlin 2.3.0 release is out! Here are the main highlights:\n\nLanguage : More stable and default features, unused return value checker, explicit backing fields, and changes to conte",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew2320",
+              "sections": [
+                "What's new in Kotlin 2.3.20"
+              ],
+              "score": 0.6181649565696716,
+              "line_start": 1,
+              "line_end": 19,
+              "preview": "What's new in Kotlin 2.3.20\n\nReleased: March 16, 2026\n\nThe Kotlin 2.3.20 release is out! Here are the main highlights:\n\nGradle : Compatibility with Gradle 9.3.0 and Kotlin/JVM compilation uses BTA by default\n\nMaven : Simplified setup for Ko",
+              "source": "https://kotlinlang.org/docs/whatsnew2320.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Breaking changes and deprecations"
+              ],
+              "score": 0.614422082901001,
+              "line_start": 743,
+              "line_end": 757,
+              "preview": "Breaking changes and deprecations\n\nThis section highlights important breaking changes and deprecations. For a complete overview, see our Compatibility guide .\n\nStarting with Kotlin 2.3.0, the compiler no longer supports -language-version=1.",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Kotlin/Native"
+              ],
+              "score": 0.6109172105789185,
+              "line_start": 235,
+              "line_end": 237,
+              "preview": "Kotlin/Native\n\nKotlin 2.3.0 introduces improvements to the Swift export support and import of C and Objective-C libraries, as well as enhanced build times for release tasks.",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            },
+            {
+              "document_id": "whatsnew23",
+              "sections": [
+                "What's new in Kotlin 2.3.0 > Language"
+              ],
+              "score": 0.5999346375465393,
+              "line_start": 33,
+              "line_end": 35,
+              "preview": "Language\n\nKotlin 2.3.0 focuses on feature stabilization, introduces a new mechanism for detecting unused return values, and improves context-sensitive resolution.",
+              "source": "https://kotlinlang.org/docs/whatsnew23.html"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "q23",
+      "query": "How do I configure a PostgreSQL replication slot for Debezium?",
+      "relevant": [],
+      "unanswerable": true,
+      "results": {
+        "fixed": {
+          "metrics": null,
+          "top5": [
+            {
+              "document_id": "compatibility-guide-23",
+              "sections": [
+                "Compatibility guide for Kotlin 2.3.x > Tools > Unsupported KGP version warning when using kotlin-dsl and kotlin(\"jvm\") plugins",
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate kotlin-android plugin for AGP versions 9.0.0 and later",
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate testApi configuration"
+              ],
+              "score": 0.20346277952194214,
+              "line_start": 293,
+              "line_end": 325,
+              "preview": "nvention plugins, precompiled script plugins or any other form of unpublished build logic, you have three options:\n\nDon't apply the kotlin(\"jvm\") plugin explicitly. Instead, let the kotlin-dsl plugin automatically provide a compatible KGP v",
+              "source": "https://kotlinlang.org/docs/compatibility-guide-23.html"
+            },
+            {
+              "document_id": "compatibility-guide-22",
+              "sections": [
+                "Compatibility guide for Kotlin 2.2.x > Tools > Remove kotlin.incremental.useClasspathSnapshot property",
+                "Compatibility guide for Kotlin 2.2.x > Tools > Deprecations to Kotlin scripting",
+                "Compatibility guide for Kotlin 2.2.x > Tools > Deprecate disambiguation classifier properties",
+                "Compatibility guide for Kotlin 2.2.x > Tools > Deprecate commonization parameters"
+              ],
+              "score": 0.20275582373142242,
+              "line_start": 335,
+              "line_end": 395,
+              "preview": "ncremental.useClasspathSnapshot property with a warning\n\n2.2.0: remove the property\n\nDeprecations to Kotlin scripting\n\nIssues : KT-71685 , KT-75632 , KT-76196 .\n\nComponent : Scripting\n\nIncompatible change type : source\n\nShort summary : Kotl",
+              "source": "https://kotlinlang.org/docs/compatibility-guide-22.html"
+            },
+            {
+              "document_id": "compatibility-guide-23",
+              "sections": [
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate migrated D8 and Binaryen properties",
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate create() function in NodeJsExec DSL",
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate properties in kotlinOptions DSL",
+                "Compatibility guide for Kotlin 2.3.x > Tools > Deprecate kotlinArtifacts API"
+              ],
+              "score": 0.1983536183834076,
+              "line_start": 581,
+              "line_end": 651,
+              "preview": "lowing properties are deprecated because they've been migrated from the org.jetbrains.kotlin.gradle.targets.js package to the org.jetbrains.kotlin.gradle.targets.wasm package:\n\nbinaryen.BinaryenEnvSpec\n\nbinaryen.BinaryenExtension\n\nbinaryen.",
+              "source": "https://kotlinlang.org/docs/compatibility-guide-23.html"
+            },
+            {
+              "document_id": "whatsnew2120",
+              "sections": [
+                "What's new in Kotlin 2.1.20 > Kotlin K2 compiler > Lombok compiler plugin: support for @SuperBuilder and updates on @Builder",
+                "What's new in Kotlin 2.1.20 > Kotlin Multiplatform: new DSL to replace Gradle's Application plugin"
+              ],
+              "score": 0.19789749383926392,
+              "line_start": 63,
+              "line_end": 103,
+              "preview": "ion about the @SuperBuilder annotation, see the official Lombok documentation .\n\nKotlin Multiplatform: new DSL to replace Gradle's Application plugin\n\nStarting with Gradle 8.7, the Application plugin is no longer compatible with the Kotlin ",
+              "source": "https://kotlinlang.org/docs/whatsnew2120.html"
+            },
+            {
+              "document_id": "whatsnew22",
+              "sections": [
+                "What's new in Kotlin 2.2.0 > Gradle > Binary compatibility validation included in Kotlin Gradle plugin",
+                "What's new in Kotlin 2.2.0 > Gradle > Binary compatibility validation included in Kotlin Gradle plugin > Filter classes",
+                "What's new in Kotlin 2.2.0 > Gradle > Binary compatibility validation included in Kotlin Gradle plugin > Multiplatform limitations"
+              ],
+              "score": 0.1975158154964447,
+              "line_start": 792,
+              "line_end": 825,
+              "preview": "rsions\n        enabled.set(true)\n    }\n}\n\nIf your project has multiple modules where you want to check for binary compatibility, configure the feature in each module separately. Each module can have its own custom configuration.\n\nOnce enabl",
+              "source": "https://kotlinlang.org/docs/whatsnew22.html"
+            }
+          ]
+        },
+        "semantic": {
+          "metrics": null,
+          "top5": [
+            {
+              "document_id": "whatsnew21",
+              "sections": [
+                "What's new in Kotlin 2.1.0 > Kotlin/Wasm > Subproject-specific Node.js settings"
+              ],
+              "score": 0.23683412373065948,
+              "line_start": 824,
+              "line_end": 840,
+              "preview": "Subproject-specific Node.js settings\n\nYou can configure Node.js settings for your project by defining properties of the NodeJsRootPlugin class for rootProject . In 2.1.0, you can configure these settings for each subproject using a new clas",
+              "source": "https://kotlinlang.org/docs/whatsnew21.html"
+            },
+            {
+              "document_id": "whatsnew2320",
+              "sections": [
+                "What's new in Kotlin 2.3.20 > New features > Name-based destructuring > How to enable"
+              ],
+              "score": 0.23129118978977203,
+              "line_start": 140,
+              "line_end": 169,
+              "preview": "How to enable\n\nTo use named-based destructuring in your project, add the compiler option to your build configuration file:\n\nkotlin {\n    compilerOptions {\n        freeCompilerArgs.add(\"-Xname-based-destructuring=only-syntax\")\n    }\n}\n\n<buil",
+              "source": "https://kotlinlang.org/docs/whatsnew2320.html"
+            },
+            {
+              "document_id": "whatsnew21",
+              "sections": [
+                "What's new in Kotlin 2.1.0 > Kotlin/Wasm > Subproject-specific Node.js settings"
+              ],
+              "score": 0.22410613298416138,
+              "line_start": 842,
+              "line_end": 842,
+              "preview": "You can also use Gradle convention plugins to apply the settings to a particular set of subprojects.",
+              "source": "https://kotlinlang.org/docs/whatsnew21.html"
+            },
+            {
+              "document_id": "whatsnew2320",
+              "sections": [
+                "What's new in Kotlin 2.3.20 > Language > Changes to overload resolution for context parameters > Name-based destructuring > How to enable"
+              ],
+              "score": 0.22153566777706146,
+              "line_start": 331,
+              "line_end": 360,
+              "preview": "How to enable\n\nTo use named-based destructuring in your project, add the compiler option to your build configuration file:\n\nkotlin {\n    compilerOptions {\n        freeCompilerArgs.add(\"-Xname-based-destructuring=only-syntax\")\n    }\n}\n\n<buil",
+              "source": "https://kotlinlang.org/docs/whatsnew2320.html"
+            },
+            {
+              "document_id": "whatsnew22",
+              "sections": [
+                "What's new in Kotlin 2.2.0 > Documentation updates > New and revamped pages"
+              ],
+              "score": 0.21841475367546082,
+              "line_start": 1144,
+              "line_end": 1146,
+              "preview": "Compose Hot Reload – Learn how to use Compose Hot Reload with your desktop targets and how to add it to an existing project.\n\nExposed migrations – Learn about the tools Exposed provides for managing database schema changes.",
+              "source": "https://kotlinlang.org/docs/whatsnew22.html"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

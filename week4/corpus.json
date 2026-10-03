@@ -1,0 +1,389 @@
+{
+  "baseline_release": "2.4.20",
+  "documents": [
+    {
+      "id": "coding-conventions",
+      "title": "Coding conventions",
+      "url": "https://kotlinlang.org/docs/coding-conventions.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "idioms",
+      "title": "Idioms",
+      "url": "https://kotlinlang.org/docs/idioms.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "null-safety",
+      "title": "Null safety",
+      "url": "https://kotlinlang.org/docs/null-safety.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "collections-overview",
+      "title": "Collections overview",
+      "url": "https://kotlinlang.org/docs/collections-overview.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "collection-transformations",
+      "title": "Collection transformations",
+      "url": "https://kotlinlang.org/docs/collection-transformations.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "sequences",
+      "title": "Sequences",
+      "url": "https://kotlinlang.org/docs/sequences.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "scope-functions",
+      "title": "Scope functions",
+      "url": "https://kotlinlang.org/docs/scope-functions.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "context-parameters",
+      "title": "Context parameters",
+      "url": "https://kotlinlang.org/docs/context-parameters.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "inline-functions",
+      "title": "Inline functions",
+      "url": "https://kotlinlang.org/docs/inline-functions.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "extensions",
+      "title": "Extensions",
+      "url": "https://kotlinlang.org/docs/extensions.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "generics",
+      "title": "Generics",
+      "url": "https://kotlinlang.org/docs/generics.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "java-interop",
+      "title": "Calling Java from Kotlin",
+      "url": "https://kotlinlang.org/docs/java-interop.html",
+      "platforms": [
+        "jvm",
+        "android"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "java-to-kotlin-interop",
+      "title": "Calling Kotlin from Java",
+      "url": "https://kotlinlang.org/docs/java-to-kotlin-interop.html",
+      "platforms": [
+        "jvm",
+        "android"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "multiplatform-expect-actual",
+      "title": "Expected and actual declarations",
+      "url": "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html",
+      "platforms": [
+        "common"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "native-objc-interop",
+      "title": "Interoperability with Swift/Objective-C",
+      "url": "https://kotlinlang.org/docs/native-objc-interop.html",
+      "platforms": [
+        "native"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "native-swift-export",
+      "title": "Swift export",
+      "url": "https://kotlinlang.org/docs/native-swift-export.html",
+      "platforms": [
+        "native"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "js-to-kotlin-interop",
+      "title": "Use Kotlin code from JavaScript",
+      "url": "https://kotlinlang.org/docs/js-to-kotlin-interop.html",
+      "platforms": [
+        "js"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "js-interop",
+      "title": "Use JavaScript code from Kotlin",
+      "url": "https://kotlinlang.org/docs/js-interop.html",
+      "platforms": [
+        "js"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "wasm-js-interop",
+      "title": "Kotlin/Wasm JavaScript interoperability",
+      "url": "https://kotlinlang.org/docs/wasm-js-interop.html",
+      "platforms": [
+        "wasm"
+      ],
+      "kind": "guide",
+      "availability": "unknown"
+    },
+    {
+      "id": "whatsnew21",
+      "title": "What's new in Kotlin 2.1.0",
+      "url": "https://kotlinlang.org/docs/whatsnew21.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.1.0",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew2120",
+      "title": "What's new in Kotlin 2.1.20",
+      "url": "https://kotlinlang.org/docs/whatsnew2120.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.1.20",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew22",
+      "title": "What's new in Kotlin 2.2.0",
+      "url": "https://kotlinlang.org/docs/whatsnew22.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.2.0",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew2220",
+      "title": "What's new in Kotlin 2.2.20",
+      "url": "https://kotlinlang.org/docs/whatsnew2220.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.2.20",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew23",
+      "title": "What's new in Kotlin 2.3.0",
+      "url": "https://kotlinlang.org/docs/whatsnew23.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.3.0",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew2320",
+      "title": "What's new in Kotlin 2.3.20",
+      "url": "https://kotlinlang.org/docs/whatsnew2320.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.3.20",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew24",
+      "title": "What's new in Kotlin 2.4.0",
+      "url": "https://kotlinlang.org/docs/whatsnew24.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.4.0",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "whatsnew2420",
+      "title": "What's new in Kotlin 2.4.20",
+      "url": "https://kotlinlang.org/docs/whatsnew2420.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "release",
+      "release_version": "2.4.20",
+      "availability": "See individual feature status in source; release version is not a snippet compatibility guarantee."
+    },
+    {
+      "id": "compatibility-guide-21",
+      "title": "Compatibility guide for Kotlin 2.1.x",
+      "url": "https://kotlinlang.org/docs/compatibility-guide-21.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "compatibility",
+      "release_version": "2.1.x",
+      "availability": "See individual change and deprecation timelines."
+    },
+    {
+      "id": "compatibility-guide-22",
+      "title": "Compatibility guide for Kotlin 2.2.x",
+      "url": "https://kotlinlang.org/docs/compatibility-guide-22.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "compatibility",
+      "release_version": "2.2.x",
+      "availability": "See individual change and deprecation timelines."
+    },
+    {
+      "id": "compatibility-guide-23",
+      "title": "Compatibility guide for Kotlin 2.3.x",
+      "url": "https://kotlinlang.org/docs/compatibility-guide-23.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "compatibility",
+      "release_version": "2.3.x",
+      "availability": "See individual change and deprecation timelines."
+    },
+    {
+      "id": "compatibility-guide-24",
+      "title": "Compatibility guide for Kotlin 2.4.x",
+      "url": "https://kotlinlang.org/docs/compatibility-guide-24.html",
+      "platforms": [
+        "common",
+        "jvm",
+        "android",
+        "native",
+        "js",
+        "wasm"
+      ],
+      "kind": "compatibility",
+      "release_version": "2.4.x",
+      "availability": "See individual change and deprecation timelines."
+    }
+  ]
+}
