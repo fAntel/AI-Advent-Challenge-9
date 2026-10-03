@@ -1,0 +1,1199 @@
+1: What's new in Kotlin 2.4.0
+2: 
+3: Released: July 14, 2026
+4: 
+5: The Kotlin 2.4.0 release is out! Here are the main highlights:
+6: 
+7: Language: Stable context parameters, explicit backing fields, and multiple features for annotation use-site targets
+8: 
+9: Standard library: Stabilized support for the UUID API and support for checking sorted order
+10: 
+11: Kotlin/JVM: Support for Java 26 and annotations in metadata enabled by default
+12: 
+13: Kotlin/Native: Support for Swift packages as dependencies, updates on Swift export, and the CMS GC enabled by default
+14: 
+15: Kotlin/Wasm: Incremental compilation enabled by default and support for WebAssembly Component Model
+16: 
+17: Kotlin/JS : Support for value class export and ES2015 features in JS code inlining
+18: 
+19: Gradle: Compatibility with Gradle 9.5.0
+20: 
+21: Maven: Automatic alignment between Java and JVM target versions
+22: 
+23: Kotlin compiler: More consistent inline function behavior during .klib compilation
+24: 
+25: You can also find an overview of the updates in this video:
+26: 
+27: For information about the Kotlin release cycle, see the Kotlin release process .
+28: 
+29: Update to Kotlin 2.4.0
+30: 
+31: The latest version of Kotlin is included in the latest versions of IntelliJ IDEA and Android Studio .
+32: 
+33: To update to the new Kotlin version, make sure your IDE is updated to the latest version and change the Kotlin version to 2.4.0 in your build scripts.
+34: 
+35: New features
+36: 
+37: In previous Kotlin releases, several new features were introduced as Experimental. The following features have now graduated to Stable in Kotlin 2.4.0, so you no longer need to opt in to use them:
+38: 
+39: Context parameters , except for context arguments and callable references
+40: 
+41: @all meta-target for properties
+42: 
+43: New defaulting rules for use-site annotation targets
+44: 
+45: Explicit backing fields
+46: 
+47: Stable UUID API in the common Kotlin standard library
+48: 
+49: New API for converting unsigned integers to BigInteger on the JVM
+50: 
+51: Support for checking sorted order
+52: 
+53: Support for value class export to JavaScript/TypeScript
+54: 
+55: Support for ES2015 features when inlining JS code
+56: 
+57: Maven: Automatic alignment between Java and JVM target versions
+58: 
+59: Support for Maven Toolchains
+60: 
+61: New features
+62: 
+63: Explicit context arguments for context parameters
+64: 
+65: Support for collection literals
+66: 
+67: Improved compile-time constants
+68: 
+69: Improved unused result checks for higher-order functions
+70: 
+71: New @IntroducedAt annotation to generate version-based overloads for optional parameters
+72: 
+73: New map fallback functions to distinguish null values and missing keys
+74: 
+75: Swift package import
+76: 
+77: Swift export goes Alpha with improved concurrency support
+78: 
+79: Support for the WebAssembly Component Model
+80: 
+81: Language
+82: 
+83: Kotlin 2.4.0 promotes context parameters, explicit backing fields, and annotation use-site targets features to Stable . This release also introduces explicit context arguments for context parameters .
+84: 
+85: Stable features
+86: 
+87: Kotlin 2.2.0 and 2.3.0 introduced a few language features as Experimental . We're happy to announce that the following language features are now Stable in this release:
+88: 
+89: Context parameters , except for context arguments and callable references
+90: 
+91: @all meta-target for properties
+92: 
+93: New defaulting rules for use-site annotation targets
+94: 
+95: Explicit backing fields
+96: 
+97: See the full list of Kotlin language design features and proposals .
+98: 
+99: No more deprecation warnings on the last segments of imports
+100: 
+101: In previous Kotlin versions, when a deprecated class was imported, the deprecation error was reported at the call site as well as at the import directive itself. As there's no way to suppress deprecation errors on imports, you may have worked around this by suppressing deprecation reports for the entire file or by using star imports.
+102: 
+103: Since reporting the deprecation on the import of a called symbol isn't useful in most cases, Kotlin 2.4.0 doesn't issue a warning when the deprecated symbol is referenced in the last segment of the import directive.
+104: 
+105: For more information, see KT-30155 .
+106: 
+107: Explicit context arguments for context parameters
+108: 
+109: Kotlin 2.4.0 introduces explicit context arguments for context parameters .
+110: 
+111: Kotlin 2.3.20 changed the overload resolution for context parameters . As a result, calls to overloads that differ only by context parameters can become ambiguous.
+112: 
+113: You can now resolve this ambiguity by passing an explicit context argument at the call site.
+114: 
+115: Here's an example:
+116: 
+117: class EmailSender
+118: class SmsSender
+119: 
+120: context(emailSender: EmailSender)
+121: fun sendNotification() {
+122:     println("Sent email notification")
+123: }
+124: 
+125: context(smsSender: SmsSender)
+126: fun sendNotification() {
+127:     println("Sent SMS notification")
+128: }
+129: 
+130: context(defaultEmailSender: EmailSender, defaultSmsSender: SmsSender)
+131: fun notifyUser() {
+132:     
+133:     // Selects the overload with the EmailSender context parameter
+134:     sendNotification(emailSender = defaultEmailSender)
+135: 
+136:     // Selects the overload with the SmsSender context parameter
+137:     sendNotification(smsSender = defaultSmsSender)
+138: }
+139: 
+140: You can also use explicit context arguments instead of the context() function to reduce nesting and make some calls easier to read. If you need to use the same context arguments in multiple calls, use the context() function instead.
+141: 
+142: This feature is Experimental . To opt in, add the following compiler option to your build file:
+143: 
+144: kotlin {
+145:     compilerOptions {
+146:         freeCompilerArgs.add("-Xexplicit-context-arguments")
+147:     }
+148: }
+149: 
+150: <build>
+151:     <plugins>
+152:         <plugin>
+153:             <groupId>org.jetbrains.kotlin</groupId>
+154:             <artifactId>kotlin-maven-plugin</artifactId>
+155:             <configuration>
+156:                 <args>
+157:                     <arg>-Xexplicit-context-arguments</arg>
+158:                 </args>
+159:             </configuration>
+160:         </plugin>
+161:     </plugins>
+162: </build>
+163: 
+164: For more information, see the feature's KEEP .
+165: 
+166: Support for collection literals
+167: 
+168: Kotlin 2.4.0 introduces experimental support for collection literals. You can now create collections in a simpler and more concise way using brackets [] .
+169: 
+170: For example:
+171: 
+172: fun main() {
+173:     // Mutable list with explicit type declaration
+174:     // val shapes: MutableList<String> = mutableListOf("triangle", "square", "circle")
+175: 
+176:     // Mutable list with brackets syntax
+177:     val shapes: MutableList<String> = ["triangle", "square", "circle"]
+178:     println(shapes)
+179:     // [triangle, square, circle]
+180: }
+181: 
+182: Currently, collection literals can't be used to construct collections defined in Java. For more information, see KT-80494 .
+183: 
+184: If the compiler doesn't have enough information to infer the collection type, it defaults to the List type:
+185: 
+186: fun main() {
+187:     val fruit = ["apple", "banana", "cherry"]
+188:     
+189:     println(fruit)
+190:     // [apple, banana, cherry]
+191: }
+192: 
+193: You can also declare custom operator fun of functions to use bracket syntax with your own types. For example, if you have the following DoubleMatrix class:
+194: 
+195: class DoubleMatrix(vararg val rows: Row) {
+196:     companion object {
+197:         operator fun of(vararg rows: Row) = DoubleMatrix(*rows)
+198:     }
+199:     class Row(vararg val elements: Double) {
+200:         companion object {
+201:             operator fun of(vararg elements: Double) = Row(*elements)
+202:         }
+203:     }
+204: }
+205: 
+206: You can create an identityMatrix class instance like this:
+207: 
+208: fun main() {
+209:     val identityMatrix: DoubleMatrix = [
+210:         [1.0, 0.0, 0.0],
+211:         [0.0, 1.0, 0.0],
+212:         [0.0, 0.0, 1.0],
+213:     ]
+214: }
+215: 
+216: In this example, the compiler translates the nested collection literals into calls to the corresponding operator fun of functions. The compiler resolves these calls recursively and uses the expected types to choose the correct overloads.
+217: 
+218: This feature is Experimental . To opt in, add the following compiler option to your build file:
+219: 
+220: kotlin {
+221:     compilerOptions {
+222:         freeCompilerArgs.add("-Xcollection-literals")
+223:     }
+224: }
+225: 
+226: <build>
+227:     <plugins>
+228:         <plugin>
+229:             <groupId>org.jetbrains.kotlin</groupId>
+230:             <artifactId>kotlin-maven-plugin</artifactId>
+231:             <configuration>
+232:                 <args>
+233:                     <arg>-Xcollection-literals</arg>
+234:                 </args>
+235:             </configuration>
+236:         </plugin>
+237:     </plugins>
+238: </build>
+239: 
+240: For more information, see the feature's KEEP .
+241: 
+242: Improved compile-time constants
+243: 
+244: Kotlin 2.4.0 brings experimental improvements to compile-time constants , making support for numeric and string types more consistent and easier to use. These improvements include support for:
+245: 
+246: Unsigned type operations.
+247: 
+248: Standard library functions for strings, like .lowercase() , .uppercase() , and .trim() functions.
+249: 
+250: Evaluation of the .name property of enum constants and the KCallable interface .
+251: 
+252: To make it clear which functions are evaluated at compile time, Kotlin 2.4.0 introduces the IntrinsicConstEvaluation annotation. Some functions are evaluated at compile-time but don't have the annotation yet. Later releases will add the annotation to the remaining functions. For a list of supported functions, see the KEEP appendix .
+253: 
+254: This feature is Experimental . To opt in, add the following compiler option to your build file:
+255: 
+256: kotlin {
+257:     compilerOptions {
+258:         freeCompilerArgs.add("-Xintrinsic-const-evaluation")
+259:     }
+260: }
+261: 
+262: <build>
+263:     <plugins>
+264:         <plugin>
+265:             <groupId>org.jetbrains.kotlin</groupId>
+266:             <artifactId>kotlin-maven-plugin</artifactId>
+267:             <configuration>
+268:                 <args>
+269:                     <arg>-Xintrinsic-const-evaluation</arg>
+270:                 </args>
+271:             </configuration>
+272:         </plugin>
+273:     </plugins>
+274: </build>
+275: 
+276: For more information, see the feature's KEEP .
+277: 
+278: Improved unused result checks for higher-order functions
+279: 
+280: Kotlin 2.4.0 introduces a new Experimental returnsResultOf() contract to improve the unused return value checker .
+281: 
+282: This contract enables the checker to distinguish between unused results that can be ignored and meaningful unused results from higher-order functions that return the result of a lambda, such as the let scope function.
+283: 
+284: Kotlin contracts are Experimental . To opt in, add the @OptIn(ExperimentalContracts::class) annotation when declaring a function with a contract.
+285: 
+286: To use this feature, add returnsResultOf() to the function's contract:
+287: 
+288: import kotlin.contracts.ExperimentalContracts
+289: import kotlin.contracts.contract
+290: 
+291: @OptIn(ExperimentalContracts::class)
+292: inline fun <T, R> T.customLet(block: (T) -> R): R {
+293:     contract {
+294:         returnsResultOf(block)
+295:     }
+296:     return block(this)
+297: }
+298: 
+299: Here's an example that uses a custom .customLet() function with a nullable value:
+300: 
+301: fun handleNullablePackageName(packageName: String?, builder: StringBuilder) {
+302:     // The checker doesn't report a warning
+303:     // because the return value of the append() function can be ignored
+304:     packageName?.customLet { builder.append(it) }
+305: 
+306:     // The checker reports a warning because the returned string is unused
+307:     packageName?.customLet { "kotlin.$it" }
+308: }
+309: 
+310: The unused return value checker is Experimental and must be enabled to report unused return values. For more information about enabling and configuring the checker, see Unused return value checker .
+311: 
+312: How to enable
+313: 
+314: The returnsResultOf() contract is Experimental . Be aware that using it produces pre-release binaries that earlier Kotlin compiler versions can't read. To opt in, add the following compiler option to your build file:
+315: 
+316: // build.gradle(.kts)
+317: kotlin {
+318:     compilerOptions {
+319:         freeCompilerArgs.add("-Xallow-returns-result-of")
+320:     }
+321: }
+322: 
+323: <!-- pom.xml -->
+324: <build>
+325:     <plugins>
+326:         <plugin>
+327:             <groupId>org.jetbrains.kotlin</groupId>
+328:             <artifactId>kotlin-maven-plugin</artifactId>
+329:             <configuration>
+330:                 <args>
+331:                     <arg>-Xallow-returns-result-of</arg>
+332:                 </args>
+333:             </configuration>
+334:         </plugin>
+335:     </plugins>
+336: </build>
+337: 
+338: New @IntroducedAt annotation to generate version-based overloads for optional parameters
+339: 
+340: Kotlin 2.4.0 introduces the @IntroducedAt annotation for preserving binary compatibility when adding new optional parameters to published APIs.
+341: 
+342: Previously, adding optional parameters to a function often required using @JvmOverloads , which can generate more overloads than needed. Alternatively, preserving binary compatibility required you to keep older signatures as hidden deprecated overloads.
+343: 
+344: With the @IntroducedAt annotation, you can annotate newly added optional parameters with the version in which they were introduced. The compiler uses this information to automatically generate the corresponding hidden overloads.
+345: 
+346: This annotation is Experimental . To opt in, use the @OptIn(ExperimentalVersionOverloading::class) annotation.
+347: 
+348: Here's an example:
+349: 
+350: @OptIn(ExperimentalVersionOverloading::class)
+351: fun Button(
+352:     label: String = "",
+353:     color: Color = DefaultColor,
+354:     @IntroducedAt("1.1") borderColor: Color = DefaultBorderColor,
+355:     @IntroducedAt("1.2") borderStyle: Style = DefaultBorderStyle,
+356:     @IntroducedAt("1.2") borderWidth: Int = 1,
+357:     onClick: () -> Unit
+358: ) {
+359:     // Function body
+360: }
+361: 
+362: In this example, the compiler generates hidden overloads for the older versions of the Button() function.
+363: 
+364: Since both @IntroducedAt and @JvmOverloads generate overloads, using them together can cause conflicting overloads. If you use both annotations, the compiler reports a warning. If you suppress the warning, the compiler prioritizes overloads generated from the @IntroducedAt annotation.
+365: 
+366: Standard library
+367: 
+368: Kotlin 2.4.0 stabilizes support for UUIDs in the common Kotlin standard library. It also adds new extension functions for converting unsigned integers to BigInteger on the JVM and support for checking sorted order.
+369: 
+370: Stable UUID API in the common Kotlin standard library
+371: 
+372: Kotlin 2.0.20 introduced a class for generating UUIDs (universally unique identifiers) and added support for converting between Kotlin and Java UUIDs. Later releases gradually improved this experimental feature by adding support for:
+373: 
+374: Comparing UUIDs with < and > operators
+375: 
+376: Parsing UUIDs from hex-and-dash and plain text formats
+377: 
+378: Returning null when parsing invalid UUIDs .
+379: 
+380: In Kotlin 2.4.0, the kotlin.uuid.Uuid API becomes Stable . The only exceptions are the functions for generating V4 and V7 UUIDs , which remain Experimental and still require opt-in.
+381: 
+382: For more information about how to work with UUIDs, see UUIDs .
+383: 
+384: Support for checking sorted order
+385: 
+386: Kotlin 2.4.0 adds new extension functions for checking sorted order in iterables, arrays, and sequences.
+387: 
+388: This includes the following extension functions:
+389: 
+390: .isSorted()
+391: 
+392: .isSortedDescending()
+393: 
+394: .isSortedWith(comparator)
+395: 
+396: .isSortedBy(selector)
+397: 
+398: .isSortedByDescending(selector)
+399: 
+400: You can use these extension functions to check whether elements are already sorted, without sorting them again or creating your own helper functions. They return true if the elements are in the specified order, or if there are fewer than two elements, and false otherwise. These functions stop as soon as they encounter an out-of-order pair, which makes them efficient for large inputs.
+401: 
+402: Here's an example of checking sorted order with .isSorted() and .isSortedBy() functions:
+403: 
+404: data class User(val name: String, val age: Int)
+405: 
+406: fun main() {
+407:     val numbers = listOf(1, 2, 3, 4)
+408:     println(numbers.isSorted())
+409:     // true
+410: 
+411:     val users = listOf(
+412:         User("Alice", 24),
+413:         User("Bob", 31),
+414:         User("Charlie", 29),
+415:     )
+416:     println(users.isSortedBy(User::age))
+417:     // false
+418: }
+419: 
+420: New API for converting unsigned integers to BigInteger on the JVM
+421: 
+422: Kotlin 2.4.0 introduces the UInt.toBigInteger() and ULong.toBigInteger() extension functions on the JVM.
+423: 
+424: Previously, converting UInt and ULong values to BigInteger required string-based workarounds or custom conversion logic. Starting with Kotlin 2.4.0, you can now use .toBigInteger() to convert unsigned integer values directly to BigInteger .
+425: 
+426: Here's an example:
+427: 
+428: fun main() {
+429:     //sampleStart
+430:     val unsignedLong = Long.MAX_VALUE.toULong() + 1uL
+431:     val unsignedInt = UInt.MAX_VALUE
+432: 
+433:     println(unsignedLong.toBigInteger())
+434:     // 9223372036854775808
+435: 
+436:     println(unsignedInt.toBigInteger())
+437:     // 4294967295
+438:    //sampleEnd
+439: }
+440: 
+441: New map fallback functions to distinguish null values and missing keys
+442: 
+443: Kotlin 2.4.0 adds new variants of the existing .getOrElse() and .getOrPut() map extension functions for maps with nullable values. These functions retrieve a value for a key or use a default value as a fallback. For maps with nullable values, the new variants let you choose whether a stored null value behaves like a missing key or an existing value, and they make that choice clear in their function names.
+444: 
+445: The new extension functions include the following:
+446: 
+447: .getOrElseIfNull(key, defaultValue) and .getOrPutIfNull(key, defaultValue) , which return the default value if the key is missing or has a null value, similar to the existing .getOrElse() and .getOrPut() functions.
+448: 
+449: .getOrElseIfMissing(key, defaultValue) and .getOrPutIfMissing(key, defaultValue) , which return the default value only when the map doesn't contain the specified key.
+450: 
+451: These APIs are Experimental and require opt-in with the @OptIn(ExperimentalStdlibApi::class) annotation.
+452: 
+453: Here's an example that demonstrates the difference between .getOrPutIfNull() and .getOrPutIfMissing() when the key exists with a null value:
+454: 
+455: @OptIn(ExperimentalStdlibApi::class)
+456: fun main() {
+457:     val mapForNull = mutableMapOf<String, String?>("user" to null)
+458:     val mapForMissing = mutableMapOf<String, String?>("user" to null)
+459: 
+460:     // Replaces the value if "user" has a null value
+461:     mapForNull.getOrPutIfNull("user") { "default_user" }
+462: 
+463:     println(mapForNull)
+464:     // {user=default_user}
+465: 
+466:     // Keeps the null value because "user" exists in the map
+467:     mapForMissing.getOrPutIfMissing("user") { "default_user" }
+468: 
+469:     println(mapForMissing)
+470:     // {user=null}
+471: }
+472: 
+473: You can also use the .getOrElseIfMissing() and .getOrPutIfMissing() functions for caches that store nullable values. If defaultValue returns null , the map stores it and doesn't call defaultValue again for the same key.
+474: 
+475: Here's an example:
+476: 
+477: data class Response(val body: String)
+478: 
+479: class Service {
+480:     var queryCount = 0
+481: 
+482:     fun query(key: String): Response? {
+483:         queryCount += 1
+484:         return null
+485:     }
+486: }
+487: 
+488: //sampleStart
+489: @OptIn(ExperimentalStdlibApi::class)
+490: fun main() {
+491:     val service = Service()
+492:     val cache = mutableMapOf<String, Response?>()
+493: 
+494:     fun getCachedResponseOrQuery(key: String): Response? =
+495:         cache.getOrPutIfMissing(key) { service.query(key) }
+496: 
+497:     // Stores null because the cache doesn't contain "user"
+498:     getCachedResponseOrQuery("user")
+499: 
+500:     println(cache)
+501:     // {user=null}
+502: 
+503:     // Uses the cached null and doesn't query the service again
+504:     getCachedResponseOrQuery("user")
+505: 
+506:     println(service.queryCount)
+507:     // 1
+508: }
+509: //sampleEnd
+510: 
+511: We would appreciate your feedback in YouTrack .
+512: 
+513: Kotlin/JVM
+514: 
+515: Kotlin 2.4.0 supports a new Java version and enables annotations in metadata by default.
+516: 
+517: Support for Java 26
+518: 
+519: Starting with Kotlin 2.4.0, the compiler can generate classes containing Java 26 bytecode.
+520: 
+521: Annotations in metadata enabled by default
+522: 
+523: The Kotlin Metadata JVM library in Kotlin 2.2.0 introduced support for reading annotations stored in Kotlin metadata . With this support, the Kotlin compiler writes annotations into metadata alongside the JVM bytecode, making them accessible to the Kotlin Metadata JVM library. As a result, annotation processors and other tools can understand and manipulate these annotations at the metadata level without using reflection or modifying source code.
+524: 
+525: In Kotlin 2.4.0, this support is enabled by default.
+526: 
+527: Kotlin/Native
+528: 
+529: Starting with Kotlin 2.4.0, Swift export is promoted to Alpha . This release also brings support for Swift package import , Xcode 26.4, improvements for memory consumption, and garbage collection.
+530: 
+531: Default concurrent marking in garbage collector
+532: 
+533: In Kotlin 2.0.20, the Kotlin team introduced experimental support for the concurrent mark and sweep garbage collector (CMS GC). After processing user feedback and fixing regressions, we are now ready to enable CMS by default, starting with Kotlin 2.4.0.
+534: 
+535: The previous default parallel mark concurrent sweep (PMCS) setup in the garbage collector had to pause application threads while the GC marked objects in the heap. In contrast, CMS allows the marking phase to run concurrently with application threads.
+536: 
+537: This significantly improves GC pause duration and app responsiveness, which is important for the performance of latency-critical applications. CMS has already demonstrated its effectiveness in benchmarks for UI applications built with Compose Multiplatform .
+538: 
+539: If you face problems, you can switch back to PMCS. To do that, set the following binary option in your gradle.properties file:
+540: 
+541: kotlin.native.binary.gc=pmcs
+542: 
+543: For more information on the Kotlin/Native garbage collector, see our documentation .
+544: 
+545: Reduced memory consumption during devirtualization analysis
+546: 
+547: Previously, devirtualization analysis was one of the most memory-consuming phases in the Kotlin/Native compiler. Namely, the link release task consumed too much memory, especially in large projects.
+548: 
+549: Kotlin 2.4.0 introduces improvements that help reduce peak memory consumption during link release tasks.
+550: 
+551: According to benchmarks from one of our EAP users, the improved devirtualization analysis reduced memory consumption by link release tasks by half, saving at least 13 GB.
+552: 
+553: Support for Xcode 26.4
+554: 
+555: Starting with Kotlin 2.4.0, the Kotlin/Native compiler supports Xcode 26.4 – one of the latest stable versions of Xcode.
+556: 
+557: You can now update your Xcode and get access to the latest APIs to continue working on your Kotlin projects for Apple operating systems.
+558: 
+559: LLVM update to version 21
+560: 
+561: In Kotlin 2.4.0, we updated LLVM from version 19 to 21. The new version includes performance improvements and helps keep the Kotlin/Native compiler up to date.
+562: 
+563: This update shouldn't affect your code, but if you encounter any issues, please report them to our issue tracker .
+564: 
+565: Changes to Apple target support
+566: 
+567: Kotlin 2.4.0 raises the default minimum supported versions of Apple targets:
+568: 
+569: For iOS and tvOS, from 14.0 to 15.0.
+570: 
+571: For macOS, from 11.0 to 12.0.
+572: 
+573: For watchOS, from 7.0 to 8.0.
+574: 
+575: If you need to support a lower version in your project than the default one, use the freeCompilerArgs option in your build file:
+576: 
+577: kotlin {
+578:     targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
+579:         binaries.configureEach {
+580:             freeCompilerArgs += "-Xoverride-konan-properties=minVersion.ios=14.0"
+581:             freeCompilerArgs += "-Xoverride-konan-properties=minVersion.macos=11.0"
+582:             freeCompilerArgs += "-Xoverride-konan-properties=minVersion.tvos=14.0"
+583:             freeCompilerArgs += "-Xoverride-konan-properties=minVersion.watchos=7.0"
+584:         }
+585:     }
+586: }
+587: 
+588: Swift export goes Alpha with improved concurrency support
+589: 
+590: Starting with Kotlin 2.4.0, Kotlin's interoperability with Swift through Swift export is officially in Alpha! This release brings major improvements to concurrency support, adding native and direct structured concurrency to Swift export and the ability to export kotlinx.coroutines flows to Swift.
+591: 
+592: Support for structured concurrency
+593: 
+594: You can now seamlessly call suspending Kotlin code from Swift. Kotlin suspend functions and suspend functional types are exported as Swift's idiomatic async counterparts:
+595: 
+596: // Kotlin
+597: suspend fun hello(): String {
+598:     delay(1000)
+599:     return "Hello Swift! This is Kotlin."
+600: }
+601: 
+602: // Swift
+603: let msg = try await hello()
+604: 
+605: Export of flow types to Swift
+606: 
+607: This update also adds support for exporting kotlinx.coroutines flows to Swift. Flows in kotlinx.coroutines represent an asynchronous stream of data that can be emitted and consumed concurrently. They are commonly used for reactive programming patterns, such as listening for database updates, network requests, or UI events.
+608: 
+609: Previously, the only way to expose the Flow interface from kotlinx.coroutines.flow to Swift was through third-party solutions. Now you can export flows out of the box into Swift's idiomatic counterpart: AsyncSequence .
+610: 
+611: The feature is enabled by default. You can export any public API with the Flow type to Swift while preserving type information. For example:
+612: 
+613: // Kotlin
+614: // Type String is preserved when exporting Flow
+615: fun flowOfStrings(): Flow<String> = flowOf("hello", "any", "world")
+616: 
+617: // Swift
+618: var actual: [String] = []
+619: 
+620: // Type String is correctly inferred from Kotlin
+621: for try await element in flowOfStrings().asAsyncSequence() {
+622:     actual.append(element)
+623: }
+624: 
+625: For more information about Swift export, see our documentation .
+626: 
+627: Swift package import
+628: 
+629: Kotlin Multiplatform projects now can declare Swift packages as dependencies for an iOS app in their Gradle configuration:
+630: 
+631: // build.gradle.kts
+632: kotlin {
+633:     swiftPMDependencies {
+634:         swiftPackage(
+635:             url = url("https://github.com/firebase/firebase-ios-sdk.git"),
+636:             version = from("12.11.0"),
+637:             products = listOf(
+638:                 product("FirebaseAI"),
+639:                 product("FirebaseAnalytics"),
+640:                 ...
+641: }
+642: 
+643: For working samples and more detailed information, see SwiftPM import .
+644: 
+645: If your project relies on CocoaPods dependencies, you can migrate the current setup to use Swift packages. The KMP tooling accounts for this use case and helps you reconfigure the project automatically. For details, see our CocoaPods migration guide .
+646: 
+647: Kotlin/Wasm
+648: 
+649: Kotlin 2.4.0 enables incremental compilation for Kotlin/Wasm by default and introduces support for the WebAssembly Component Model.
+650: 
+651: Incremental compilation enabled by default
+652: 
+653: Kotlin/Wasm introduced incremental compilation in Kotlin 2.1.0. Starting with Kotlin 2.4.0, it is Stable and enabled by default. With this feature, the compiler rebuilds only the files affected by recent changes, which significantly reduces build time.
+654: 
+655: To disable incremental compilation, add the following line to your project's local.properties or gradle.properties file:
+656: 
+657: # gradle.properties
+658: kotlin.incremental.wasm=false
+659: 
+660: If you run into any issues, report them in YouTrack
+661: 
+662: Improved display of internal variables in Chrome DevTools
+663: 
+664: Kotlin 2.4.0 improves the debugging experience for Kotlin/Wasm in Chrome DevTools by making temporary, synthetic, and internal variables easier to distinguish from user-defined variables.
+665: 
+666: The Kotlin compiler and compiler plugins, such as Compose, can generate these variables. They now use the ~ prefix by default, so they are grouped together and moved to the end of the variable list, which Chrome DevTools sorts by name.
+667: 
+668: Support for the WebAssembly Component Model
+669: 
+670: Kotlin/Wasm goes a step further in Kotlin 2.4.0 by introducing experimental support for the WebAssembly Component Model . The proposal defines a way to build components from Wasm modules through standardized interfaces and types. This approach helps Wasm evolve from a low-level binary instruction format into a system for composing reusable, language-agnostic components. It enables Kotlin/Wasm to go beyond the browser. For example, Kotlin and WebAssembly are well suited for Function-as-a-Service, also known as FaaS or serverless, applications.
+671: 
+672: To try this feature, check out a simple server built with wasi:http .
+673: 
+674: Share your feedback in YouTrack .
+675: 
+676: Kotlin/JS
+677: 
+678: Kotlin 2.4.0 further improves export to JavaScript/TypeScript, including support for exporting value classes, interfaces, and type variance, as well as ES2015 features when inlining JS code.
+679: 
+680: Support for value class export to JavaScript/TypeScript
+681: 
+682: Previously, only regular Kotlin classes could be exported to JavaScript/TypeScript. Kotlin 2.4.0 lifts that limitation. You can now export Kotlin's inline value classes as regular TypeScript classes.
+683: 
+684: To export a value class, mark it with the @JsExport annotation on the Kotlin side:
+685: 
+686: // Kotlin
+687: @JsExport
+688: @JvmInline
+689: value class Email(val address: String) {
+690:     init { require(address.contains("@")) { "Invalid email" } }
+691: }
+692: 
+693: @JsExport
+694: class AuthService {
+695:     suspend fun login(email: Email): String = ...
+696: }
+697: 
+698: From the TypeScript side, it looks like a regular class:
+699: 
+700: // TypeScript
+701: import { AuthService, Email } from "..."
+702: const auth = new AuthService();
+703: 
+704: console.log(await auth.login(new Email("jane@example.com"))); 
+705: // "Welcome, jane@example.com!"
+706: console.log(await auth.login(new Email("not-an-email"))); 
+707: // "Invalid email"
+708: 
+709: For more information, see @JsExport annotation .
+710: 
+711: Support for ES2015 features when inlining JS code
+712: 
+713: Starting with Kotlin 2.4.0, JavaScript code inlining has full support for ES2015 features .
+714: 
+715: It's useful for interoperability with third-party libraries, as well as for direct control over automatic application code generation.
+716: 
+717: Now you can use modern JS features inside js() calls, including:
+718: 
+719: const and let variable declarations
+720: 
+721: ES classes
+722: 
+723: Generators
+724: 
+725: Lambdas ( arrow functions )
+726: 
+727: Spread and rest operators
+728: 
+729: Template strings
+730: 
+731: Remember that the parameter of the js() function should be a string constant because it's parsed at compile time and translated to JavaScript code "as-is". For example, to inline the spread operator, use:
+732: 
+733: fun spreadExample(): dynamic = js("""
+734:     const add = (a, b, c) => a + b + c;
+735: 
+736:     const nums = [1, 2, 3];
+737:     const sum = add(...nums);
+738: 
+739:     const a = [1, 2, 3];
+740:     const b = [...a, 4, 5, 6];
+741: 
+742:     return { sum, b: b };
+743: """)
+744: 
+745: For more information on inlining JavaScript code, see our documentation .
+746: 
+747: Preserve type variance when exporting to TypeScript
+748: 
+749: Previously, Kotlin variance information in generic positions was lost when exporting types to TypeScript.
+750: 
+751: With Kotlin 2.4.0, variance annotation is now saved during export and mapped to TypeScript's variance annotations .
+752: 
+753: In your Kotlin code, define the variance of your generic type parameters:
+754: 
+755: // Kotlin
+756: // 'out' signals covariance (the interface only produces T)
+757: interface Producer<out T> {
+758:     fun produce(): T
+759: }
+760: 
+761: // 'in' signals contravariance (the interface only consumes T)
+762: interface Consumer<in T> {
+763:     fun consume(item: T)
+764: }
+765: 
+766: With Kotlin 2.4.0, the in and out keywords are preserved in the generated TypeScript output:
+767: 
+768: // Generated .d.ts
+769: export interface Producer<out T> {
+770:     produce(): T;
+771: }
+772: 
+773: export interface Consumer<in T> {
+774:     consume(item: T): void;
+775: }
+776: 
+777: Improved interface export to JavaScript/TypeScript
+778: 
+779: Kotlin 2.4.0 makes it more convenient to export Kotlin interfaces to JavaScript/TypeScript.
+780: 
+781: The new @JsNoRuntime annotation removes the previously required metadata for implementing Kotlin interfaces, allowing the direct mapping to regular TypeScript interfaces, similar to how external interfaces already behave by default.
+782: 
+783: To export a Kotlin interface, for example in your Kotlin Multiplatform project, annotate it with @JsNoRuntime in the common code:
+784: 
+785: // commonMain
+786: import kotlin.js.JsNoRuntime
+787: 
+788: @JsNoRuntime
+789: expect interface DataProcessor {
+790:     fun process(data: String): Int 
+791: }
+792: 
+793: Then provide the actual implementation in your JS-specific source code:
+794: 
+795: // jsMain
+796: @JsNoRuntime
+797: actual interface DataProcessor {
+798:     actual fun process(data: String)
+799: } 
+800: 
+801: Because the required metadata for implementing Kotlin interfaces is removed, the interface is mapped to a regular TypeScript interface:
+802: 
+803: // Generated .d.ts
+804: export interface DataProcessor {
+805:     process(data: string): void;
+806: }
+807: 
+808: The @JsNoRuntime annotation is only allowed on standard interfaces, so that TypeScript can treat Kotlin interfaces as regular TypeScript interfaces. Therefore, the following operations are prohibited:
+809: 
+810: is and as type checks.
+811: 
+812: Class references with the ::class syntax .
+813: 
+814: Passing an interface as a reified type argument.
+815: 
+816: Avoid annotating external interfaces with @JsNoRuntime , as this results in a compiler warning.
+817: 
+818: Lifting restrictions on exporting interfaces
+819: 
+820: Kotlin 2.4.0 makes another step toward the stabilization of @JsExport , improving how Kotlin interfaces are exported.
+821: 
+822: Now you can export Kotlin interfaces with nested classes and named companion objects:
+823: 
+824: @JsExport
+825: interface Identity {
+826:     class Metadata(val tag: String)
+827: 
+828:     companion object Registry {
+829:         val defaultTag = "GUEST"
+830:     }
+831: }
+832: 
+833: For more information, see @JsExport annotation .
+834: 
+835: Gradle
+836: 
+837: Kotlin 2.4.0 is fully compatible with Gradle 7.6.3 through 9.5.0. You can also use Gradle versions up to the latest Gradle release. However, be aware that doing so may result in deprecation warnings, and some new Gradle features might not work. Kotlin 2.4.0 also brings improvements like consistent default module names across platforms and compiler messages written to the Problems API for the Kotlin/JVM.
+838: 
+839: Minimum supported AGP version bumped to 8.5.2
+840: 
+841: Starting with Kotlin 2.4.0, the minimum supported Android Gradle plugin version is 8.5.2.
+842: 
+843: Consistent module names across platforms
+844: 
+845: Prior to Kotlin 2.4.0, default module names differed across platforms. This inconsistency could cause naming conflicts and resolution issues. Kotlin 2.4.0 standardizes the default names to {group}:{project_name} across all platforms.
+846: 
+847: If you need to revert the JVM module name to its previous version, add the following to your build.gradle.kts file for a Kotlin/JVM project:
+848: 
+849: kotlin {
+850:     compilerOptions.moduleName(project.name)
+851: }
+852: 
+853: For a multiplatform project:
+854: 
+855: kotlin {
+856:     jvm {
+857:         compilerOptions.moduleName(project.name)
+858:     }
+859: }
+860: 
+861: Compiler messages written to Problems API for Kotlin/JVM
+862: 
+863: In Kotlin 2.2.0, the Kotlin Gradle plugin (KGP) started reporting diagnostics to Gradle's Problems API to provide a consistent experience both in Gradle's CLI and in IntelliJ IDEA.
+864: 
+865: In Kotlin 2.4.0, the plugin also writes compiler messages to the Problems API for Kotlin/JVM, bringing the API closer to becoming a single source for all logs and messages.
+866: 
+867: Maven
+868: 
+869: Kotlin 2.4.0 makes project configuration even easier with support for Maven Toolchains and automatic alignment between Java and JVM target versions.
+870: 
+871: Automatic alignment between Java and JVM target versions
+872: 
+873: To simplify project configuration and prevent compatibility issues, the Kotlin Maven plugin now automatically aligns the JVM target version with the Java compiler version configured in the project.
+874: 
+875: This ensures that the Kotlin and Maven compilers target the same bytecode version, avoiding issues where Kotlin-generated bytecode is incompatible with the rest of the project or the intended deployment environment.
+876: 
+877: With the <extensions> option enabled, you don't need to set the kotlin.compiler.jvmTarget or kotlin.compiler.jdkRelease options. If neither of them is defined, the Kotlin Maven plugin automatically resolves the JVM target version in the following order:
+878: 
+879: As the maven.compiler.release version defined either as a project property or within the maven-compiler-plugin configuration.
+880: 
+881: In this case, both jvmTarget and jdkRelease compiler options are set for the Kotlin compiler, limiting the API to a specific JDK version.
+882: 
+883: As the maven.compiler.target version in case the Maven release version is not set. The compiler target can be defined either as a project property or within the maven-compiler-plugin configuration.
+884: 
+885: In this case, only Kotlin's jvmTarget is set, and the API is not limited to a specific JDK version.
+886: 
+887: This greatly simplifies your Kotlin project configuration, so your pom.xml file can look like this:
+888: 
+889: <properties>
+890:     <maven.compiler.release>17</maven.compiler.release>
+891:     <kotlin.version>2.4.20</kotlin.version>
+892: </properties>
+893: 
+894: <build>
+895:     <plugins>
+896:         <plugin>
+897:             <groupId>org.jetbrains.kotlin</groupId>
+898:             <artifactId>kotlin-maven-plugin</artifactId>
+899:             <version>${kotlin.version}</version>
+900:             <extensions>true</extensions>
+901:         </plugin>
+902:     </plugins>
+903: </build>
+904: 
+905: During the build, the plugin outputs a similar message:
+906: 
+907: [INFO] Using jvmTarget=17 (derived from maven.compiler.release=17)
+908: 
+909: The <extensions> option only checks project-level properties and the global maven-compiler-plugin configuration. It doesn't check the configurations defined in the plugin's <executions> section.
+910: 
+911: For more information about automatic project configuration, see our documentation .
+912: 
+913: Support for Maven Toolchains
+914: 
+915: Kotlin 2.4.0 introduces support for Maven Toolchains to the Kotlin Maven plugin.
+916: 
+917: The feature helps manage the JDK version in your build. With Maven Toolchains, you can specify the JDK version used for Kotlin compilation, independent of the JVM version running Maven (set in JAVA_HOME ). When the maven-toolchains-plugin is configured in the build, the Kotlin Maven plugin automatically picks up the selected JDK toolchain, in the same way the Maven compiler plugin and other Maven plugins do. This allows you to configure a single toolchain to control the JDK used across all plugins in the build, including Kotlin compilation:
+918: 
+919: <plugin>
+920:     <groupId>org.apache.maven.plugins</groupId>
+921:     <artifactId>maven-toolchains-plugin</artifactId>
+922:     <version>3.2.0</version>
+923:     <executions>
+924:         <execution>
+925:             <goals>
+926:                 <goal>toolchain</goal>
+927:             </goals>
+928:         </execution>
+929:     </executions>
+930:     <configuration>
+931:         <toolchains>
+932:             <jdk>
+933:                 <version>21</version>
+934:             </jdk>
+935:         </toolchains>
+936:     </configuration>
+937: </plugin>
+938: 
+939: Keep in mind the priority of different ways to set up the JDK version:
+940: 
+941: jdkHome in the kotlin-maven-plugin configuration. An explicitly set jdkHome option always takes precedence over the toolchain version.
+942: 
+943: JDK version in maven-toolchains-plugin . The JDK version set through Maven Toolchains overrides the JDK version set in the JAVA_HOME path.
+944: 
+945: The JAVA_HOME path.
+946: 
+947: You can also use a plugin-specific <jdkToolchain> option to directly set the JDK version in the toolchain of kotlin-maven-plugin . Compared to using maven-toolchains-plugin , this parameter only affects Kotlin compilation and has no impact on other plugins in the build.
+948: 
+949: Currently, setting maven-toolchains-plugin to use a specific JDK version does not affect the kapt and test-kapt goals of kotlin-maven-plugin . To work around this, set the necessary version in the JAVA_HOME path. For more details, see KT-79897 .
+950: 
+951: For more information on configuring Kotlin Maven projects, see our documentation .
+952: 
+953: Build tools API
+954: 
+955: Kotlin 2.4.0 brings a number of improvements to the build tools API (BTA). The BTA:
+956: 
+957: Introduces new type-safe abstractions for most JVM and common compiler options. The BTA now handles their format instead of the client, reducing the risk of errors and providing an additional layer of assistance. This change is backwards-compatible at runtime, but it may break source compatibility.
+958: 
+959: Can now track non-source changes in incremental compilation, such as configuring a different Kotlin version or changing compiler options. Build systems can control this behavior through the BaseIncrementalCompilationConfiguration.TRACK_CONFIGURATION_INPUTS option.
+960: 
+961: Supports binary compatibility validation through the AbiValidationToolchain , making it easier for other build systems to add this functionality.
+962: 
+963: Introduces a new feature so that build systems can customize how compiler messages are displayed through the CompilerMessageRenderer interface and the JvmCompilationOperation builder .
+964: 
+965: Introduces new options for configuring Kotlin daemon logging:
+966: 
+967: LOGS_PATH — the directory for daemon log files.
+968: 
+969: LOGS_FILE_SIZE_LIMIT — the maximum log file size in bytes.
+970: 
+971: LOGS_FILE_COUNT_LIMIT — the maximum number of retained log files.
+972: 
+973: By default, limits are set to a value specific to the Kotlin compiler version. To have no limit, build tools must set the option to null .
+974: 
+975: Build systems can set the option when configuring the execution policy :
+976: 
+977: val executionPolicy = kotlinToolchains.daemonExecutionPolicy {
+978:     set(ExecutionPolicy.WithDaemon.LOGS_PATH, Paths("/var/log/kotlin-daemon"))
+979:     set(ExecutionPolicy.WithDaemon.LOGS_FILE_SIZE_LIMIT, 10_485_760L)
+980:     set(ExecutionPolicy.WithDaemon.LOGS_FILE_COUNT_LIMIT, 10)
+981: }
+982: 
+983: Kotlin compiler
+984: 
+985: Kotlin 2.4.0 includes more consistent behavior for inline functions declared in the same module during .klib compilation.
+986: 
+987: Consistent intra-module function inlining during klib compilation
+988: 
+989: Previously, function inlining behaved inconsistently on different Kotlin platforms. The JetBrains team is working to unify it across all supported platforms to ensure the same compatibility guarantees.
+990: 
+991: On the Kotlin/JVM, function inlining happens at compile time. So, when Kotlin sources are compiled with the Kotlin/JVM compiler, the resulting class files have no inline function calls in the bytecode because the bodies of inline functions are inlined into their call sites, so their behavior is fixed during compilation.
+992: 
+993: On the contrary, on Kotlin/Native, Kotlin/JS, and Kotlin/Wasm, function inlining did not happen during source-to-klib compilation, only during binary generation. As a result, the behavior of inline functions wasn't fixed during .klib compilation, and .klib libraries didn't provide the same compatibility guarantees for inline functions as Kotlin/JVM does.
+994: 
+995: Kotlin 2.4.0 takes the first step in unifying the behavior of inline functions by enabling intra-module inlining when generating .klib artifacts:
+996: 
+997: // Existing logging.klib library
+998: inline fun logDebug(message: String) {
+999:     println("[DEBUG] $message")
+1000: }
+1001: 
+1002: // Currently compiled App module
+1003: inline fun greetUser(name: String) {
+1004:     println("Hello, $name!")
+1005: }
+1006: 
+1007: fun main() {
+1008:     logDebug("App started") // Not inlined: declared in another module
+1009:     greetUser("Alice")      // Inlined: declared in the same module
+1010: }
+1011: 
+1012: When compiled to a .klib , the code looks something like:
+1013: 
+1014: // Pseudocode
+1015: fun main() {
+1016:     logDebug("App started")  // Not inlined, declared in another module
+1017:     val tmp0 = "Alice"
+1018:     println("Hello, $tmp0!") // Inlined from greetUser()
+1019: }
+1020: 
+1021: This means only inline functions declared in the same module are inlined during .klib compilation. Other functions, in this case, are inlined during the generation of platform-specific binaries.
+1022: 
+1023: How to enable
+1024: 
+1025: Starting with 2.4.0, the intra-module inlining is enabled by default for Kotlin/Native, Kotlin/JS, and Kotlin/Wasm.
+1026: 
+1027: If you face unexpected problems with this feature, you can disable it using the following compiler option in the command line:
+1028: 
+1029: -Xklib-ir-inliner=disabled
+1030: 
+1031: The next step is to enable cross-module inlining to ensure all inline functions in the project are consistently inlined. This change is planned for future Kotlin releases, but you can already try it out using the following compiler option in the command line:
+1032: 
+1033: -Xklib-ir-inliner=full
+1034: 
+1035: Please share your feedback and report any problems in YouTrack .
+1036: 
+1037: Consistent partial library linkage across Kotlin compilers
+1038: 
+1039: In Kotlin 1.9.0, partial library linkage was enabled by default for both the Kotlin/Native and Kotlin/JS compilers, with Kotlin/Wasm following in Kotlin 2.0.0. This feature effectively makes compilers treat linkage issues in Kotlin libraries consistently with Kotlin/JVM.
+1040: 
+1041: Since then, we haven't received negative feedback and haven't noticed users disabling the partial linkage in their projects. That's why starting with Kotlin 2.4.0, the partial linkage is always enabled, and the -Xpartial-linkage compiler option is now deprecated.
+1042: 
+1043: The default log level for all Kotlin compilers is SILENT . Linkage issues are not reported during compilation. To change this behavior in your projects, set the -Xpartial-linkage-loglevel compiler option in your build file:
+1044: 
+1045: // build.gradle.kts
+1046: kotlin {
+1047:     macosX64("native") {
+1048:         binaries.executable()
+1049:         
+1050:         compilations.configureEach {
+1051:             compilerOptions.configure {
+1052:                 // To report linkage issues with the “info” log level:
+1053:                 freeCompilerArgs.add("-Xpartial-linkage-loglevel=INFO")
+1054: 
+1055:                 // To report issues as errors:
+1056:                 freeCompilerArgs.add("-Xpartial-linkage-loglevel=ERROR")
+1057:             }
+1058:         }
+1059:     }
+1060: }
+1061: 
+1062: INFO reports linkage issues with the "info" log level.
+1063: 
+1064: WARNING reports warnings at compile time and records them in compilation logs.
+1065: 
+1066: ERROR allows compilation to fail in case of linkage issues and reports errors in compilation logs. Use this option to examine the linkage issues more closely.
+1067: 
+1068: If you encounter issues with this feature, please report them in our issue tracker .
+1069: 
+1070: Kotlin compiler plugins
+1071: 
+1072: In Kotlin 2.4.0, Kotlin's compiler plugins received notable updates, too. The kapt plugin can now exclude unnecessary annotation processors from the compile classpath, and the Power-assert plugin offers simplified configuration through the new runtime library.
+1073: 
+1074: kapt: Exclude annotation processors from compile classpath
+1075: 
+1076: Kotlin 2.4.0 adds support for the includeCompileClasspath configuration option for annotation processor discovery, similar to the Kotlin Gradle plugin. The new option allows you to exclude unnecessary annotation processors from the compile classpath.
+1077: 
+1078: To configure this in your build file, set the includeCompileClasspath option to false in the <execution> section of the kapt plugin:
+1079: 
+1080: <execution>
+1081:     <id>kapt</id>
+1082:         <goals><goal>kapt</goal></goals>
+1083:         <configuration>
+1084:             <!-- Add new option -->
+1085:             <includeCompileClasspath>false</includeCompileClasspath> 
+1086:             <sourceDirs>...</sourceDirs>
+1087:             <annotationProcessorPaths>...</annotationProcessorPaths>
+1088:         </configuration>
+1089: </execution>
+1090: 
+1091: Alternatively, you can do the same with the kapt.include.compile.classpath in the <properties> section:
+1092: 
+1093: <properties>
+1094:     <kapt.include.compile.classpath>false</kapt.include.compile.classpath>
+1095: </properties>
+1096: 
+1097: With the option set to false , annotation processors not included in the <annotationProcessorPaths> section of the kapt configuration are excluded from the kapt processing.
+1098: 
+1099: If includeCompileClasspath is not set and kapt detects an annotation processor on the compile classpath that is not explicitly defined in the <annotationProcessorPaths> section, you'll see the following deprecation warning:
+1100: 
+1101: [WARNING] Annotation processors discovery from compile classpath is deprecated. Set 'kapt.include.compile.classpath=false' to disable discovery.
+1102: 
+1103: For more information on kapt configuration, see our documentation .
+1104: 
+1105: Power-assert: New runtime library
+1106: 
+1107: Kotlin 2.4.0 makes Power-assert capable functions more discoverable and easier to configure with the new runtime library.
+1108: 
+1109: Previously, adopting Power-assert required complex build configurations and function parameter conventions. Starting with this release, Power-assert capable functions can use the new runtime library to integrate directly with the compiler plugin transformations.
+1110: 
+1111: This brings major improvements for both plugin users and library authors:
+1112: 
+1113: The new CallExplanation data structure provides detailed information about the call site. This enables more dynamic diagram rendering for assertion failures and better integration with external tools.
+1114: 
+1115: The new @PowerAssert annotation makes assertion functions instantly discoverable by the compiler plugin. That way, you can now add out-of-the-box support for Power-assert into your libraries.
+1116: 
+1117: Use our example collection as a playground for experimenting with the new features.
+1118: 
+1119: For more information, see our documentation .
+1120: 
+1121: Compose compiler
+1122: 
+1123: With Kotlin 2.4.0, the Compose compiler offers more consistent incremental compilation and advances the deprecation cycle of several feature flags.
+1124: 
+1125: Consistent incremental compilation for internal declarations
+1126: 
+1127: Starting from Kotlin 2.4.0, the Compose compiler offers more consistent incremental compilation. Stability of internal types across different files is now inferred during runtime. This allows Compose to update inferred stability values even when class usages are not recompiled.
+1128: 
+1129: As a side effect, the size of your artifacts may increase whenever a @Composable function uses an internal class from a different file as a parameter. This is caused by the compiler encoding the execution paths for both stable and unstable cases, since stability has to be decided during runtime. This overhead of runtime stability is removed by minifiers that perform full-app optimizations (such as R8) as they are able to infer the unnecessary execution path and eliminate it.
+1130: 
+1131: This update does not change the final stability value, so the behavior of @Composable functions remains unchanged.
+1132: 
+1133: Feature flag deprecations
+1134: 
+1135: Kotlin 2.4.0 advances the deprecation cycle of experimental feature flags that graduated to stable and are now enabled by default:
+1136: 
+1137: StrongSkipping , IntrinsicRemember , and associated DSL properties are advanced to DeprecationLevel.ERROR . They will be removed in Kotlin 2.5.0.
+1138: 
+1139: OptimizeNonSkippingGroups and PausableComposition are now deprecated. They are scheduled to be removed in Kotlin 2.6.0.
+1140: 
+1141: Breaking changes and deprecations
+1142: 
+1143: This section highlights important breaking changes and deprecations. For a complete overview, see our Compatibility guide .
+1144: 
+1145: Starting with Kotlin 2.4.0, the compiler no longer supports -language-version=1.9 . As a result, the K1 compiler is no longer supported.
+1146: 
+1147: Kotlin 2.4.0 streamlines the DSL for binary compatibility validation in the Kotlin Gradle plugin and deprecates some parts. For the latest DSL, see Binary compatibility validation in the Kotlin Gradle plugin .
+1148: 
+1149: Support for Kotlin script execution through the KotlinScriptMojo Maven plugin has been removed .
+1150: 
+1151: Documentation updates
+1152: 
+1153: We made the following documentation changes in the Kotlin ecosystem:
+1154: 
+1155: Liquid Glass in a Compose Multiplatform app – Migrate an iOS app from fully Compose-driven navigation to native SwiftUI navigation with iOS 26 Liquid Glass styling.
+1156: 
+1157: Adding Swift packages as dependencies to KMP modules – Learn how to set up a SwiftPM dependency in your KMP project.
+1158: 
+1159: Switch Kotlin Multiplatform project from CocoaPods to SwiftPM dependencies manually or with Junie – Learn how you can use Junie and Kotlin AI skills to make migration easier.
+1160: 
+1161: Configure TeamCity for a KMP app – Use TeamCity to build, test, and deploy your KMP applications.
+1162: 
+1163: Recommended serialization approaches for Navigation 3 – Find the best way to use serialization with Navigation 3 in your CMP application.
+1164: 
+1165: Multiplatform ViewModel – Learn how to set up and work with ViewModels in a multiplatform project.
+1166: 
+1167: Backend development with Kotlin – Explore the different frameworks you can use for backend development.
+1168: 
+1169: Create a task manager app with Spring Boot and Claude – Learn how Claude can help you create an app with Spring Boot from scratch.
+1170: 
+1171: Configure a Maven project – Set up Kotlin compilation in your existing Java Maven project or in a new Kotlin Maven project.
+1172: 
+1173: Test Kotlin projects with Maven – Learn how to create tests with JUnit and use Maven plugins to run unit and integration tests.
+1174: 
+1175: Use annotation processors in Kotlin projects – Choose between kapt and KSP to process annotations in your backend project.
+1176: 
+1177: Kotlin AI skills – Use agent skills to help you perform Kotlin-specific tasks.
+1178: 
+1179: Kotlin Language Server – Read about JetBrains' official implementation of the Language Server Protocol (LSP) for Kotlin.
+1180: 
+1181: Numbers – Explore Kotlin's number types and how to work with them.
+1182: 
+1183: Getting started with KSP – Learn how to add a KSP-based processor to your project or create your own.
+1184: 
+1185: Migrate from kapt to KSP – Migrate your annotation processors to get the best out of Kotlin's features.
+1186: 
+1187: Lincheck overview – Understand how Lincheck works behind the scenes to test concurrent code on the JVM.
+1188: 
+1189: Getting started with Lincheck – Create a project and run tests with Lincheck.
+1190: 
+1191: Testing arbitrary code with Lincheck – Learn how to test concurrent code with Lincheck.
+1192: 
+1193: How to test data structures with Lincheck – Dive into Lincheck's data structure testing process.
+1194: 
+1195: Testing strategies with Lincheck – Learn about Lincheck's testing strategies: model checking and stress testing.
+1196: 
+1197: Configuring a testing strategy with Lincheck – Explore the different options for Lincheck's testing strategies.
+1198: 
+1199: Deploy a Ktor application with Dokku – Learn about the deployment workflow with Dokku.

@@ -1,0 +1,47 @@
+[daemon]
+# Paths beginning with ~/ are expanded for the daemon user.
+socket_path = "~/.local/state/advent-agent/agent.sock"
+session_dir = "~/.local/state/advent-agent"
+request_timeout = "5m"
+lease_timeout = "30s"
+evict_after = "2s"
+
+# Debug logging is disabled by default. The command-line --debug flag also
+# enables it without changing this file.
+debug = false
+log_path = "~/Library/Logs/advent-agent/agentd.log"
+log_max_bytes = 10485760
+log_backups = 3
+
+[provider]
+name = "deepseek"
+
+[deepseek]
+endpoint = "https://api.deepseek.com/chat/completions"
+model = "deepseek-v4-flash"
+reasoning = "none"
+
+[agent]
+# Used to show how much of the model's input context the latest request used.
+context_window_tokens = 1000000
+# Keep the newest messages verbatim. Once another batch becomes old enough,
+# replace that batch with an updated summary.
+compression_enabled = true
+# full, summary, sliding, or branching
+context_strategy = "summary"
+recent_messages = 5
+summary_batch_messages = 5
+
+[client]
+poll_interval = "250ms"
+autostart = true
+
+[scheduler]
+# Used by `advent-agent schedule add --every default`.
+default_interval = "1h"
+
+# Optional absolute overrides. Defaults resolve beside advent-agentd (or the
+# comparison CLI): .venv/bin/kotlin-index and data/index.sqlite.
+[rag]
+# executable = "/absolute/path/week4/.venv/bin/kotlin-index"
+# database = "/absolute/path/week4/data/index.sqlite"

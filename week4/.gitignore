@@ -5,3 +5,10 @@ build/
 data/
 *.sqlite*
 .DS_Store
+
+/advent-agent
+/advent-agentd
+/homebox-mcp
+/budget-mcp
+/report-mcp
+/supplier-mcp

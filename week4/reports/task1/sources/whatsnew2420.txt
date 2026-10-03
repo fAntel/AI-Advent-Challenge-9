@@ -1,0 +1,682 @@
+1: What's new in Kotlin 2.4.20
+2: 
+3: Released: September 7, 2026
+4: 
+5: Kotlin 2.4.20 is out! Here are the release highlights:
+6: 
+7: Standard library: Support for coroutine stack trace recovery, new functions for checking the equality and uniqueness of collection elements, and new overloads for kotlin.test assertion functions
+8: 
+9: Kotlin/Native: New Swift export features, improved incremental compilation, and automatically generated Package.swift files for SwiftPM dependencies
+10: 
+11: Kotlin/Wasm: Changes to top-level require() calls in @JsFun declarations, improved initialization order of companion objects, support for Wasmtime in the Kotlin Gradle plugin, new compilation modes, and reduced binary size for functional interfaces
+12: 
+13: Kotlin/JS: A new DSL for browser testing, support for exporting suspending lambdas as async functions, improved exportability of data classes
+14: 
+15: Gradle: Support for Gradle 9.7.0 and improved reporting in the Problems API
+16: 
+17: Build tools API: Support for new targets: Kotlin/JS, Kotlin/Wasm, and Kotlin metadata
+18: 
+19: Kotlin compiler: kotlinr runner command and a separate native image
+20: 
+21: You can also find an overview of the updates in this video:
+22: 
+23: For information about the Kotlin release cycle, see Kotlin release process .
+24: 
+25: Update to Kotlin 2.4.20
+26: 
+27: The latest version of Kotlin is included in the latest versions of IntelliJ IDEA and Android Studio .
+28: 
+29: To update to the new Kotlin version, make sure your IDE is updated to the latest version and change the Kotlin version to 2.4.20 in your build scripts.
+30: 
+31: New features
+32: 
+33: Kotlin 2.2.20 introduced experimental support for compiling when expressions with invokedynamic on JVM 21 and later.
+34: 
+35: In Kotlin 2.4.20, the feature has now graduated to Stable and is enabled by default.
+36: 
+37: For more information, see the documentation .
+38: 
+39: New features
+40: 
+41: The following pre-stable features are available in this release, including those with Beta , Alpha , and Experimental status:
+42: 
+43: Standard library: Support for coroutine stack trace recovery
+44: 
+45: Standard library: New functions to check collection elements for equality and uniqueness
+46: 
+47: Standard library: New overloads for kotlin.test assertion functions
+48: 
+49: Kotlin/Native: New Swift export features
+50: 
+51: Kotlin/Native: Improved incremental compilation of klib artifacts
+52: 
+53: Kotlin/JS: A new DSL for browser testing
+54: 
+55: Kotlin/JS: Support for exporting suspending lambdas as async functions
+56: 
+57: Build tools API: Support for Kotlin/JS, Kotlin/Wasm, and Kotlin metadata
+58: 
+59: Kotlin compiler: Separate native image
+60: 
+61: Standard library
+62: 
+63: Kotlin 2.4.20 adds support for coroutine stack trace recovery and introduces new functions to check collection elements for equality and uniqueness, as well as new overloads for kotlin.test assertion functions.
+64: 
+65: Support for coroutine stack trace recovery
+66: 
+67: Kotlin 2.4.20 adds the StackTraceRecoverable interface to the standard library. This improves integration with the kotlinx.coroutines library because it lets you define how to create new exception instances for stack trace recovery without adding a dependency on kotlinx.coroutines .
+68: 
+69: Stack trace recovery helps with debugging when one coroutine throws an exception and another rethrows it. It lets you see where the exception originates and where another coroutine rethrows it.
+70: 
+71: The kotlinx.coroutines library performs stack trace recovery by creating a new exception instance with additional coroutine stack trace information. This happens automatically for exceptions with constructors that take only an exception message, a cause, both, or no arguments.
+72: 
+73: If an exception constructor has additional required arguments, such as a line number or an error code, implement the StackTraceRecoverable interface to define how the kotlinx.coroutines library creates a new instance of that exception.
+74: 
+75: To implement the interface, override the copyForStackTraceRecovery() function. In the override, return a new exception instance for stack trace recovery, or null if you don't want the kotlinx.coroutines library to copy the exception.
+76: 
+77: The StackTraceRecoverable interface is available on all targets, but the kotlinx.coroutines library uses it for stack trace recovery only on the JVM.
+78: 
+79: These APIs are Experimental and require opt-in with the @OptIn(ExperimentalStdlibCoroutineSupportApi::class) annotation.
+80: 
+81: Here's an example of a custom exception that preserves a line property when it creates a new instance for stack trace recovery:
+82: 
+83: import kotlin.coroutines.ExperimentalStdlibCoroutineSupportApi
+84: import kotlin.coroutines.debug.StackTraceRecoverable
+85: 
+86: @OptIn(ExperimentalStdlibCoroutineSupportApi::class)
+87: class FileEditException
+88: // The implementation requires a private constructor
+89: // to pass the cause to the IllegalStateException constructor
+90: private constructor(
+91:     val line: Int,
+92:     private val detail: String,
+93:     cause: Throwable?,
+94: ) : IllegalStateException("When editing line $line: $detail", cause),
+95:     // Implements StackTraceRecoverable for stack trace recovery
+96:     StackTraceRecoverable<FileEditException> {
+97: 
+98:     constructor(line: Int, detail: String) : this(line, detail, null)
+99: 
+100:     // Copies the line number and message details
+101:     override fun copyForStackTraceRecovery(): FileEditException =
+102:         FileEditException(line, detail, this)
+103:     }
+104: 
+105: fun main() {
+106:     val original = FileEditException(15, "Unexpected token")
+107: 
+108:     // Normally, you don't need to call this function directly unless you're testing its behavior
+109:     // The kotlinx.coroutines library invokes it automatically during stack trace recovery
+110:     val copy = original.copyForStackTraceRecovery()
+111: 
+112:     println(copy.message)
+113:     // When editing line 15: Unexpected token
+114: 
+115:     println(copy.cause == original)
+116:     // true
+117: }
+118: 
+119: For more information, see the feature's KEEP .
+120: 
+121: We would appreciate your feedback in YouTrack .
+122: 
+123: New functions to check collection elements for equality and uniqueness
+124: 
+125: Before Kotlin 2.4.20, if you wanted to check whether collection elements were all distinct or all equal, you had to use inefficient code patterns.
+126: 
+127: Kotlin 2.4.20 introduces experimental functions to fill this gap:
+128: 
+129: Function | Checks
+130: allDistinct() | Every value in the collection is unique.
+131: allDistinctBy() | Every object has a unique value for the selected property.
+132: allEqual() | Every value in the collection is the same.
+133: allEqualBy() | Every object has the same value for the selected property.
+134: 
+135: You can use these functions on collections, sequences, and arrays. They compare elements using structural equality just like other collection operations.
+136: 
+137: These functions are Experimental and require opt-in with the @OptIn(ExperimentalStdlibApi::class) annotation or the -opt-in=kotlin.ExperimentalStdlibApi compiler option:
+138: 
+139: @OptIn(ExperimentalStdlibApi::class)
+140: fun main() {
+141:     data class Response(
+142:         val participantId: String,
+143:         val answer: String,
+144:         val responseDate: String
+145:     )
+146: 
+147:     val responses = listOf(
+148:         Response("P001", "Yes", "2026-07-21"),
+149:         Response("P002", "Maybe", "2026-07-21"),
+150:         Response("P003", "No", "2026-07-21")
+151:     )
+152: 
+153:     // Checks if all participants gave the same answer
+154:     println(responses.allEqualBy { it.answer })
+155:     // false
+156: 
+157:     // Checks for duplicate participants
+158:     println(responses.allDistinctBy { it.participantId })
+159:     // true
+160: 
+161:     // Checks if all responses were submitted on the same date
+162:     println(responses.allEqualBy { it.responseDate })
+163:     // true
+164: 
+165:     val answers = responses.map { it.answer }
+166: 
+167:     // Checks if answers are identical
+168:     println(answers.allEqual())
+169:     // false
+170: 
+171:     // Checks if answers are distinct
+172:     println(answers.allDistinct())
+173:     // true
+174: }
+175: 
+176: We would appreciate your feedback in the KEEP .
+177: 
+178: New overloads for kotlin.test assertion functions
+179: 
+180: Kotlin 2.4.20 adds new overloads for kotlin.test assertion functions. They accept a lambda that generates error messages lazily, only when the assertion fails.
+181: 
+182: Previously, kotlin.test assertion functions like assertTrue() or assertEquals() accepted only pre-formatted error messages built on every assertion, even when the assertion succeeded, and the message was never actually used.
+183: 
+184: The new overloads align the kotlin.test API with JUnit 5 and accept a message supplier through a lambda, instead of a plain string. This improves performance, especially for the Power-assert compiler plugin , which generates detailed error messages for assertions.
+185: 
+186: The new overloads are available for the following assertion functions:
+187: 
+188: Function | Description
+189: assertTrue() / assertFalse() | Checks whether the value is true or false .
+190: assertEquals() / assertNotEquals() | Checks whether the values are equal or not.
+191: assertSame() / assertNotSame() | Checks whether the values refer to the same instance.
+192: assertIs() / assertIsNot() | Checks whether the value is of the specified type. For assertIs() , the function smart-casts it to that type.
+193: assertNull() | Checks whether the value is null .
+194: assertContains() | Checks whether the element (key, character, substring, or regex) is present in the collection, array, sequence, range, or map.
+195: assertContentEquals() | Checks whether the collections, sequences, or arrays contain equal elements in the same order.
+196: 
+197: To use the new API, explicitly opt in with the @OptIn(ExperimentalKotlinTestApi::class) annotation:
+198: 
+199: import kotlin.test.ExperimentalKotlinTestApi
+200: import kotlin.test.assertEquals
+201: import kotlin.test.assertTrue
+202: 
+203: @OptIn(ExperimentalKotlinTestApi::class)
+204: fun testValues(actual: Int, expected: Int, items: List<String>) {
+205:     // The message is built only if the assertion fails
+206:     assertTrue(actual > 0) { "Expected a positive value but got $actual" }
+207: 
+208:     // Avoids formatting the list unless the assertion fails
+209:     assertEquals(expected, actual) { "Unexpected value for items: ${items.joinToString()}" }
+210: }
+211: 
+212: For more information, see the feature's KEEP .
+213: 
+214: Kotlin/Native
+215: 
+216: Kotlin 2.4.20 brings automatic generation of Package.swift files for SwiftPM dependencies in Kotlin Multiplatform projects, new Swift export features, including support for sealed classes and cross-language inheritance, and improved incremental compilation.
+217: 
+218: Generated Package.swift for SwiftPM dependencies
+219: 
+220: When exporting an XCFramework that depends on SwiftPM packages, you must publish the resulting SwiftPM package for it to resolve correctly. To help with this, the assembleSharedXCFramework Gradle task now generates a Package.swift file to be distributed along with the XCFramework.
+221: 
+222: For details, see the SwiftPM export page .
+223: 
+224: New Swift export features
+225: 
+226: Sealed classes
+227: 
+228: Kotlin 2.4.20 adds support for sealed classes and interfaces to Swift export.
+229: 
+230: Previously, you had to write a default case for every switch statement over a sealed type. Now, sealed hierarchies defined in Kotlin are mapped to Swift enums, enabling exhaustive switch statements with full autocompletion in Xcode.
+231: 
+232: Swift export generates a sealedType() method on each sealed type. This method returns a Swift enum whose cases match the direct subclasses of the sealed hierarchy. You can nest these calls to match deeper levels of the hierarchy.
+233: 
+234: For example, declare a sealed interface with a class hierarchy in Kotlin:
+235: 
+236: // Kotlin
+237: sealed interface Shape
+238: 
+239: class Circle : Shape {
+240:     override fun toString(): String = "Circle"
+241: }
+242: 
+243: class Rectangle : Shape {
+244:     override fun toString(): String = "Rectangle"
+245: }
+246: 
+247: fun createCircle(): Shape = Circle()
+248: 
+249: On the Swift side, you can use an exhaustive switch without a default case:
+250: 
+251: // Swift
+252: let shape = createCircle()
+253: 
+254: let name = switch shape.sealedType() {
+255:     case let .circle(type): "It's a \(type.value)"
+256:     case let .rectangle(type): "It's a \(type.value)"
+257: }
+258: // name == "It's a Circle"
+259: 
+260: Because the switch is exhaustive, the compiler warns you if a new subclass is added to the sealed hierarchy, so you can handle it immediately instead of relying on a default case.
+261: 
+262: Cross-language inheritance in Swift export
+263: 
+264: Kotlin 2.4.20 introduces cross-language inheritance support in Swift export.
+265: 
+266: A common use case for this feature is the reverse import pattern, where you define a contract in Kotlin and provide platform-specific implementations on the Swift side. This is especially useful when you need to use pure Swift libraries that can't be directly imported into Kotlin.
+267: 
+268: To implement the pattern, declare a Kotlin superclass for the Swift implementation to inherit from and a Kotlin interface. Then implement this interface in Swift and pass the Swift object to Kotlin functions that accept that interface. For example, for the CryptoKit library:
+269: 
+270: On the Kotlin side, declare an interface, a function that accepts it, and an open base class:
+271: 
+272: // Kotlin
+273: interface CryptoProvider {
+274:     fun hashMD5(input: String): String
+275: }
+276: 
+277: fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+278: 
+279: open class SwiftBase
+280: 
+281: On the Swift side, inherit from the exported SwiftBase class, implement the interface using a pure Swift library, and pass the object back to Kotlin:
+282: 
+283: // Swift
+284: import CryptoKit
+285: 
+286: final class IosCryptoProvider: SwiftBase, CryptoProvider {
+287:     func hashMD5(input: String) -> String {
+288:         guard let data = input.data(using: .utf8) else { return "failed" }
+289:         return Insecure.MD5.hash(data: data).description
+290:     }
+291: }
+292: 
+293: let provider = IosCryptoProvider()
+294: 
+295: // Calls the Kotlin function, which calls hashMD5() back in Swift
+296: print(processHash(provider: provider, input: "Hello, world!"))
+297: 
+298: When Kotlin receives a Swift object, it treats it like an implementation of a regular interface, calling the Swift code directly.
+299: 
+300: For more details on Swift export, see our documentation .
+301: 
+302: Improved incremental compilation of klib artifacts
+303: 
+304: Kotlin 2.4.20 brings stabilization improvements to incremental compilation of klib artifacts, which is now in Beta .
+305: 
+306: This optimization was first introduced in Kotlin 1.9.20 and proved to drastically reduce compilation time for debug builds. Since then, we've fixed a number of bugs and improved performance.
+307: 
+308: To try out incremental compilation, add the following option to your gradle.properties file:
+309: 
+310: kotlin.incremental.native=true
+311: 
+312: We're actively collecting feedback and planning to enable incremental compilation by default for all projects in the next Kotlin releases. If you encounter any issues, please report them to our issue tracker .
+313: 
+314: Kotlin/Wasm
+315: 
+316: Kotlin 2.4.20 changes how Kotlin/Wasm handles top-level require() calls in @JsFun declarations, aligns companion object initialization order with JVM behavior, reduces binary size for functional interfaces, introduces new compilation modes, and adds support for Wasmtime as a runtime for the wasmWasi target in the Kotlin Gradle plugin.
+317: 
+318: Changes to top-level require() calls in @JsFun declarations
+319: 
+320: Kotlin/Wasm now reports an error when a @JsFun declaration uses the top-level require() function.
+321: 
+322: Previously, the compiler generated a require variable in the import-object.mjs file, allowing @JsFun declarations to call require() .
+323: 
+324: This behavior unintentionally exposed a compiler implementation detail. To support migration away from it, Kotlin/Wasm removes this generated require declaration, and the compiler now reports errors for such calls. For example:
+325: 
+326: // Reports an error
+327: @JsFun("(mod) => require(mod)")
+328: external fun loadModule(mod: String): JsAny
+329: 
+330: To prepare for this change, replace top-level require() calls in @JsFun declarations with the @JsModule annotation:
+331: 
+332: @JsModule("module")
+333: external val module: Module
+334: 
+335: external interface Module {
+336:     // Defines the expected module members
+337: }
+338: 
+339: For dynamic module loading, use the import() expression instead. Add the /* webpackIgnore: true */ magic comment to prevent webpack from parsing the dynamic import:
+340: 
+341: @JsFun("""
+342:     ((module) => () => module)(
+343:         await import(/* webpackIgnore: true */ "module")
+344:     )
+345: """)
+346: private external fun loadModuleDynamically(): JsAny?
+347: 
+348: You can also use the import() expression conditionally. For example, you can load a module only when running in Node.js:
+349: 
+350: @JsFun("""
+351:     ((module) => () => module)(
+352:         ((typeof process !== "undefined") && (process.release.name === "node"))
+353:             ? await import(/* webpackIgnore: true */ "module")
+354:             : null
+355:     )
+356: """)
+357: private external fun loadNodeModule(): JsAny?
+358: 
+359: If your project relies on dependencies that require a top-level require() function, add it as a property of globalThis as a workaround:
+360: 
+361: @JsFun("""
+362:     ((module) => {
+363:         globalThis.require = module.default.createRequire(import.meta.url)
+364:         return () => {}
+365:     })(await import("node:module"))
+366: """)
+367: external fun defineRequire()
+368: 
+369: If you run into any issues, share your feedback in our issue tracker .
+370: 
+371: Improved companion object initialization order
+372: 
+373: Kotlin/Wasm now initializes superclass companion objects before subclass companion objects, matching the JVM behavior. Previously, the initialization could be reversed, leading to inconsistent behavior across platforms.
+374: 
+375: The update improves cross-platform consistency and reduces platform-specific differences in class initialization behavior. It also enables correct handling of companion object initialization in deeper inheritance hierarchies, including cases where intermediate classes don't declare companion objects.
+376: 
+377: Support for Wasmtime in the Kotlin Gradle plugin
+378: 
+379: Kotlin 2.4.20 introduces support for Wasmtime as a runtime for the wasmWasi target in the Kotlin Gradle plugin.
+380: 
+381: Previously, the wasmWasi target supported only the Node.js runtime, which required a JavaScript bootstrap to run WASI applications. With Wasmtime support, you can now run Kotlin/Wasm applications on a standalone WebAssembly runtime.
+382: 
+383: To use Wasmtime as the runtime for the wasmWasi target, add wasmtime() to your Gradle build file:
+384: 
+385: kotlin {
+386:     wasmWasi {
+387:         wasmtime()
+388:     }
+389: }
+390: 
+391: We would appreciate your feedback in YouTrack .
+392: 
+393: New compilation modes
+394: 
+395: Kotlin 2.4.20 adds support for selecting a Kotlin/Wasm compilation mode, including new multi-module modes. Previously, the compiler used the monolith compilation mode, which compiles the project and its dependencies together and generates a single binary. This lets the compiler perform dead code elimination and produce the smallest output.
+396: 
+397: You can now select one of the following compilation modes:
+398: 
+399: Compilation mode | Compilation | Output | Optimization behavior
+400: monolith (default) | Compiles the project and its dependencies together. | A single binary | Removes unreachable declarations and applies optimizations for the entire program, including dependencies.
+401: multimodule-open-world | Compiles each module independently and recompiles only modules that change. | A separate, independent binary for each module | Doesn't apply cross-module optimizations, which results in larger binaries.
+402: multimodule-closed-world | Processes all modules in one invocation and recompiles only modules that change. | Separate binaries that depend on each other | Removes unreachable declarations but optimizes each Wasm binary independently.
+403: 
+404: To select a compilation mode, add the kotlin.wasm.compilationMode property to your gradle.properties file:
+405: 
+406: kotlin.wasm.compilationMode=multimodule-open-world
+407: 
+408: You can also configure Kotlin/Wasm to use closed-world multi-module compilation for development builds and monolith compilation for production builds. This reduces recompilation time during development and produces the smallest output for production builds.
+409: 
+410: To use this configuration, add the following property to your gradle.properties file:
+411: 
+412: kotlin.wasm.compilationMode=multimodule-closed-world-only-in-dev
+413: 
+414: We would appreciate your feedback in YouTrack .
+415: 
+416: Reduced binary size for lambdas and functional interfaces
+417: 
+418: Kotlin 2.4.20 changes how Kotlin/Wasm compiles lambdas and functional interfaces. Instead of generating separate anonymous classes, the compiler now generates functions and uses shared base classes.
+419: 
+420: Tests with the KotlinConf application show that this change reduces Wasm binary size by approximately 5–10%.
+421: 
+422: Because the change introduces more dynamic calls, it may affect runtime performance. If you experience any issues, report them in our issue tracker .
+423: 
+424: Kotlin/JS
+425: 
+426: Kotlin 2.4.20 improves exportability of data classes, introduces a new experimental DSL for browser testing, and adds support for exporting suspending lambdas as JavaScript async functions.
+427: 
+428: Consistent exportability of synthetic functions on exported data classes
+429: 
+430: Kotlin 2.4.20 fixes an issue which prevented the @JsExport.Ignore annotation from being properly applied to data class properties.
+431: 
+432: Previously, when you marked a data class with the @JsExport annotation, the compiler still reported warnings about the data class exportability because of the automatically generated copy() and componentN() functions. This happened even if the constructor and the properties were explicitly marked as ignored with @JsExport.Ignore .
+433: 
+434: For example, consider a Session data class exported to JavaScript that also has a reference to an internal DatabaseConnection type that isn't meant to be exported:
+435: 
+436: // Kotlin
+437: // An internal type that isn't exported to JavaScript
+438: class DatabaseConnection
+439: 
+440: @JsExport
+441: data class Session @JsExport.Ignore constructor(
+442:     val userId: String,
+443:     @JsExport.Ignore val connection: DatabaseConnection,
+444: )
+445: 
+446: Now that the issue is fixed, the compiler accounts for @JsExport.Ignore annotations, so Session 's synthetic copy() and componentN() functions no longer trigger warnings about the non-exported type DatabaseConnection . This aligns with the visibility rules introduced by the @ConsistentCopyVisibility and @ExposedCopyVisibility annotations .
+447: 
+448: A new DSL for browser testing
+449: 
+450: Kotlin 2.4.20 introduces a new experimental DSL for running Kotlin/JS tests in a browser environment.
+451: 
+452: Currently, the Kotlin Gradle plugin uses Karma as a browser launcher to run JavaScript tests across different browsers. The Karma project has been deprecated for two years now, which has led us to explore alternative ways to support browser testing.
+453: 
+454: The new DSL is intended to replace Karma as a manager of different tools under the hood and includes:
+455: 
+456: Playwright as a browser driver and a distribution manager that supports the Chromium, Firefox, and WebKit (Safari) browser engines.
+457: 
+458: Mocha as a test runner.
+459: 
+460: webpack as a bundler (will be replaced with Vite in future releases ).
+461: 
+462: To try out the new DSL for browser testing, add the opt-in test {} block inside browser {} for your Kotlin/JS target:
+463: 
+464: import org.jetbrains.kotlin.gradle.ExperimentalJsTestDsl
+465: import kotlin.time.Duration.Companion.seconds
+466: 
+467: kotlin {
+468:     js {
+469:         browser {
+470:             // Add and configure the new test {} block
+471:             @OptIn(ExperimentalJsTestDsl::class)
+472:             test {
+473:                 // Configure default timeout for all runners
+474:                 timeout = 2.seconds
+475:                 // Configure headless mode using Gradle providers
+476:                 headless = providers
+477:                     .environmentVariable("IS_IN_CI")
+478:                     .map { it.toBoolean() }
+479:                     .orElse(false)
+480:                 // Enable and configure Chromium test runner
+481:                 chromium {
+482:                     // Override the common timeout option
+483:                     timeout = 5.seconds
+484:                     // Add extra launch arguments
+485:                     launchArgs.add("--no-sandbox")
+486:                 }
+487:                 // Enable Firefox test runner
+488:                 firefox()
+489:                 // Enable WebKit test runner
+490:                 webkit()
+491:                 // Enable and configure an additional WebKit test runner
+492:                 webkit("noheadless") {
+493:                     // Set up custom options
+494:                     headless = false
+495:                 }
+496:             }
+497:         }
+498:     }
+499: }
+500: 
+501: The new DSL for browser testing is in active development. We would appreciate your feedback in YouTrack .
+502: 
+503: For more information, see Run tests in Kotlin/JS .
+504: 
+505: Support for exporting suspending lambdas as async functions
+506: 
+507: With Kotlin 2.4.20, you can now export suspending lambda expressions as JavaScript async functions.
+508: 
+509: Previously, there was no way to export declarations containing suspending lambdas from Kotlin/JS libraries. Now the Kotlin compiler automatically handles the bridging between Kotlin's suspend functions and JavaScript's native async / await model, which is useful for mixed Kotlin/TypeScript codebases.
+510: 
+511: To enable this feature, add the following compiler option to your build.gradle.kts file:
+512: 
+513: kotlin {
+514:     js {
+515:         compilations.all {
+516:             compileTaskProvider.configure {
+517:                 compilerOptions {
+518:                     freeCompilerArgs.add("-Xsuspend-lambda-exporting")
+519:                 }
+520:             }
+521:         }
+522:     }
+523: }
+524: 
+525: Then, mark the relevant declarations with @JsExport :
+526: 
+527: // Kotlin
+528: @JsExport
+529: class TaskRunner {
+530:     suspend fun runTask(task: suspend () -> String): String {
+531:         return task()
+532:     }
+533: }
+534: 
+535: From the TypeScript side, the suspending lambda appears as a regular async function:
+536: 
+537: // TypeScript
+538: import { TaskRunner } from "..."
+539: 
+540: const runner = new TaskRunner();
+541: const result = await runner.runTask(async () => "done");
+542: console.log(result); // "done"
+543: 
+544: For more information on the @JsExport annotation, see our documentation .
+545: 
+546: Gradle
+547: 
+548: Kotlin 2.4.20 is fully compatible with Gradle 7.6.3 through 9.7.0. You can also use Gradle versions up to the latest Gradle release. However, be aware that doing so may result in deprecation warnings, and some new Gradle features might not work.
+549: 
+550: Kotlin 2.4.20 also comes with an improved integration with the Problems API.
+551: 
+552: Improved reporting in Problems API
+553: 
+554: Kotlin 2.2.0 was the first release in which the Kotlin Gradle Plugin (KGP) integrated with Gradle's Problems API . Kotlin 2.4.0 added support for writing compiler messages to the Problems API for Kotlin/JVM .
+555: 
+556: Kotlin 2.4.20 adds compiler diagnostic IDs to the information that the compiler passes to the Problems API . It also groups diagnostics by these IDs, making it easier to identify the source of compilation problems.
+557: 
+558: Starting with Gradle 8.6, the KGP enables this integration by default. As the API is still evolving, use the most recent Gradle version to benefit from the latest improvements.
+559: 
+560: Build tools API
+561: 
+562: Kotlin 2.4.20 adds experimental support for Kotlin/JS, Kotlin/Wasm, and Kotlin metadata to the build tools API.
+563: 
+564: Support for Kotlin/JS, Kotlin/Wasm, and Kotlin metadata
+565: 
+566: In Kotlin 2.2.0 , the build tools API (BTA) became available for Kotlin/JVM. Kotlin 2.4.20 takes the next step toward BTA stabilization by adding support for new targets: Kotlin/JS, Kotlin/Wasm, and Kotlin metadata.
+567: 
+568: This makes the Kotlin Gradle plugin interact with the compiler more consistently. In some cases, you can also benefit from faster, more stable compilation.
+569: 
+570: The BTA is a universal API that acts as an abstraction layer between build systems and the Kotlin compiler ecosystem. It helps support Kotlin features and compatibility with the Kotlin compiler in available build tools.
+571: 
+572: In Kotlin 2.4.20, BTA is available as an opt-in for the new targets. To try it out, add the corresponding properties to your gradle.properties file:
+573: 
+574: kotlin.wasm.runViaBuildToolsApi=true
+575: kotlin.js.runViaBuildToolsApi=true
+576: kotlin.metadata.runViaBuildToolsApi=true
+577: 
+578: Starting with Kotlin 2.5.0, we plan to enable BTA in Kotlin/JS, Kotlin/Wasm, and Kotlin metadata by default.
+579: 
+580: If you're curious about the BTA proposal or want to share your feedback, see this KEEP .
+581: 
+582: Kotlin compiler
+583: 
+584: Kotlin 2.4.20 includes an update about the changed Kotlin runner command, kotlinr , and introduces an experimental Kotlin compiler native image.
+585: 
+586: Changed the Kotlin runner command from kotlin to kotlinr
+587: 
+588: The kotlinr command replaces kotlin as the Kotlin runner command to avoid a naming conflict with the kotlin command in the Kotlin Toolchain . The Kotlin runner also warns you when you use the kotlin command and recommends kotlinr instead.
+589: 
+590: Native image
+591: 
+592: Kotlin 2.4.20 features the first Experimental release of the Kotlin compiler native image. The native image provides a drop-in replacement for the standard kotlinc command-line tool, while offering faster startup time and higher performance.
+593: 
+594: To try out the native image, download the build from GitHub Releases .
+595: 
+596: The native image also bundles the following compiler plugins you can use with the -Xplugin or -Xcompiler-plugin CLI options:
+597: 
+598: Serialization
+599: 
+600: Compose compiler
+601: 
+602: All-open
+603: 
+604: no-arg
+605: 
+606: SAM with receiver
+607: 
+608: Assignment
+609: 
+610: Lombok
+611: 
+612: Power-assert
+613: 
+614: For more information on the Kotlin compiler native image, see its README .
+615: 
+616: Breaking changes and deprecations
+617: 
+618: This section highlights important breaking changes and deprecations. For a complete overview, see our Compatibility guide .
+619: 
+620: Since Apple is dropping support for its 32-bit watchOS targets, the watchosArm32 Kotlin/Native target is now deprecated. It's planned for removal in Kotlin 2.5.0 to ensure compatibility with Xcode 27.
+621: 
+622: Starting with Kotlin 2.4.20, the Kotlin/Native compiler prohibits AtomicFU atomic operations inside a public inline function or inside an internal inline function called from another file.
+623: 
+624: Kotlin 2.4.20 updates the npm dependency for webpack to 5.108.1. This can affect your project in two ways:
+625: 
+626: webpack has moved its built-in minimizer dependency from terser-webpack-plugin to the broader minimizer-webpack-plugin . Terser remains the default JavaScript minimizer, but if your project configures or depends on terser-webpack-plugin directly, you may need to update its configuration.
+627: 
+628: webpack no longer ignores import.meta when determining a JavaScript file's module type. If import.meta is present, webpack treats the file as an ES module, which can break files that also use CommonJS constructs. For Kotlin/JS, you can configure the target to use ES modules with the useEsModules() Gradle DSL . Kotlin/Wasm should work in most cases without additional configuration. If you encounter an import.meta error with Kotlin/Wasm, check whether your project's sources or a direct or transitive dependency uses import.meta . Update your own code as needed. If a dependency causes the issue, update it to a compatible version if one is available, or report the issue to the library maintainers.
+629: 
+630: Starting with Kotlin 2.4.20, Kotlin/Wasm deprecates the generated JavaScript wasmExports API. The compiler prohibits access to all exports except wasmExports.memory , which remains temporarily available with a warning. Use the kotlin.wasm.unsafe.wasmMemory property to access the module's WebAssembly.Memory object.
+631: 
+632: Documentation updates
+633: 
+634: Since the last release, we've created new pages and tutorials for the Kotlin ecosystem documentation and revamped existing ones:
+635: 
+636: Configure an iOS delivery pipeline – Set up continuous delivery for a Kotlin Multiplatform iOS app with TeamCity.
+637: 
+638: Compose Multiplatform updates:
+639: 
+640: Popups – Learn how to create and configure popups in Compose Multiplatform.
+641: 
+642: Window and dialog API v2 – Explore the new API for managing desktop windows and dialogs in Compose Multiplatform.
+643: 
+644: Tray and notifications – Learn how to add an application icon to the system tray and send system notifications in Compose Multiplatform for desktop.
+645: 
+646: Menu bar – Learn how to create a menu bar for a specific window in Compose Multiplatform for desktop.
+647: 
+648: Drag and drop – Handle platform-specific data when implementing drag and drop in Compose Multiplatform.
+649: 
+650: UIKit alternative for Liquid Glass – Explore an alternative approach to Liquid Glass that uses UIKit navigation instead of SwiftUI.
+651: 
+652: MCP server for AI agents – Learn how to use the MCP server in Compose Hot Reload to connect AI agents to your development workflow.
+653: 
+654: Caching with Spring – Learn how to add caching to a Spring application with new Kotlin examples.
+655: 
+656: Exposed IntelliJ IDEA plugin – Learn how to work with Exposed in IntelliJ IDEA using code completion, database-aware inspections, and live templates.
+657: 
+658: Kotlin serialization – Learn how to serialize Kotlin data, customize JSON structure and type representation, and work with more advanced serialization scenarios.
+659: 
+660: Flow and Flow operators – Learn how to create and collect cold and hot flows, handle exceptions, and use a wide range of flow operators.
+661: 
+662: Debug coroutines – Learn how to debug coroutines on the JVM using debug mode, stack trace recovery, and the debug agent.
+663: 
+664: Lincheck – Learn how model checking works in Lincheck, how to use operation execution options , and how to verify the test results.
+665: 
+666: kapt compiler plugin – Learn how to configure the kapt compiler plugin in Gradle, Maven, and the command-line compiler.
+667: 
+668: Code quality tools in Kotlin projects – Explore tools for analyzing JVM bytecode and Kotlin code.
+669: 
+670: Power-assert plugin with Maven – Learn how to use the Power-assert plugin to get more detailed test failure messages.
+671: 
+672: Multiple-round processing with KSP – Explore how KSP works across multiple processing rounds, including generated files, deferred symbols, and validation.
+673: 
+674: Non-denotable types – Learn about platform types , captured types , and intersection types in Kotlin.
+675: 
+676: Type aliases – Learn about type alias scope and visibility.
+677: 
+678: This expressions – Learn how implicit this is resolved and when to use this explicitly to refer to a receiver.
+679: 
+680: Strings – Learn about string templates, common string operations, building strings, and type conversion.
+681: 
+682: Packages and imports – Learn how to organize Kotlin code using packages and imports.

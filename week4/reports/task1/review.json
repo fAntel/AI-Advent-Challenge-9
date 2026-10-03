@@ -1,0 +1,539 @@
+{
+  "reviewer": "Implementing assistant; manual content and citation review, not DeepSeek grading",
+  "basis": "Saved Task0 source sections and full retained source snapshots, rather than presumed model knowledge. Expected facts were written before generation. No Kotlin/Swift examples were compiled. Missing means an expected fact is absent or only partly covered; incorrect means contradicted by the saved source. Unsupported does not automatically mean false.",
+  "assessments": [
+    {
+      "question_id": "q01",
+      "mode": "plain",
+      "answer_sha256": "d0c62fa10283cf194bab3b53e915e7b651598e9cf8a9234eee1d903094595620",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "incorrect",
+          "evidence": "Uses context(Logger) and calls context receivers the current experimental Kotlin 2.x feature. The snapshot instead introduces named context parameters (source lines 3–9)."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explains static call-site resolution by type in the lexical scope."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not mention ambiguity between compatible values at the same scope level (source line 63)."
+        }
+      ],
+      "unsupported_claims": "Material outdated guidance: recommends -Xcontext-receivers and the old receiver syntax without identifying the replacement. The claimed historical introduction date is not established by the reviewed guide.",
+      "citations": "Not applicable: no evidence supplied or citations requested to invented references."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag",
+      "answer_sha256": "da4c2bc5f00726eb2b408c39f0fd9c21c26ef824eb45a9c274a1b4b935d76434",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Uses context(users: UserService), matching source lines 9–21."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explicitly says resolution happens at the call site by type."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Explicitly explains ambiguity at the same scope level."
+        }
+      ],
+      "unsupported_claims": "No material unsupported factual claim found. The serviceA example contains an ellipsis and is illustrative, not runnable as printed.",
+      "citations": "All used references [1], [3], [5] identify supplied chunks. [5] supports named syntax and replacement of receivers; [3] supports resolution/ambiguity and context blocks; [1] supports _ and contextOf. Unrelated chunks [2] and [4] are correctly unused."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag",
+      "answer_sha256": "dcafb6ab63fe4fa2bf0ee0a6df1644849eb0731af65f0ca18ab8a7594d1ef4b0",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "States common source set and no implementation."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explicitly includes intermediate iosMain shared by two iOS targets."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Covers package and target coverage, but never explicitly explains matching signatures, which the complete source mentions at line 35. Its example demonstrates one signature only."
+        }
+      ],
+      "unsupported_claims": "No material unsupported claim found. The every-platform-source-set wording is qualified by the earlier intermediate-source-set explanation. The Beta caveat is supported by the supplied class section.",
+      "citations": "References [1]–[5] all resolve to supplied chunks and support the associated claims about placement, package matching, compiler merging, Beta status and annotation aliases. Lack of retrieved signature detail is a coverage gap, not a fabricated citation."
+    },
+    {
+      "question_id": "q11",
+      "mode": "plain",
+      "answer_sha256": "f0ed0834a073ef230fea8a47ae4e0844469321937c9ab296aa4561a9aaca043c",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Places expect in commonMain; its expect function and class examples have no implementation, although the no-body rule is not stated explicitly."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Includes platform and intermediate shared source sets."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Explicitly lists matching package/name, parameter/return types and target coverage."
+        }
+      ],
+      "unsupported_claims": "The broad claim that contract-relevant modifiers including tailrec must match is not established by the reviewed source. Several finer signature/default/modifier rules go beyond the saved matching-signature guidance; this review does not treat them as independently verified compiler rules.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q12",
+      "mode": "plain",
+      "answer_sha256": "cad2a3a321787f0fd0667ff6605a4b4cec2a0e1796d8b208b11e9b10db2c2ce9",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Explicitly recommends actual typealias in the JVM implementation and demonstrates AtomicInteger."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Requires matching constructors and members and says missing/incompatible API fails."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not mention that the alias must share the expect declaration package."
+        }
+      ],
+      "unsupported_claims": "Claims the feature remains stable, whereas the complete saved guide labels expected/actual classes Beta (lines 196–198). The final-class limitation is too broad unless inheritance is actually required; aliasing itself does not require subclassing.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag",
+      "answer_sha256": "9a2176815f1dcde64fac6dd790a67b733733bd1cdaca7d93cb1c5efe1635902b",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Recommends actual typealias and shows commonMain/jvmMain placement."
+        },
+        {
+          "id": "f2",
+          "status": "incorrect",
+          "evidence": "Says any API beyond a plain name requires an actual class. The complete source explicitly aliases MyDate with getYear/getMonth/getDayOfMonth members to LocalDate (lines 322–333). Existing compatible members do satisfy expect."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Explicitly states same-package alias with platform type elsewhere."
+        }
+      ],
+      "unsupported_claims": "The claimed restriction to simple name mapping is false against the reference. It also says visibility expansion requires suppression without the Kotlin 2.0 caveat at source line 343; retrieved [4] omits that caveat. Example changes the source expect enum class Month into expect class Month without explaining compatibility.",
+      "citations": "All numeric labels resolve. [3] supports alias and package placement. [1]/[2] show inheritance as an option but do NOT support the claimed prohibition on aliases with members. [4] contains a suppression example but cannot establish that suppression is always required in the current version. Citation presence therefore overstates support."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag",
+      "answer_sha256": "346034e32c9f97d066027d5cf807a04a5d8a767eb8c7989d8dddb3a1b83e1b69",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Separates non-suspend @Throws mapping into NSError and Swift throws."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explicitly states listed classes/subclasses propagate and other exceptions terminate."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Explicitly covers completion-handler error parameter, CancellationException-only propagation without @Throws, and no non-suspend propagation."
+        }
+      ],
+      "unsupported_claims": "Core explanation is supported. The IOException example needs a Native-compatible exception definition/import; the supplied IOException snippet came from the JVM page, so the printed example is not independently validated as Native code.",
+      "citations": "Every citation is [1], which identifies the supplied Errors and exceptions section and supports the associated propagation rules. The general mapping applied to the example is supported, but [1] does not establish availability of an IOException type on Native."
+    },
+    {
+      "question_id": "q13",
+      "mode": "plain",
+      "answer_sha256": "62b6a2c61063e85ff577d188001e957c5b859b9959a4e6ccfb9bbbe2e3141bf4",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Correctly describes the annotated non-suspend NSError/Swift throws mapping and shows examples."
+        },
+        {
+          "id": "f2",
+          "status": "missing",
+          "evidence": "Omits the restriction to listed exception classes and subclasses; does not say an unlisted exception from an annotated function terminates."
+        },
+        {
+          "id": "f3",
+          "status": "incorrect",
+          "evidence": "Later mentions suspend completion handlers, but blanket statements that unannotated functions cannot propagate omit and contradict the CancellationException exception. Opening bullet also conflates suspend callbacks with ordinary throws mapping."
+        }
+      ],
+      "unsupported_claims": "NSError userInfo class/message details are not established by the reviewed section. The IOException example similarly requires an appropriate Native exception type.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q14",
+      "mode": "plain",
+      "answer_sha256": "472e21d889734264c02ec0fa4eb4e570a0882ef7ad859d19c44f69246c25afa6",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "incorrect",
+          "evidence": "Calls completion handlers the default Swift export mapping; the designated direct Swift export guide maps suspend functions/types to native async."
+        },
+        {
+          "id": "f2",
+          "status": "missing",
+          "evidence": "Does not show try await usage; instead supplies a callback example and an alleged optional annotation route."
+        },
+        {
+          "id": "f3",
+          "status": "incorrect",
+          "evidence": "Conflates direct Swift export with the Objective-C bridge and never states Alpha status."
+        }
+      ],
+      "unsupported_claims": "The alleged @SwiftAsync annotation, -Xswift-async flag and Kotlin 1.7.20 introduction are unsupported by the saved sources. The Objective-C guide instead discusses Swift 5.5 async calling support (lines 259–267); it does not validate these claimed Kotlin controls.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag",
+      "answer_sha256": "f65c2b4feb37d9d007aefcd0ed6330b09735c61da261c64d4067111faa4fb565",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Explicitly maps both suspend functions and functional types to native async."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Shows let msg = try await hello(), matching the guide."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Names the Swift export feature and its Alpha status, with the direct mapping rather than callbacks."
+        }
+      ],
+      "unsupported_claims": "The full Kotlin 2.4.0 release section at lines 588–590 confirms Alpha status and improved concurrency. Dispatcher details match the full guide. No material factual contradiction found.",
+      "citations": "Used [1], [2], [5] all identify supplied chunks. Async/try-await and dispatcher claims are supported. However [2] starts at line 592, after the Alpha statement at 588–590, so the Alpha/version-status attribution is not supported by that supplied chunk, even though the complete source confirms it."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag",
+      "answer_sha256": "3c379563f483ae9e172dd9c2fbb425e0889bfb9a08ca5066f5601a1ba59e52fb",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Recommends external declarations and gives function/class examples."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Says no Kotlin implementation is provided and JavaScript must already supply it."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not explain the package-level restriction, inherited external modifier, or definedExternally defaults."
+        }
+      ],
+      "unsupported_claims": "Overgeneralizes the specific ExperimentalWasmJsInterop opt-in in a nativeInvoke example into a statement that Wasm external interop is experimental. The full Wasm page labels Kotlin/Wasm Beta and describes this particular callable-object facility as temporary. It adds platform-specific material although the designated source is Kotlin/JS.",
+      "citations": "Both [1] and [4] identify supplied Wasm chunks. [1] supports describing existing JS APIs, but is only a three-line introductory fragment, not the complete no-body rules. [4] supports the callable-object example and its opt-in; it does not establish that all external interop requires that opt-in."
+    },
+    {
+      "question_id": "q16",
+      "mode": "plain",
+      "answer_sha256": "1626cf9e7e23386bba211b6c1644a81af56b6581801a63d7ac568342581cca86",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Correctly recommends external declarations for JS-provided implementations."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explicitly says members have no bodies and Kotlin emits no implementation."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Shows definedExternally and implicit external members in examples, but omits the package-level restriction and does not explain inherited external status."
+        }
+      ],
+      "unsupported_claims": "The Kotlin 1.x versus 2.x plugin distinction is not supported by the source and is unnecessary to answer the question. JsModule/JsNonModule specifics extend beyond the designated section; examples were not compiled, including the declared toString member.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q17",
+      "mode": "plain",
+      "answer_sha256": "4ecc8e7874c849629a6ed313ce63a5b8e235f81a654c0bc17b987cdcd42a5003",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "incorrect",
+          "evidence": "Replaces JsReference with directly exported Kotlin classes/objects. The full Wasm guide allows only package-level function exports and requires JsReference for Kotlin objects (lines 402–406)."
+        },
+        {
+          "id": "f2",
+          "status": "incorrect",
+          "evidence": "Factory returns Counter directly, not Counter().toJsReference()."
+        },
+        {
+          "id": "f3",
+          "status": "incorrect",
+          "evidence": "Calls counter.increment()/getValue() from JS rather than passing an opaque handle to Kotlin helpers and unwrapping with get()."
+        }
+      ],
+      "unsupported_claims": "Confuses Kotlin/JS class exports with Kotlin/Wasm. The claimed strong-reference/GC lifetime guarantee is not established by the reviewed source. Named exports also conflict with the saved Wasm default-export-object description.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag",
+      "answer_sha256": "1599cd6107e70a080d12e0e6ec4e5e707fbbee590bcbc0398e2d3cebbe6a0917",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Uses JsReference<T> and explains an opaque empty frozen JS object."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Factory returns User(name).toJsReference()."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Exported setUserName accepts the handle and calls user.get(); JS calls the helper."
+        }
+      ],
+      "unsupported_claims": "No material unsupported claim found. Explicitly avoids a historical availability guarantee, consistent with the snapshot caveat.",
+      "citations": "All cited labels [1], [5] resolve. [1] supplies handle creation, opacity and get(); [5] supplies the JS helper usage. They support the associated explanation and examples."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag",
+      "answer_sha256": "30e0935913518f65ea5bf4c0453ccec23aa89dc6c8ca981775c310b62fc6ed5e",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Gives Kotlin 2.4.0 for stabilization."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explicitly retains experimental status and opt-in for V4/V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not mention the 2.0.20 experimental introduction. This is background completeness, not a wrong answer to the stabilization-date question."
+        }
+      ],
+      "unsupported_claims": "No material unsupported claim found. Exact generateV4/generateV7 names are present in supplied chunk [4].",
+      "citations": "The used label [1] supports stabilization and experimental exceptions. It does not spell out the function names, but supplied unused [4] does; minor citation granularity gap rather than a fabricated API."
+    },
+    {
+      "question_id": "q18",
+      "mode": "plain",
+      "answer_sha256": "4e6fb3ed912205515a963e30b4f92eb2f45f5dc22e5b83824278e078b7fafb92",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "incorrect",
+          "evidence": "Says stable in 2.0.20; the snapshot says stable in 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "missing",
+          "evidence": "Omits V4/V7 experimental exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "incorrect",
+          "evidence": "Claims experimental introduction in 1.9.0; source says 2.0.20."
+        }
+      ],
+      "unsupported_claims": "Conflates introduction and stabilization and invents an earlier introduction version relative to the source. The calendar release date is not verified by the reviewed section.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q19",
+      "mode": "plain",
+      "answer_sha256": "bf30c4afa9b52025ef52143020d67b3bb96e6b01c8ceb0f9ffb4e1d0a73d4d54",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Correctly identifies 2.4.20 support for suspending callback parameters with Promise-returning JavaScript callbacks."
+        },
+        {
+          "id": "f2",
+          "status": "incorrect",
+          "evidence": "Says available by default in 2.4.20, contradicting the documented -Xsuspend-lambda-exporting requirement."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Uses @JsExport and describes automatic suspend/Promise bridging."
+        }
+      ],
+      "unsupported_claims": "The default-enabled assertion is material and incorrect against the snapshot. Its non-suspend runLater stub does not demonstrate the coroutine context needed to invoke block; the exact generated TypeScript signature and adapter internals are not verified in the source.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag",
+      "answer_sha256": "f0f944dc629b811972fc4c4573e7aa38beb74f6d700ce6866c861300425c3675",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Identifies the 2.4.20 suspending-lambda async export feature."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Gives -Xsuspend-lambda-exporting in compilerOptions."
+        },
+        {
+          "id": "f3",
+          "status": "satisfied",
+          "evidence": "Uses the documented @JsExport TaskRunner and async/await example."
+        }
+      ],
+      "unsupported_claims": "Core guidance is supported. The historical 2.3.0 suspend-function comparison omits that feature’s own enabling flag, which appears in the complete release section immediately after the retrieved [4] chunk. This does not change the correctly stated 2.4.20 lambda flag.",
+      "citations": "Labels [1], [3], [4], [5] all resolve and support their main associated claims: introduction, enabling flag, bridge example and earlier suspend-function support. [4] is truncated before its own enablement caveat."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag",
+      "answer_sha256": "f4e7361ddfc2d9f350f374ee4c56a42a8375abe513df5bd2653da5d4ccbe2c97",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Names cross-language inheritance in response to the explicitly versioned question."
+        },
+        {
+          "id": "f2",
+          "status": "satisfied",
+          "evidence": "Explains Swift subclasses an exported Kotlin open class and implements Kotlin interfaces."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not describe passing the Swift instance back to a Kotlin function accepting the interface. The direct feature-name question is nevertheless answered."
+        }
+      ],
+      "unsupported_claims": "No material unsupported claim found; answer is brief and stays within the retrieved section.",
+      "citations": "The sole used label [1] identifies the exact supplied 2.4.20 cross-language inheritance section and supports both sentences."
+    },
+    {
+      "question_id": "q20",
+      "mode": "plain",
+      "answer_sha256": "e86f22788898005e88cadc9630bc04215e202a9c0132f77a7e5a8026b359772c",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "satisfied",
+          "evidence": "Identifies Swift subclassing exported Kotlin open classes in 2.4.20, although it does not use the exact cross-language inheritance name."
+        },
+        {
+          "id": "f2",
+          "status": "missing",
+          "evidence": "Shows a Kotlin base and Swift subclass but omits the Kotlin interface part of the documented reverse-import pattern."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not pass the Swift implementation back to Kotlin through the interface."
+        }
+      ],
+      "unsupported_claims": "The -Xbinary=objcExportSubclassing=true flag is not supported by the saved Swift export section. Speculation that this is stable or enabled by default in some 2.4.x versions is not established by the source; a cutoff disclaimer does not substantiate it.",
+      "citations": "Not applicable: plain answer has no supplied evidence."
+    }
+  ],
+  "pairs": [
+    {
+      "question_id": "q01",
+      "outcome": "improved",
+      "evidence": "Plain uses old context(Logger) receivers and misses ambiguity. RAG uses context(users: UserService), type-based call-site matching and same-scope ambiguity; all three expected facts are covered."
+    },
+    {
+      "question_id": "q11",
+      "outcome": "mixed",
+      "evidence": "Both explain common/platform/intermediate placement. Plain explicitly covers signature matching but adds unsupported fine-grained modifier rules. RAG stays closer to source text yet omits explicit signature matching. Neither dominates on both completeness and grounding."
+    },
+    {
+      "question_id": "q12",
+      "outcome": "regressed",
+      "evidence": "Plain correctly says an existing class must already provide compatible members. RAG falsely limits actual typealias to name-only declarations and prescribes inheritance when expect has any members. Adding same-package guidance does not offset this core error."
+    },
+    {
+      "question_id": "q13",
+      "outcome": "improved",
+      "evidence": "RAG supplies the listed-exception/subclass restriction and CancellationException exception for suspend calls. Plain omits both and overgeneralizes unannotated-function termination."
+    },
+    {
+      "question_id": "q14",
+      "outcome": "improved",
+      "evidence": "Plain confuses direct Swift export with callbacks and proposes unsupported @SwiftAsync/-Xswift-async controls. RAG gives native async and try await correctly. Its Alpha statement is true in the complete source but not supported by cited chunk [2]."
+    },
+    {
+      "question_id": "q16",
+      "outcome": "largely unchanged",
+      "evidence": "Both correctly recommend external with no Kotlin implementation; both miss part of the detailed declaration rules. RAG again retrieves Wasm neighbors instead of the designated Kotlin/JS section, adding an overbroad experimental-status claim. Plain adds unverified plugin-version guidance. No clear core-answer gain."
+    },
+    {
+      "question_id": "q17",
+      "outcome": "improved",
+      "evidence": "Plain wrongly exports a Kotlin class directly and invokes methods from JS. RAG uses JsReference, toJsReference(), opaque JS handles and exported helpers calling get(), matching the Wasm guide."
+    },
+    {
+      "question_id": "q18",
+      "outcome": "improved",
+      "evidence": "Plain says stable in 2.0.20 and introduced in 1.9.0; the source says introduced in 2.0.20 and stable in 2.4.0. RAG gives the correct stability release and V4/V7 exceptions, though it omits introduction history."
+    },
+    {
+      "question_id": "q19",
+      "outcome": "improved",
+      "evidence": "Both identify the lambda export feature. Plain claims it works by default; RAG includes the required -Xsuspend-lambda-exporting flag and documented @JsExport/async example."
+    },
+    {
+      "question_id": "q20",
+      "outcome": "improved",
+      "evidence": "Both identify Swift inheritance. RAG accurately names cross-language inheritance and includes interfaces alongside the open base class; plain adds an unsupported flag and stability/default speculation. Both omit passing the Swift implementation back into Kotlin."
+    }
+  ],
+  "summary": "My review found **7 improvements, 1 regression, 1 mixed result and 1 largely unchanged result** with RAG. The strongest gains correct outdated context syntax, Swift export mapping, Wasm object handling, UUID stabilization and the required suspending-lambda export flag. RAG is not uniformly better: q12 invents a restriction on actual typealias despite citing sources. Citation labels all resolve, but some cited chunks do not support the full attached claim (notably q12 and the Alpha claim in q14). These are judgments about this one selected run against the saved corpus, not a general accuracy estimate."
+}

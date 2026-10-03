@@ -1,0 +1,224 @@
+1: Use JavaScript code from Kotlin
+2: 
+3: Kotlin was first designed for easy interoperation with the Java platform: it sees Java classes as Kotlin classes, and Java sees Kotlin classes as Java classes.
+4: 
+5: However, JavaScript is a dynamically typed language, which means it does not check types at compile time. You can freely talk to JavaScript from Kotlin via dynamic types. If you want to use the full power of the Kotlin type system, you can create external declarations for JavaScript libraries which will be understood by the Kotlin compiler and the surrounding tooling.
+6: 
+7: Inline JavaScript
+8: 
+9: You can inline JavaScript code into your Kotlin code using the js() function:
+10: 
+11: fun jsTypeOf(o: Any): String {
+12:     return js("typeof o")
+13: }
+14: 
+15: JavaScript code inlining has full support for ES2015 features , including:
+16: 
+17: const and let variable declarations
+18: 
+19: ES classes
+20: 
+21: Generators
+22: 
+23: Lambdas ( arrow functions )
+24: 
+25: Spread and rest operators
+26: 
+27: Template strings
+28: 
+29: Because the parameter of js is parsed at compile time and translated to JavaScript code "as-is", it must be a string constant. So, the following code is incorrect:
+30: 
+31: fun jsTypeOf(o: Any): String {
+32:     return js(getTypeof() + " o") // Error: Argument must be a string constant
+33:     // The compiler cannot evaluate string concatenations
+34: }
+35: 
+36: fun getTypeof() = "typeof"
+37: 
+38: Instead, for example to inline the rest operator, use a string constant:
+39: 
+40: fun runSumExample() {
+41:     val sum = js("(...nums) => nums.reduce((a, b) => a + b, 0)")
+42:     println(sum(1, 2, 3, 4))
+43: }
+44: 
+45: Invoking js() returns a result of dynamic type, which doesn't provide type safety at compile time.
+46: 
+47: external modifier
+48: 
+49: To tell Kotlin that a certain declaration is written in pure JavaScript, you should mark it with the external modifier. When the compiler sees such a declaration, it assumes that the implementation for the corresponding class, function or property is provided externally (by the developer or via an npm dependency ), and therefore does not try to generate any JavaScript code from the declaration. This is also why external declarations can't have a body. For example:
+50: 
+51: external fun alert(message: Any?): Unit
+52: 
+53: external class Node {
+54:     val firstChild: Node
+55: 
+56:     fun append(child: Node): Node
+57: 
+58:     fun removeChild(child: Node): Node
+59: 
+60:     // etc
+61: }
+62: 
+63: external val window: Window
+64: 
+65: Note that the external modifier is inherited by nested declarations. This is why in the example Node class, there is no external modifier before member functions and properties.
+66: 
+67: The external modifier is only allowed on package-level declarations. You can't declare an external member of a non- external class.
+68: 
+69: Declare (static) members of a class
+70: 
+71: In JavaScript, you can define members either on a prototype or a class itself:
+72: 
+73: function MyClass() { ... }
+74: MyClass.sharedMember = function() { /* implementation */ };
+75: MyClass.prototype.ownMember = function() { /* implementation */ };
+76: 
+77: There is no such syntax in Kotlin. However, in Kotlin we have companion objects. Kotlin treats companion objects of external classes in a special way: instead of expecting an object, it assumes members of companion objects to be members of the class itself. MyClass from the example above can be described as follows:
+78: 
+79: external class MyClass {
+80:     companion object {
+81:         fun sharedMember()
+82:     }
+83: 
+84:     fun ownMember()
+85: }
+86: 
+87: Declare parameters with default values
+88: 
+89: If you are writing an external declaration for a JavaScript function which has a parameter with a default value, use definedExternally . This delegates the generation of the default values to the JavaScript function itself:
+90: 
+91: external fun myFunWithOptionalArgs(
+92:     x: Int,
+93:     y: String = definedExternally,
+94:     z: String = definedExternally
+95: )
+96: 
+97: With this external declaration, you can call myFunWithOptionalArgs with one required argument and two optional arguments, where the default values are calculated by the JavaScript implementation of myFunWithOptionalArgs .
+98: 
+99: Extend JavaScript classes
+100: 
+101: You can easily extend JavaScript classes as if they were Kotlin classes. Just define an external open class and extend it by a non- external class. For example:
+102: 
+103: open external class Foo {
+104:     open fun run()
+105:     fun stop()
+106: }
+107: 
+108: class Bar : Foo() {
+109:     override fun run() {
+110:         window.alert("Running!")
+111:     }
+112: 
+113:     fun restart() {
+114:         window.alert("Restarting")
+115:     }
+116: }
+117: 
+118: There are some limitations:
+119: 
+120: When a function of an external base class is overloaded by signature, you can't override it in a derived class.
+121: 
+122: You can't override a function including parameters with default values.
+123: 
+124: Non-external classes can't be extended by external classes.
+125: 
+126: external interfaces
+127: 
+128: JavaScript does not have the concept of interfaces. When a function expects its parameter to support two methods foo and bar , you would just pass in an object that actually has these methods.
+129: 
+130: You can use interfaces to express this concept in statically typed Kotlin:
+131: 
+132: external interface HasFooAndBar {
+133:     fun foo()
+134: 
+135:     fun bar()
+136: }
+137: 
+138: external fun myFunction(p: HasFooAndBar)
+139: 
+140: A typical use case for external interfaces is to describe settings objects. For example:
+141: 
+142: external interface JQueryAjaxSettings {
+143:     var async: Boolean
+144: 
+145:     var cache: Boolean
+146: 
+147:     var complete: (JQueryXHR, String) -> Unit
+148: 
+149:     // etc
+150: }
+151: 
+152: fun JQueryAjaxSettings(): JQueryAjaxSettings = js("{}")
+153: 
+154: external class JQuery {
+155:     companion object {
+156:         fun get(settings: JQueryAjaxSettings): JQueryXHR
+157:     }
+158: }
+159: 
+160: fun sendQuery() {
+161:     JQuery.get(JQueryAjaxSettings().apply {
+162:         complete = { (xhr, data) ->
+163:             window.alert("Request complete")
+164:         }
+165:     })
+166: }
+167: 
+168: External interfaces have some restrictions:
+169: 
+170: They can't be used on the right-hand side of is checks.
+171: 
+172: They can't be passed as reified type arguments.
+173: 
+174: They can't be used in class literal expressions (such as I::class ).
+175: 
+176: as casts to external interfaces always succeed. Casting to external interfaces produces the "Unchecked cast to external interface" compile time warning. The warning can be suppressed with the @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE") annotation.
+177: 
+178: IntelliJ IDEA can also automatically generate the @Suppress annotation. Open the intentions menu via the light bulb icon or Alt-Enter, and click the small arrow next to the "Unchecked cast to external interface" inspection. Here, you can select the suppression scope, and your IDE will add the annotation to your file accordingly.
+179: 
+180: Casts
+181: 
+182: In addition to the "unsafe" cast operator as , which throws a ClassCastException in case a cast is not possible, Kotlin/JS also provides unsafeCast<T>() . When using unsafeCast , no type checking is done at all during runtime. For example, consider the following two methods:
+183: 
+184: fun usingUnsafeCast(s: Any) = s.unsafeCast<String>()
+185: fun usingAsOperator(s: Any) = s as String
+186: 
+187: They will be compiled accordingly:
+188: 
+189: function usingUnsafeCast(s) {
+190:     return s;
+191: }
+192: 
+193: function usingAsOperator(s) {
+194:     var tmp$;
+195:     return typeof (tmp$ = s) === 'string' ? tmp$ : throwCCE();
+196: }
+197: 
+198: Equality
+199: 
+200: Kotlin/JS has particular semantics for equality checks compared to other platforms.
+201: 
+202: In Kotlin/JS, the Kotlin referential equality operator ( === ) always translates to the JavaScript strict equality operator ( === ).
+203: 
+204: The JavaScript === operator checks not only that two values are equal but also that the types of these two values are equal:
+205: 
+206: fun main() {
+207:    val name = "kotlin"
+208:    val value1 = name.substring(0, 1)
+209:    val value2 = name.substring(0, 1)
+210: 
+211:    println(value1 === value2)
+212:    // Prints 'true' on Kotlin/JS
+213:    // Prints 'false' on other platforms
+214: }
+215: 
+216: Also, in Kotlin/JS, the Byte , Short , Int , Float , and Double numeric types are all represented with the Number JavaScript type in runtime. Therefore, the values of these five types are indistinguishable:
+217: 
+218: fun main() {
+219:    println(1.0 as Any === 1 as Any)
+220:    // Prints 'true' on Kotlin/JS
+221:    // Prints 'false' on other platforms
+222: }
+223: 
+224: For more information about equality in Kotlin, see the Equality documentation.

@@ -1,0 +1,473 @@
+1: Interoperability with Swift using Swift export
+2: 
+3: Kotlin's interoperability with Swift through Swift export is currently in Alpha. Swift export allows you to export Kotlin sources directly and call Kotlin code from Swift idiomatically, eliminating the need for Objective-C headers.
+4: 
+5: Swift export makes multiplatform development for Apple targets more streamlined. For example, if you have a Kotlin module with top-level functions, Swift export enables clean, module-specific imports, removing the confusing Objective-C underscores and mangled names.
+6: 
+7: Current Swift export features are:
+8: 
+9: Multi-module support . Each Kotlin module is exported as a separate Swift module, simplifying function calls.
+10: 
+11: Package support . Kotlin packages are explicitly preserved during export, avoiding naming conflicts in the generated Swift code.
+12: 
+13: Type aliases . Kotlin type aliases are exported and preserved in Swift, improving readability.
+14: 
+15: Enhanced nullability for primitives . Unlike Objective-C interop, which required boxing types like Int? into wrapper classes like KotlinInt to preserve nullability, Swift export converts nullability information directly.
+16: 
+17: Overloads . You can call Kotlin's overloaded functions in Swift without ambiguity.
+18: 
+19: Flattened package structure . You can translate Kotlin packages into Swift enums, removing the package prefix from generated Swift code.
+20: 
+21: Module name customization . You can customize the resulting Swift module names in the Gradle configuration of your Kotlin project.
+22: 
+23: Concurrency support . You can seamlessly call suspending Kotlin code from Swift and export kotlinx.coroutines flows as Swift's AsyncSequence out of the box.
+24: 
+25: Enable Swift export
+26: 
+27: Swift export is currently in Alpha and still incomplete, so breaking changes are expected. To try it out, configure the build file in your Kotlin project and set up Xcode to integrate Swift export.
+28: 
+29: Configure Kotlin project
+30: 
+31: You can use the following build file in your project as a starting point for setting up Swift export:
+32: 
+33: // build.gradle.kts
+34: kotlin {
+35: 
+36:     iosArm64()
+37:     iosSimulatorArm64()
+38: 
+39:     swiftExport {
+40:         // Set the root module name
+41:         moduleName = "Shared"
+42: 
+43:         // Set the collapse rule
+44:         // Removes package prefix from generated Swift code
+45:         flattenPackage = "com.example.sandbox"
+46: 
+47:         // Configure external modules export
+48:         export(project(":subproject")) {
+49:             // Set the name for the exported module 
+50:             moduleName = "Subproject"
+51:             // Set the collapse rule for the exported dependency 
+52:             flattenPackage = "com.subproject.library"
+53:         }
+54: 
+55:         // Provide compiler arguments to link tasks
+56:         configure {
+57:             freeCompilerArgs.add("-Xexpect-actual-classes")
+58:         }
+59:     }
+60: }
+61: 
+62: The Kotlin compiler automatically generates all the necessary files (including swiftmodule files, static .a library, a header file, and a modulemap file) and copies them into the app's build directory, which you can access from Xcode.
+63: 
+64: You can also clone our public sample with Swift export already set up.
+65: 
+66: Configure Xcode project
+67: 
+68: To configure Xcode to integrate Swift export into your project:
+69: 
+70: In Xcode, open the project settings.
+71: 
+72: On the Build Phases tab, locate the Run Script phase with the embedAndSignAppleFrameworkForXcode task.
+73: 
+74: Replace the script with the embedSwiftExportForXcode task in the run script phase:
+75: 
+76: ./gradlew :<Shared module name>:embedSwiftExportForXcode
+77: 
+78: Build the project. The build generates Swift modules in the output directory.
+79: 
+80: Current limitations
+81: 
+82: Swift export currently works only in projects that use direct integration to connect the iOS framework to the Xcode project. This is a standard configuration for Kotlin Multiplatform projects created with the Kotlin Multiplatform plugin in IntelliJ IDEA or through the web wizard .
+83: 
+84: Other known issues:
+85: 
+86: Types that inherit from List , Set , or Map are ignored during the export ( KT-80416 ).
+87: 
+88: Inheritors of List , Set , or Map cannot be instantiated on the Swift side ( KT-80417 ).
+89: 
+90: When exported to Swift, Kotlin generic type parameters are type-erased to their upper bounds.
+91: 
+92: No IDE migration tips or automation are available.
+93: 
+94: When using declarations that require opt-in, you must add an explicit optIn compiler option at the module level to your Gradle build file. For example, for the kotlinx.datetime library:
+95: 
+96: swiftExport {
+97:     moduleName = "Shared"
+98: 
+99:     export("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0") {
+100:         moduleName = "KotlinDateTime"
+101:         flattenPackage = "kotlinx.datetime"
+102:     }
+103: }
+104: 
+105: // Add a separate opt-in block at the module level
+106: compilerOptions {
+107:     optIn.add("kotlin.time.ExperimentalTime")
+108: }
+109: 
+110: Mappings
+111: 
+112: The table below shows how Kotlin concepts are mapped to Swift.
+113: 
+114: Kotlin | Swift
+115: class | class
+116: object | class with shared property
+117: enum class | enum
+118: sealed classes and interfaces | enum
+119: typealias | typealias
+120: Function | Function
+121: suspend fun | async
+122: kotlinx.coroutines flows | AsyncSequence
+123: Property | Property
+124: Constructor | Initializer
+125: Package | Nested enum
+126: Boolean | Bool
+127: Char | Unicode.UTF16.CodeUnit
+128: Byte | Int8
+129: Short | Int16
+130: Int | Int32
+131: Long | Int64
+132: UByte | UInt8
+133: UShort | UInt16
+134: UInt | UInt32
+135: ULong | UInt64
+136: Float | Float
+137: Double | Double
+138: Any | KotlinBase class
+139: Unit | Void
+140: Nothing | Never
+141: 
+142: Declarations
+143: 
+144: Classes
+145: 
+146: Swift export supports only final classes that directly inherit from Any , like class Foo() . They are translated to Swift classes that inherit from a special KotlinBase class:
+147: 
+148: // Kotlin
+149: class MyClass {
+150:     val property: Int = 0
+151: 
+152:     fun method() {}
+153: }
+154: 
+155: // Swift
+156: public class MyClass : KotlinRuntime.KotlinBase {
+157:     public var property: Swift.Int32 {
+158:         get {
+159:             // ...
+160:         }
+161:     }
+162:     public override init() {
+163:         // ...
+164:     }
+165:     public func method() -> Swift.Void {
+166:         // ...
+167:     }
+168: }
+169: 
+170: Objects
+171: 
+172: Objects are translated to Swift classes with a private init and static shared accessor:
+173: 
+174: // Kotlin
+175: object O
+176: 
+177: // Swift
+178: public class O : KotlinRuntime.KotlinBase {
+179:     public static var shared: O {
+180:         get {
+181:             // ...
+182:         }
+183:     }
+184:     private override init() {
+185:         // ...
+186:     }
+187: }
+188: 
+189: Type aliases
+190: 
+191: Kotlin type aliases are exported as is:
+192: 
+193: // Kotlin
+194: typealias MyInt = Int
+195: 
+196: // Swift
+197: public typealias MyInt = Swift.Int32
+198: 
+199: Enums
+200: 
+201: Kotlin enum class declarations are exported as regular native Swift enum types:
+202: 
+203: // Kotlin
+204: enum class Color(val rgb: Int) {
+205:     RED(0xFF0000),
+206:     GREEN(0x00FF00),
+207:     BLUE(0x0000FF)
+208: }
+209: 
+210: val color = Color.RED
+211: 
+212: // Swift
+213: public enum Color: Swift.CaseIterable, Swift.LosslessStringConvertible, Swift.RawRepresentable {
+214:     case RED, GREEN, BLUE
+215: 
+216:     public var rgb: Swift.Int32 { get }
+217: }
+218: 
+219: Sealed classes and interfaces
+220: 
+221: Sealed hierarchies defined in Kotlin are mapped to Swift enums, enabling exhaustive switch statements.
+222: 
+223: Swift export generates a .sealedType() method on each sealed type. This method returns a Swift enum whose cases match the direct subclasses of the sealed hierarchy. You can nest these calls to match deeper levels of the hierarchy.
+224: 
+225: For example, declare a sealed interface with a class hierarchy in Kotlin:
+226: 
+227: // Kotlin
+228: sealed interface Shape
+229: 
+230: class Circle : Shape {
+231:     override fun toString(): String = "Circle"
+232: }
+233: 
+234: class Rectangle : Shape {
+235:     override fun toString(): String = "Rectangle"
+236: }
+237: 
+238: fun createCircle(): Shape = Circle()
+239: 
+240: On the Swift side, you can use an exhaustive switch without a default case:
+241: 
+242: // Swift
+243: let shape = createCircle()
+244: 
+245: let name = switch shape.sealedType() {
+246:     case let .circle(type): "It's a \(type.value)"
+247:     case let .rectangle(type): "It's a \(type.value)"
+248: }
+249: // name == "It's a Circle"
+250: 
+251: Because the switch is exhaustive, the compiler warns you if a new subclass is added to the sealed hierarchy, so you can handle it immediately instead of relying on a default case for switch .
+252: 
+253: Functions
+254: 
+255: Swift export supports simple top-level functions and methods:
+256: 
+257: // Kotlin
+258: fun foo(a: Short, b: Bar) {}
+259: 
+260: fun baz(): Long = 0
+261: 
+262: // Swift
+263: public func foo(a: Swift.Int16, b: Bar) -> Swift.Void {
+264:     // ...
+265: }
+266: 
+267: public func baz() -> Swift.Int64 {
+268:     // ...
+269: }
+270: 
+271: For Kotlin's extension functions, the receiver parameter becomes an ordinary Swift parameter in the first position:
+272: 
+273: // Kotlin
+274: fun Int.foo(): Unit = TODO()
+275: 
+276: // Swift
+277: func foo(_ receiver: Int32) {}
+278: 
+279: Kotlin's functions with vararg are mapped to Swift's variadic function parameters:
+280: 
+281: // Kotlin
+282: fun log(vararg messages: String)
+283: 
+284: // Swift
+285: public func log(messages: Swift.String...)
+286: 
+287: Support for functions with the operator modifier is currently limited.
+288: 
+289: Generic types are generally not supported.
+290: 
+291: Properties
+292: 
+293: Kotlin properties are translated to Swift properties:
+294: 
+295: // Kotlin
+296: val a: Int = 0
+297: 
+298: var b: Short = 15
+299: 
+300: const val c: Int = 0
+301: 
+302: // Swift
+303: public var a: Swift.Int32 {
+304:     get {
+305:         // ...
+306:     }
+307: }
+308: public var b: Swift.Int16 {
+309:     get {
+310:         // ...
+311:     }
+312:     set {
+313:         // ...
+314:     }
+315: }
+316: public var c: Swift.Int32 {
+317:     get {
+318:         // ...
+319:     }
+320: }
+321: 
+322: Constructors
+323: 
+324: Constructors are translated to Swift initializers:
+325: 
+326: // Kotlin
+327: class Foo(val prop: Int)
+328: 
+329: // Swift
+330: public class Foo : KotlinRuntime.KotlinBase {
+331:     public init(
+332:         prop: Swift.Int32
+333:     ) {
+334:         // ...
+335:     }
+336: }
+337: 
+338: Types
+339: 
+340: kotlin.Nothing
+341: 
+342: The Kotlin Nothing type is translated to the Never type:
+343: 
+344: // Kotlin
+345: fun foo(): Nothing = TODO()
+346: 
+347: fun baz(input: Nothing) {}
+348: 
+349: // Swift
+350: public func foo() -> Swift.Never {
+351:     // ...
+352: }
+353: 
+354: public func baz(input: Swift.Never) -> Void {
+355:     // ...
+356: }
+357: 
+358: Classifier types
+359: 
+360: Swift export currently supports only final classes that directly inherit from Any .
+361: 
+362: Packages
+363: 
+364: Kotlin packages are translated to nested Swift enums to avoid name collisions:
+365: 
+366: // Kotlin
+367: // bar.kt file in foo.bar package
+368: fun callMeMaybe() {}
+369: 
+370: // Kotlin
+371: // baz.kt file in foo.baz package
+372: fun callMeMaybe() {}
+373: 
+374: // Swift
+375: public extension foo.bar {
+376:     public func callMeMaybe() {}
+377: }
+378: 
+379: public extension foo.baz {
+380:     public func callMeMaybe() {}
+381: }
+382: 
+383: public enum foo {
+384:     public enum bar {}
+385: 
+386:     public enum baz {}
+387: }
+388: 
+389: Concurrency
+390: 
+391: Suspending functions
+392: 
+393: You can call suspending Kotlin code from Swift. Kotlin suspending functions and suspending functional types are exported as Swift's async counterparts:
+394: 
+395: // Kotlin
+396: suspend fun hello(): String {
+397:     delay(1000)
+398:     return "Hello Swift! This is Kotlin."
+399: }
+400: 
+401: // Swift
+402: let msg = try await hello()
+403: 
+404: Flows
+405: 
+406: You can also export kotlinx.coroutines flows as Swift's AsyncSequence :
+407: 
+408: // Kotlin
+409: // Preserves the String type when exporting Flow
+410: fun flowOfStrings(): Flow<String> = flowOf("hello", "any", "world")
+411: 
+412: // Swift
+413: var actual: [String] = []
+414: 
+415: // Infers the String type from Kotlin
+416: for try await element in flowOfStrings().asAsyncSequence() {
+417:     actual.append(element)
+418: }
+419: 
+420: Coroutine dispatchers
+421: 
+422: By default, when you call a Kotlin suspending function from Swift or use the asAsyncSequence function, Kotlin creates a coroutine context that uses the Dispatchers.Default dispatcher and executes the exported code there.
+423: 
+424: To run the exported code on a different dispatcher , use the withContext() function to switch the coroutine context in Kotlin. For example:
+425: 
+426: suspend fun runOnMain(): Int = withContext(Dispatchers.Main) {
+427:     delay(10L)
+428:     42
+429: }
+430: 
+431: Cross-language inheritance
+432: 
+433: Swift export supports cross-language inheritance. A common use case for this feature is the reverse import pattern, where you define a contract in Kotlin and provide platform-specific implementations on the Swift side. This is especially useful when you need to use pure Swift libraries that can't be directly imported into Kotlin.
+434: 
+435: To implement the pattern, you need to declare a Kotlin interface and a Kotlin superclass that the Swift implementation can inherit from. You then implement the interface in Swift and pass the Swift object to Kotlin functions that accept that interface. For example, for the CryptoKit library:
+436: 
+437: On the Kotlin side, declare an interface, a function that accepts it, and an open base class:
+438: 
+439: // Kotlin
+440: interface CryptoProvider {
+441:     fun hashMD5(input: String): String
+442: }
+443: 
+444: fun processHash(provider: CryptoProvider, input: String): String = provider.hashMD5(input)
+445: 
+446: open class SwiftBase
+447: 
+448: On the Swift side, inherit from the exported SwiftBase class, implement the interface using a pure Swift library, and pass the object back to Kotlin:
+449: 
+450: // Swift
+451: import CryptoKit
+452: 
+453: final class IosCryptoProvider: SwiftBase, CryptoProvider {
+454:     func hashMD5(input: String) -> String {
+455:         guard let data = input.data(using: .utf8) else { return "failed" }
+456:         return Insecure.MD5.hash(data: data).description
+457:     }
+458: }
+459: 
+460: let provider = IosCryptoProvider()
+461: 
+462: // Calls the Kotlin function, which calls hashMD5() back in Swift
+463: print(processHash(provider: provider, input: "Hello, world!"))
+464: 
+465: When Kotlin receives the Swift object, it treats it like an implementation of a regular Kotlin interface, calling the Swift code directly.
+466: 
+467: Evolution of Swift export
+468: 
+469: We're planning to expand and gradually stabilize Swift export in future Kotlin releases, improving interoperability between Kotlin and Swift. You can leave your feedback:
+470: 
+471: In Kotlin Slack – get an invite and join the #swift-export channel.
+472: 
+473: Report issues in YouTrack .
