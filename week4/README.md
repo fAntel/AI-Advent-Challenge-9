@@ -48,7 +48,7 @@ make test
 make build
 ```
 
-`make build` installs a fresh wheel and builds all six Go executables, then checks CLI
+`make build` installs a fresh wheel and builds all seven Go executables, then checks CLI
 help. `make test` runs Python tests plus normal and race-enabled Go tests. All demonstrations use the rebuilt artifact
 `week4/.venv/bin/kotlin-index`. Tests use a fake embedding service and require
 neither internet access nor Ollama.
@@ -465,3 +465,149 @@ See `reports/grounding/answers.json` for exact inputs, raw responses and evidenc
 and `reports/grounding/review.json` for the separately authored hash-bound judgments.
 The corpus is unchanged; these checks assess support against saved documentation,
 not an independent verification of current Kotlin behavior.
+
+
+## Task4: standalone mini-chat
+
+`mini-chat` is a separate Go CLI. It reuses the Kotlin SQLite index, local Ollama
+embeddings, DeepSeek provider and grounded RAG contract. It does not start the
+agent daemon or load its sessions, task lifecycle, project instructions, MCP tools
+or scheduling. It reads the existing default-profile provider endpoint and RAG
+path configuration; credentials use `DEEPSEEK_API_KEY` or the existing macOS
+Keychain entry. Generation and memory extraction default to Flash with reasoning
+disabled. Relevance scoring uses Flash, as in the earlier RAG implementation.
+
+After `make test` and `make build` succeed, these commands use the rebuilt
+`week4/mini-chat` (run from `week4/`):
+
+```sh
+./mini-chat
+./mini-chat sessions
+./mini-chat resume SESSION_ID
+```
+
+The default conversation database is `data/chat.sqlite` beside the executable,
+separate from `data/index.sqlite`. `--db FILE` overrides conversation storage;
+`--index FILE` and `--indexer FILE` override retrieval paths. Relative overrides
+resolve from the current directory. New chats also accept `--model` and
+`--reasoning`; resume uses saved session settings and accepts only `--db`.
+The local model and built index from Setup are required for questions.
+
+Start with a natural statement, for example:
+
+> Our goal is to design a Kotlin library for browser JavaScript. Keep Kotlin/JS,
+> not Wasm. By client I mean the browser JavaScript consumer. How do I export a function?
+
+Each question runs structured task-memory extraction, resolves its search question,
+retrieves and filters fresh evidence for the resolved platform, and validates the generated answer's citations
+and verbatim quotes before display. The default retrieval settings are semantic
+chunks, 20 candidates, relevance cutoff 2, five selected chunks and a 6,000-character
+budget. The extractor resolves the saved target to the index platform filter (for example,
+Kotlin/JS to `js` and Swift/iOS to `native`); common-language documents remain
+eligible. Insufficient evidence produces an explicit unknown response with a Sources
+section explaining that supporting sources are unavailable. A memory-conflict
+clarification also has a Sources section, identifying that no documentation claims
+were made, even though retrieval ran.
+
+Memory contains the user-stated goal, constraints, definitions and the prior-question
+log. Automatic fact updates require an exact quote from the current user turn.
+The extractor is instructed to reuse keys and distinguish explicit corrections
+from ambiguous contradictions. The harness preserves a conflicting saved value
+unless the extracted change identifies an explicit replacement; otherwise it asks
+for clarification. Provenance validation proves where text came from, not the
+correctness of the model's interpretation. Inspect or correct memory at any time:
+
+```text
+/memory
+/goal Design a Kotlin browser library
+/constraint platform=Kotlin/JS
+/definition client=browser JavaScript consumer
+/forget constraint platform
+/history
+/help
+/exit
+```
+
+Local commands do not call the model or retrieve. Memory changes are displayed
+when saved. Only the last four completed exchanges are supplied as recent history;
+the goal, fixed facts and all non-discarded prior questions are supplied separately.
+The complete transcript remains stored. If a request exceeds 120,000 characters,
+the turn fails explicitly instead of silently trimming task memory; start a new
+session or shorten facts explicitly. Single questions are limited to 16,000
+characters and individual memory values to 2,000 characters.
+
+SQLite stores versioned session records, turn checkpoints, memory revisions, exact
+provider requests/responses and usage, retrieved evidence and validated results.
+Updates are atomic, with a per-session OS lock during processing. Different
+sessions can run independently. A crash releases the lock; resume exposes the
+pending turn. `/retry` reuses completed extraction/retrieval stages; `/discard`
+restores the pre-turn memory and retains the abandoned turn in the audit history.
+New questions and memory edits wait until the pending turn is resolved. A remote
+call interrupted before its response is saved may be repeated on retry.
+
+This is a local single-user CLI for macOS/Linux. History and evidence are not
+rotated automatically; chat storage grows with use. The memory interpreter and
+quote/claim relationship still require semantic review.
+
+### Task4 dialog validation
+
+`mini-chat-suite.json` contains two fixed twelve-question dialogs: Kotlin/JS browser
+interop and Kotlin/Swift Objective-C export. Each includes early goals and definitions,
+follow-ups beyond the recent-history window, an explicit constraint change, an
+ambiguous contradiction, confirmation of the saved constraint, and an unsupported
+Kotlin 3.0 question. The final question returns to the original goal.
+
+The deterministic tests use SQLite plus fake provider/index services. They test
+retention, restarts, isolation, corrections, conflicts, retry/discard, invalid quotes,
+context limits and evaluation checkpoint reuse. They do not establish model quality.
+After tests and build, run the live suite with the same `week4/mini-chat` artifact:
+
+```sh
+./mini-chat eval --suite mini-chat-suite.json --output reports/task4/answers.json --db data/task4-chat.sqlite
+```
+
+The evaluator saves each turn and resumes on rerun. Changed suite or model/retrieval
+settings require a new output file. Preserve the conversation database to resume.
+Raw artifacts include prompts, memory revisions, evidence, sources, quotes and
+provider usage. The independently authored review assesses goal/constraint adherence
+and semantic support separately from mechanical quote validation.
+
+Render the saved dialogs and separately authored review with:
+
+```sh
+.venv/bin/python scripts/render_mini_chat.py
+```
+
+The renderer binds each review to a hash of the complete turn, including memory,
+provider calls and evidence. Missing or stale reviews withhold semantic quality totals.
+
+### Task4 recorded result
+
+The full Python and Go tests, including Go race checks and both deterministic
+12-question dialogs, pass. `make build` succeeds. Both live twelve-question dialogs
+completed; the Swift dialog was resumed and finished interactively in agterm's
+scratch terminal using the rebuilt `week4/mini-chat`.
+
+The [reviewed live report](reports/task4/dialogs.md) retains all 24 turns. The
+original goal and client definition persisted in every memory snapshot. Both
+explicit constraint changes were saved, and both ambiguous contradictions asked
+for clarification without replacing the fixed value. All 18 factual answers have
+validated sources and exact quotations. Two clarifications and four unknown
+responses display explicit source-status explanations.
+
+Semantic review found full goal/constraint adherence in 21/24 responses and full
+support from displayed quotes in 9/18 factual answers. Remaining issues include
+example-language deviations, an unnecessary refusal despite useful evidence,
+Objective-C naming being overgeneralized to Swift, and a final import-direction
+limitation being applied to an export task. Several partial quote assessments
+have additional support in the full retrieved chunks. These limitations are
+recorded individually; source validation alone does not establish semantic
+correctness or compilable examples.
+
+The final run used 146 API attempts, 367,700 tokens and estimated provider cost
+$0.053284. Three TLS failures and four rejected generated answers were retried
+from checkpoints; rejected answers were never published. The earlier
+[initial attempt](reports/task4/initial-attempt.md) is preserved with its review
+and $0.030530 estimated cost. It exposed platform-mismatched retrieval and a missed
+conflict, leading to the platform filter and tighter memory extraction contract.
+This small suite was used during development, so it is not a held-out benchmark.

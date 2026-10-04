@@ -3,12 +3,14 @@
 build:
 	.venv/bin/python -m pip install --no-build-isolation .
 	.venv/bin/kotlin-index --help >/dev/null
+	go build -buildmode=exe -o mini-chat ./cmd/mini-chat
 	go build -buildmode=exe -o advent-agent ./cmd/advent-agent
 	go build -buildmode=exe -o advent-agentd ./cmd/advent-agentd
 	go build -buildmode=exe -o homebox-mcp ./cmd/homebox-mcp
 	go build -buildmode=exe -o budget-mcp ./cmd/budget-mcp
 	go build -buildmode=exe -o report-mcp ./cmd/report-mcp
 	go build -buildmode=exe -o supplier-mcp ./cmd/supplier-mcp
+	./mini-chat --help >/dev/null
 	./advent-agent --help >/dev/null
 	./advent-agentd --help >/dev/null
 	./homebox-mcp --help >/dev/null
@@ -22,4 +24,4 @@ test:
 	go test -race ./...
 
 clean:
-	rm -f advent-agent advent-agentd homebox-mcp budget-mcp report-mcp supplier-mcp
+	rm -f mini-chat advent-agent advent-agentd homebox-mcp budget-mcp report-mcp supplier-mcp

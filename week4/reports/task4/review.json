@@ -1,0 +1,203 @@
+{
+  "run_notes": [
+    "Both fixed twelve-question dialogs completed. The Swift conversation resumed in the agterm scratch terminal after question 3 failed citation validation; questions 4–12 were typed interactively into the same session. A final eval invocation exported the completed sessions without further model calls.",
+    "The original goal and client definition remain present in all 24 saved memory snapshots. Both explicit example-language changes were saved, and both ambiguous contradictions prompted clarification while preserving the existing constraint. Answer adherence is assessed separately below; saved state alone does not guarantee that every answer follows it.",
+    "All 18 factual answers have validated source metadata and exact supporting fragments. There are two conflict clarifications and four unknown responses, including both unsupported Kotlin 3.0 controls. The JavaScript type question was unnecessarily refused despite useful packed evidence; the null/undefined question lost all candidates during filtering.",
+    "Three TLS-handshake failures and four invalid generated-answer attempts were retried from saved checkpoints. Raw attempts remain in answers.json. Invalid generated output was never published as an answer. The source/quote contract validates provenance, not complete semantic support or code compilation.",
+    "The preserved initial-attempt.json and initial-attempt.md document the earlier platform-mismatch and missed-conflict failures. The final implementation added platform-filtered retrieval and tightened the memory contract before the fresh run. Initial attempt: 72 API attempts, estimated cost $0.030530. This is development and evaluation on one small fixed suite, not an independent held-out benchmark."
+  ],
+  "assessments": [
+    {
+      "turn_id": "189a6ec593749cfe45747087cc233e07",
+      "turn_sha256": "22cb03b456e1f6b683c2866742f25a1ce080fe4e59418abbcb45fbc3d0b33ab9",
+      "goal_and_constraints": "partial",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "The browser goal and Kotlin/JS scope are retained. The main annotation advice is supported, but an inline JavaScript import example breaches the Kotlin-only examples preference. The displayed ESM quote establishes package flattening, not every detail of the illustrated import."
+    },
+    {
+      "turn_id": "3ce633bbc8fda421f98e6801cf3f4e3c",
+      "turn_sha256": "c5895658c6b14a9da26de86815ec1951eeccf5d415b589972a63990487c996d2",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": false,
+      "notes": "Unnecessary model abstention: the packed evidence includes the Kotlin/JS type-mapping table and export-specific Promise<Unit>/Long material. A supported partial answer was available. No fabricated facts were published."
+    },
+    {
+      "turn_id": "c189d55fb63b394c60fd598f1fcd00aa",
+      "turn_sha256": "4f4928bc66b9eb65ac45e5e46234e44953f0d45cf328365877637039ab0d8e9c",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "Correctly resolves the class-export follow-up in Kotlin/JS. The displayed quotes support regular/value-class export, but do not show the additional @JvmInline detail mentioned in the answer; that detail is present in the full chunk."
+    },
+    {
+      "turn_id": "7ea109ad69b60d566003367580a52ff1",
+      "turn_sha256": "c888229f2fedfe11da6588a2c7e30bade5c2f257cad9159adb9aee0cfb376307",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "The naming advice and valid-identifier requirement are supported. The example and the non-ES-module behavior are present in the full evidence, but the selected quote fragments do not display all of that support. Unlike the initial attempt, the example retains its enclosing class and name property."
+    },
+    {
+      "turn_id": "fb48a4204f0c3b30d26e6d862864de06",
+      "turn_sha256": "4f28edc73dee2ce2ce2b0f61375c0c2e1253d06c45d0b020eec9966121b86c95",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Retains the Kotlin-only example restriction. Quotes support the suspend-lambda compiler flag, annotated class, async mapping and release caveat; ordinary-lambda coverage is explicitly left unresolved."
+    },
+    {
+      "turn_id": "18a8557609cbca041b49b1ba8f811f22",
+      "turn_sha256": "b63459877c470c3184929cc6edba3545d98e8aec4e71897d2e6baf673a7172da",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Uses platform-compatible Kotlin/JS external-interface/class evidence. The declarations and settings-object explanation are supported by the displayed fragments."
+    },
+    {
+      "turn_id": "5b69c03745b33b94bba16efa1c8382e6",
+      "turn_sha256": "b07cbaed4f53a905db0e9b99ce5a58d2527d5ffafd358ff889d125d9a47416a0",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Saves the explicit switch to Kotlin plus JavaScript examples. The explanation and restrictions are supported by the displayed Kotlin/JS quotes; the absence of a JavaScript example in current evidence is disclosed rather than filled with unrelated Wasm code."
+    },
+    {
+      "turn_id": "9751605b6020ae2d6f4ae016b5d1e6d8",
+      "turn_sha256": "2553a3cfd4742b3efd13093ee3467ff7f4a48c2aa9722d71fb5e48e0107b6878",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "Detects the ambiguous TypeScript-only statement, keeps the saved examples constraint and asks for confirmation. Retrieval ran; the clarification makes no documentation claims and labels Sources accordingly."
+    },
+    {
+      "turn_id": "4ecf4a9911e8785e4801be4f3720498d",
+      "turn_sha256": "8f854593a7dfee2e12286a197a3a9f55ab314392dbc6613db023a31edc175b23",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "Keeps the confirmed examples constraint and Kotlin/JS target. Dynamic and external declarations are supported; the concrete sum function is in the full evidence but omitted from the displayed quote fragments."
+    },
+    {
+      "turn_id": "70858daec1ff68f3033d17ee12634ccc",
+      "turn_sha256": "90b5a0345661ffc129a84f918cb853ee4ecdbcf17265ed729c61d37f07fd4e2a",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "The harness abstains after every retrieved candidate is filtered out. This is an evidence-coverage gap for the null/undefined question, not evidence that the complete corpus cannot answer it."
+    },
+    {
+      "turn_id": "0ae9f0becb40e3e55b288d1135426c43",
+      "turn_sha256": "41a4bdec2a398db1f52ed038fba9a80a39715f5e1b65c35c03f82137fde70e6b",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "Correctly refuses to invent exact Kotlin 3.0 changes. No answer-generation call was made and unavailable sources are explicit."
+    },
+    {
+      "turn_id": "38e08801fd21ec2cda58754d788428a5",
+      "turn_sha256": "02105cf44f30ce626bb39ff21851e883613f38c1b79b8dba7ce2fece60931526",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "Explicitly returns to the original browser goal, Kotlin/JS target and updated examples preference. Export and the version-specific historical interface limitation are quoted. The constructed Identity/consumer example is not established by the displayed fragments and was not compiler-tested; the limitation is explicitly described as lifted, not a current universal restriction."
+    },
+    {
+      "turn_id": "acae12b6cddb08e4888e77e4e3bbc05a",
+      "turn_sha256": "78081e9c648d7abdd5fa8d712f9a6fc420b960e11a102cad64743860b0b230cc",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "Retains the Swift/iOS Objective-C-bridge goal, but infers that the Swift client accesses classes through the Objective-C-prefixed spelling. The cited naming statement is specifically about Objective-C and does not establish that Swift spelling."
+    },
+    {
+      "turn_id": "25a87ff68875a7de64ebd6dc095bc187",
+      "turn_sha256": "d1150c92a0f09d2aaaac2cedd532ad31051775b40e045f0c8575c0314ee84b82",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "Correct bridge and client are retained. Most exception behavior is quoted, including the cancellation exception. The opening only-@Throws statement is too broad before that later exception, and some secondary details are in the packed chunk rather than displayed fragments."
+    },
+    {
+      "turn_id": "44e7cbd079f098a7c9126e898b6fb562",
+      "turn_sha256": "13cf7b5cc716a175d502d6345b6cf875e7a20a15e16935885c31842ddb1922c1",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "The validated retry quotes callback/completion-handler mapping, NSError handling, Swift 5.5 async access and its experimental caveat. The preceding invalid citation was rejected before publication."
+    },
+    {
+      "turn_id": "5a4d881bb1557022e7d8a00e744b8057",
+      "turn_sha256": "44c1e219b6f674fbe9aa0579a23343b7f2d301d2c37eb5f76563a7f5181e6e35",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "Answers the Objective-C-bridge async/await question with the quoted Swift 5.5 caveat. It also adds a clearly separated direct-Swift-export comparison, which is outside the chosen route; the displayed quote for that comparison does not show the try-await call syntax. The first attempt was rejected for a missing quote."
+    },
+    {
+      "turn_id": "4cce15cb4d9c5ce45f76f5463a0aca3a",
+      "turn_sha256": "baab76ab96e4af262af57c40370365eaa7fd4006e9172f15e3b6716cea4a5b0d",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Preserves the bridge and client definition. String/NSString mapping, copying overhead and collection conversion advice follow the displayed quotes."
+    },
+    {
+      "turn_id": "93854e91aae25a31527bb285e36434e3",
+      "turn_sha256": "ee53b04ff119cf6c3d5281a77084867b0e274736773037c3fc9f3b3fb5f4dbc2",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "The collection-conversion cost, Objective-C counterparts and unsupported custom collection classes are supported by the saved quotes. No switch to direct Swift export occurs."
+    },
+    {
+      "turn_id": "858ba0f909f6295e2e470b7e19443408",
+      "turn_sha256": "ba9635e7096dc6ec8bea67f586e7e4c77bcb589c5731f746640c5dadcb6eb784",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "The explicit examples change is saved. Both Kotlin and Swift naming examples and the ObjCName behavior are displayed verbatim in the supporting fragments."
+    },
+    {
+      "turn_id": "e9c7c93f7bf28cbcddfe8c3f93933daa",
+      "turn_sha256": "285ccaf41d5826859617c251a9e27c7ae6e5879cf19ff85fe68ca30aa34cadd8",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "Detects the conflicting direct-Swift-export statement and asks whether to replace the saved bridge. The Objective-C bridge remains fixed; retrieval ran without publishing documentation claims."
+    },
+    {
+      "turn_id": "d4042e708c4206cb4d86733678b268e3",
+      "turn_sha256": "44318827a15f8ed4ac0e69d428b2c0f2c7a584d618bb1fb29f1ce4696b97ca65",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Keeps the confirmed Objective-C bridge and correctly uses HiddenFromObjC/internal with the quoted visibility distinction."
+    },
+    {
+      "turn_id": "39978ff1af6e9cba95268fb781558782",
+      "turn_sha256": "d51e8b79c4471c640a3f95f7b62317a773debd897a6b2a550335a65acf9869c0",
+      "goal_and_constraints": "partial",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "The generics, information-loss and nullability explanation follows the displayed source fragments. The code remains Kotlin notation, including the illustration of the Swift-visible nullable result; it does not supply a Swift example to satisfy the saved paired-language preference."
+    },
+    {
+      "turn_id": "b12b6d60599976bf851740826f94b1d6",
+      "turn_sha256": "532f08ebd83eebcf7adbb639c4b3f9c0e879827368e2528f26d7cf82ecaa108c",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "Correctly refuses unsupported Kotlin 3.0 predictions without answer generation."
+    },
+    {
+      "turn_id": "b290b81537a06a118e37c7ac51983f21",
+      "turn_sha256": "927d587c946a5daaf677a2a655cdc5f36aa0f5bfcfc02fca810ba4a3a1b97015",
+      "goal_and_constraints": "partial",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "The original goal, Swift-client definition and Objective-C bridge are explicitly recalled. The selected limitation concerns importing Objective-C libraries into Kotlin, the opposite direction from exporting this Kotlin library to Swift; it is quoted accurately but does not establish an applicable export limitation. The first answer failed citation validation and was not displayed."
+    }
+  ]
+}

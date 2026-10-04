@@ -1,0 +1,100 @@
+{
+  "assessments": [
+    {
+      "turn_id": "3b38fbd903461739401d30782c03e8c3",
+      "turn_sha256": "fa6ded4c906edd2aef4d7cb51eb3438c481c9e80cfe477a1abae787d0f6209b8",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Retains browser Kotlin/JS scope and Kotlin-only illustration. The displayed annotation and naming quotes support the advice."
+    },
+    {
+      "turn_id": "bc478f9a3c36a200fdb51899ab1a9583",
+      "turn_sha256": "cd6e11491a14dc74721578dcb54aec6e812da1c11c9e42fc1a819c893e82bd81",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Correctly resolves the exported-function follow-up. The displayed mapping table and Promise<Unit> release excerpt support the answer against the saved snapshots."
+    },
+    {
+      "turn_id": "6a817ecbb44d7fce721d4b9b6888f669",
+      "turn_sha256": "89ab96418fa96386b9ce945812ad22d80331b96b002e2126102ebfbca9eb1fe3",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": true,
+      "notes": "The class-export answer follows the goal. Several optional details (named companions, @JvmInline and suspending members) are not fully established by the displayed quote fragments."
+    },
+    {
+      "turn_id": "86dcd0fc29b0ce291b1251565e941c54",
+      "turn_sha256": "ba9fe8c21251e37445862b74f2d1357a1975c808a8ad09eb6be67da474e5c7d2",
+      "goal_and_constraints": "yes",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "Naming guidance is supported, but the standalone sample references an undefined name variable copied from a larger source example. It should not be treated as a compilable example."
+    },
+    {
+      "turn_id": "b47cc5a414b3fcc83edf5483338ef21b",
+      "turn_sha256": "1d887852d082dc20d2e71bac764aa5ade0d8483df3a146a8daea47e2523b1de1",
+      "goal_and_constraints": "partial",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "Remembers the browser client, but includes a JavaScript callback example despite the then-active Kotlin-only example constraint. The suspend-lambda support is quoted; the answer does not establish ordinary lambda support."
+    },
+    {
+      "turn_id": "d3a2592435b61cde2bcb341c9ab87ac8",
+      "turn_sha256": "fe0a67f66bc481d19bfb700dbaa669e3135b127f63dfe8241aab6960a8df68ac",
+      "goal_and_constraints": "partial",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "Memory retains Kotlin/JS, but retrieval selected mostly Wasm declarations. The answer warns about this scope mismatch after presenting them; it should have retrieved platform-compatible evidence."
+    },
+    {
+      "turn_id": "ec32a925cc4847d9a7a6f19481c6c9a2",
+      "turn_sha256": "3d221a3ea54c546ba23cb42b1faeabf3a32a07955c04ee260397ef83a5d78451",
+      "goal_and_constraints": "no",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "The explicit example-language change is saved correctly. However, the answer mixes Kotlin/JS and Wasm interface examples, including Wasm JsAny, without preserving the saved exclusion of Wasm."
+    },
+    {
+      "turn_id": "db291951aabc5b46256101c995b5ddce",
+      "turn_sha256": "5ee22baa25a68e5101b3a4b29f6e5cfbd7517e625ad7d69083363c1905616211",
+      "goal_and_constraints": "no",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "The extractor misreads the contradictory TypeScript-only statement as availability of documentation, omits a conflict, and the answer again mixes Wasm examples. Saved facts survive, but clarification behavior fails."
+    },
+    {
+      "turn_id": "81bdfbfdbfeb24dab251fa40b710a569",
+      "turn_sha256": "4f38d40a6a7c8d06d03981e8da3a9cafb775bb08eccd91495ad6c31bdac304bd",
+      "goal_and_constraints": "yes",
+      "semantic_support": "yes",
+      "appropriate_response": true,
+      "notes": "Retains the confirmed Kotlin/JavaScript example preference and answers the Kotlin/JS dynamic question with a correctly interpreted platform comparison. Missing paired examples are disclosed."
+    },
+    {
+      "turn_id": "509f60732796896fe73eb4c94044c27f",
+      "turn_sha256": "c6bc3013c446b64bb7c72013ed52f18ae37ec55da0b8ea69c615efc426ad8fd6",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "All candidates were filtered out, so the harness appropriately abstains rather than inventing null/undefined guidance. This shows a retrieval coverage limitation, not proof the corpus lacks the answer."
+    },
+    {
+      "turn_id": "45cd5209c0ffd6c37c8a1a9e67c887b0",
+      "turn_sha256": "efe5667c2b8d0a33cee78f6c1c500d0615ff6988c5341b8225195a811fd5a00c",
+      "goal_and_constraints": "yes",
+      "semantic_support": "N/A",
+      "appropriate_response": true,
+      "notes": "Correctly refuses to invent exact Kotlin 3.0 changes and displays unavailable sources."
+    },
+    {
+      "turn_id": "8ad55a034733a5b5e66a6f59614ad194",
+      "turn_sha256": "d9eac57c036fa59907336c90b0a5ed7074d29c7513aefcaa93fd3aca4b18b127",
+      "goal_and_constraints": "partial",
+      "semantic_support": "partial",
+      "appropriate_response": false,
+      "notes": "Returns to Kotlin/JS export and remembers the example constraint, but labels support for dynamic as a limitation. The requested limitation is not actually supplied."
+    }
+  ]
+}
