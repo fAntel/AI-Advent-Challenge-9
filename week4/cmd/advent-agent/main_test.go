@@ -126,3 +126,18 @@ func TestPromptAndChatFlagSelectChatMode(t *testing.T) {
 		t.Fatal("interactive default unexpectedly selected chat")
 	}
 }
+
+func TestStatsSeparateRAGPreparationFromAnswers(t *testing.T) {
+	s := agent.Session{Calls: []agent.CallMetrics{{Purpose: "rag_rewrite", Usage: agent.Usage{PromptTokens: 20, TotalTokens: 25}}, {Purpose: "rag_score", Usage: agent.Usage{PromptTokens: 100, TotalTokens: 110}}}}
+	var output bytes.Buffer
+	printSessionStats(&output, &s)
+	if !strings.Contains(output.String(), "no completed answer calls yet") || !strings.Contains(output.String(), "RAG preparation: calls=2") || strings.Contains(output.String(), "latest answer request:") {
+		t.Fatal(output.String())
+	}
+	output.Reset()
+	s.Calls = append(s.Calls, agent.CallMetrics{Purpose: "answer", Usage: agent.Usage{PromptTokens: 30}})
+	printSessionStats(&output, &s)
+	if !strings.Contains(output.String(), "latest answer request: input context=30") || strings.Contains(output.String(), "input-context growth:") {
+		t.Fatal(output.String())
+	}
+}

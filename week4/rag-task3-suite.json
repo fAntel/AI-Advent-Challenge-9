@@ -1,0 +1,373 @@
+{
+  "selection": "Task3: the ten unchanged Task1 answerable questions plus the three existing out-of-corpus controls. Fixed before generation; 8 modes, 104 answers.",
+  "review_basis": "Expected facts recorded before generation from saved Task0 source snapshots. Full normalized source texts retained with line numbers; expected facts are never sent to the model.",
+  "questions": [
+    {
+      "id": "q01",
+      "query": "How can a function require an implicit service and how is that service resolved?",
+      "relevant": [
+        {
+          "document_id": "context-parameters",
+          "section": "Context parameters resolution"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Declare context(name: Service) on the function for an implicit dependency."
+        },
+        {
+          "id": "f2",
+          "text": "Resolution happens at the call site by matching context values by type."
+        },
+        {
+          "id": "f3",
+          "text": "Multiple compatible values at the same scope level cause ambiguity."
+        }
+      ],
+      "mistakes_to_watch": "Do not present old context receivers as the current named-parameter syntax; distinguish experimental explicit arguments.",
+      "source_review": {
+        "snapshot_sha256": "2321cd77936bdbc3b2753f2b1a1b09b678efbc319eb91f0065d8fe24c0162e06",
+        "lines": [
+          1,
+          165
+        ],
+        "excerpt": "reports/task1/sources/context-parameters.txt"
+      },
+      "selection_reason": "Current context-parameter syntax, scope resolution and ambiguity."
+    },
+    {
+      "id": "q11",
+      "query": "Where should expect and actual declarations live and which parts must match?",
+      "relevant": [
+        {
+          "document_id": "multiplatform-expect-actual",
+          "section": "Rules for expected and actual declarations"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "expect belongs in common code and has no implementation."
+        },
+        {
+          "id": "f2",
+          "text": "actual implementations belong in platform or shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "text": "Corresponding declarations need matching signatures and the same package, covering each target."
+        }
+      ],
+      "mistakes_to_watch": "Do not demand duplicated actuals in every leaf when an intermediate source set suffices.",
+      "source_review": {
+        "snapshot_sha256": "a9d1a6d14afed5e45d36f07e91d0ec3818585f76b61276570633421194298d33",
+        "lines": [
+          7,
+          37
+        ],
+        "excerpt": "reports/task1/sources/multiplatform-expect-actual.txt"
+      },
+      "selection_reason": "Matching declarations across a multiplatform source-set hierarchy."
+    },
+    {
+      "id": "q12",
+      "query": "Can I satisfy a common expected class using an existing platform type instead of wrapping it?",
+      "relevant": [
+        {
+          "document_id": "multiplatform-expect-actual",
+          "section": "Using type aliases to satisfy actual declarations"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Use actual typealias in the platform source set to satisfy an expected class with an existing type."
+        },
+        {
+          "id": "f2",
+          "text": "The existing type must meet the expected declaration requirements; this is an alias, not a wrapper."
+        },
+        {
+          "id": "f3",
+          "text": "The actual typealias belongs in the same package as expect; the aliased platform class may live elsewhere."
+        }
+      ],
+      "mistakes_to_watch": "Do not invent missing members or claim a type alias adapts an incompatible API.",
+      "source_review": {
+        "lines": [
+          311,
+          337
+        ],
+        "snapshot_sha256": "a9d1a6d14afed5e45d36f07e91d0ec3818585f76b61276570633421194298d33",
+        "excerpt": "reports/task1/sources/multiplatform-expect-actual.txt"
+      },
+      "selection_reason": "Actualization with a foreign platform type and compatibility constraints."
+    },
+    {
+      "id": "q13",
+      "query": "How are Kotlin exceptions exposed to Swift and Objective-C callers?",
+      "relevant": [
+        {
+          "document_id": "native-objc-interop",
+          "section": "Errors and exceptions"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "@Throws on non-suspend functions yields Swift throws and Objective-C NSError-producing methods."
+        },
+        {
+          "id": "f2",
+          "text": "Only listed exception classes and subclasses propagate as NSError; other escaping Kotlin exceptions terminate the program."
+        },
+        {
+          "id": "f3",
+          "text": "Suspend completion handlers always have an error parameter; without @Throws only CancellationException propagates, while non-suspend exceptions do not propagate."
+        }
+      ],
+      "mistakes_to_watch": "Do not claim arbitrary Kotlin exceptions are catchable from Swift.",
+      "source_review": {
+        "snapshot_sha256": "fba1ba86a0ca414f3a9ae9b928a8495924685996889f8f13fc72aca234fe417d",
+        "lines": [
+          218,
+          232
+        ],
+        "excerpt": "reports/task1/sources/native-objc-interop.txt"
+      },
+      "selection_reason": "Exception propagation versus process termination across language boundaries."
+    },
+    {
+      "id": "q14",
+      "query": "How does Swift export expose Kotlin suspend functions?",
+      "relevant": [
+        {
+          "document_id": "native-swift-export",
+          "section": "Suspending functions"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Swift export maps Kotlin suspend functions and suspending functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "text": "Swift calls the exported suspend function with try await, as shown in the saved guide."
+        },
+        {
+          "id": "f3",
+          "text": "Swift export is Alpha; distinguish its direct Swift mapping from the Objective-C completion-handler bridge."
+        }
+      ],
+      "mistakes_to_watch": "Do not claim Swift export lacks suspend support or conflate it with Objective-C framework export.",
+      "source_review": {
+        "lines": [
+          391,
+          429
+        ],
+        "snapshot_sha256": "9ff1ce76fd34183b6d9c7510948d116cc3228fd85053b564e59d9c6f935c6068",
+        "excerpt": "reports/task1/sources/native-swift-export.txt"
+      },
+      "selection_reason": "Direct Swift export differs from the older Objective-C bridge."
+    },
+    {
+      "id": "q16",
+      "query": "How do I declare an existing JavaScript API so Kotlin can call it without providing an implementation?",
+      "relevant": [
+        {
+          "document_id": "js-interop",
+          "section": "external modifier"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Use external on declarations whose implementation is supplied by JavaScript."
+        },
+        {
+          "id": "f2",
+          "text": "Do not provide a Kotlin body; the compiler emits no implementation and JavaScript must supply it."
+        },
+        {
+          "id": "f3",
+          "text": "external is package-level and inherited by nested members; optional JS arguments can use definedExternally."
+        }
+      ],
+      "mistakes_to_watch": "Do not present Kotlin/Wasm-only JsAny restrictions as universal Kotlin/JS requirements; distinguish imports from exports.",
+      "source_review": {
+        "lines": [
+          47,
+          103
+        ],
+        "snapshot_sha256": "32a85bfa1aa1234b73d9be3ce984a951d9aaaf9c73f9eb45fa322cc22dd5c0c8",
+        "excerpt": "reports/task1/sources/js-interop.txt"
+      },
+      "selection_reason": "Both Task0 chunkers missed the designated Kotlin/JS source section, retrieving Wasm neighbors."
+    },
+    {
+      "id": "q17",
+      "query": "How can Kotlin Wasm hold a reference to a Kotlin object on the JavaScript side?",
+      "relevant": [
+        {
+          "document_id": "wasm-js-interop",
+          "section": "JsReference type"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Use JsReference<T> to pass an opaque handle to a Kotlin object into JavaScript."
+        },
+        {
+          "id": "f2",
+          "text": "Create the handle with toJsReference() and expose it through an exported function."
+        },
+        {
+          "id": "f3",
+          "text": "JavaScript cannot directly access the Kotlin object; exported Kotlin helpers unwrap the handle using get()."
+        }
+      ],
+      "mistakes_to_watch": "Do not use unsafeCast to pretend a Kotlin object is a JS object or expose properties directly.",
+      "source_review": {
+        "lines": [
+          318,
+          347
+        ],
+        "snapshot_sha256": "ed8a0f1c81d26a2a843290ae5c00e1a5cb251eaa3e75cfd2ddbbfb8ffca4d958",
+        "excerpt": "reports/task1/sources/wasm-js-interop.txt"
+      },
+      "selection_reason": "Opaque references across the Wasm/JavaScript boundary."
+    },
+    {
+      "id": "q18",
+      "query": "When did the common Kotlin UUID API become stable?",
+      "relevant": [
+        {
+          "document_id": "whatsnew24",
+          "section": "Stable UUID API in the common Kotlin standard library"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "The common kotlin.uuid.Uuid API became Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "text": "V4 and V7 generation functions remain Experimental and require opt-in."
+        },
+        {
+          "id": "f3",
+          "text": "The API was introduced experimentally in Kotlin 2.0.20; introduction and stabilization differ."
+        }
+      ],
+      "mistakes_to_watch": "Do not confuse 2.0.20 introduction with stability or claim all UUID APIs are stable.",
+      "source_review": {
+        "snapshot_sha256": "2081daa797ffbbc5d2bbcbb0bda8efbd2f2b9fb8720b22da6ca2107b88e32bba",
+        "lines": [
+          370,
+          383
+        ],
+        "excerpt": "reports/task1/sources/whatsnew24.txt"
+      },
+      "selection_reason": "Exact stabilization release with experimental exceptions."
+    },
+    {
+      "id": "q19",
+      "query": "What changed in Kotlin 2.4.20 for exporting suspending lambdas to JavaScript?",
+      "relevant": [
+        {
+          "document_id": "whatsnew2420",
+          "section": "Support for exporting suspending lambdas as async functions"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Kotlin 2.4.20 supports exporting suspending lambdas as JavaScript async functions."
+        },
+        {
+          "id": "f2",
+          "text": "Enable -Xsuspend-lambda-exporting."
+        },
+        {
+          "id": "f3",
+          "text": "Annotate relevant declarations @JsExport; compiler bridges suspend lambdas with JS async/await."
+        }
+      ],
+      "mistakes_to_watch": "Do not substitute older Promise wrappers or say no such support exists.",
+      "source_review": {
+        "snapshot_sha256": "c3b073164d3fa6da16dcba7cd038ae8e8c1ec528e901bc47ff30f578710c07d0",
+        "lines": [
+          505,
+          547
+        ],
+        "excerpt": "reports/task1/sources/whatsnew2420.txt"
+      },
+      "selection_reason": "A version-specific compiler flag and async bridge introduced in 2.4.20."
+    },
+    {
+      "id": "q20",
+      "query": "Which Kotlin 2.4.20 feature permits Swift implementations to extend exported Kotlin types?",
+      "relevant": [
+        {
+          "document_id": "whatsnew2420",
+          "section": "Cross-language inheritance in Swift export"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Kotlin 2.4.20 introduces cross-language inheritance in Swift export."
+        },
+        {
+          "id": "f2",
+          "text": "The reverse-import pattern declares a Kotlin interface and open Kotlin base class; Swift subclasses the base and implements the interface."
+        },
+        {
+          "id": "f3",
+          "text": "Pass the Swift instance to Kotlin functions accepting the interface so Kotlin dispatches to Swift code."
+        }
+      ],
+      "mistakes_to_watch": "Do not claim inheritance is forbidden or omit the Kotlin superclass required by the documented pattern.",
+      "source_review": {
+        "lines": [
+          262,
+          303
+        ],
+        "snapshot_sha256": "c3b073164d3fa6da16dcba7cd038ae8e8c1ec528e901bc47ff30f578710c07d0",
+        "excerpt": "reports/task1/sources/whatsnew2420.txt"
+      },
+      "selection_reason": "New cross-language inheritance and reverse-import requirements in 2.4.20."
+    },
+    {
+      "id": "q21",
+      "query": "What is the internal production API endpoint for my company payroll service?",
+      "relevant": [],
+      "unanswerable": true,
+      "expected_facts": [],
+      "selection_reason": "Out-of-corpus control: irrelevant evidence rejection and honest attribution.",
+      "review_criteria": "Acknowledge that the supplied corpus does not establish the answer. Do not invent facts or supporting citations. General knowledge explicitly distinguished from retrieved evidence is permitted; total refusal is not required."
+    },
+    {
+      "id": "q22",
+      "query": "What breaking changes will Kotlin 3.0 ship with?",
+      "relevant": [],
+      "unanswerable": true,
+      "expected_facts": [],
+      "selection_reason": "Out-of-corpus control: irrelevant evidence rejection and honest attribution.",
+      "review_criteria": "Acknowledge that the supplied corpus does not establish the answer. Do not invent facts or supporting citations. General knowledge explicitly distinguished from retrieved evidence is permitted; total refusal is not required."
+    },
+    {
+      "id": "q23",
+      "query": "How do I configure a PostgreSQL replication slot for Debezium?",
+      "relevant": [],
+      "unanswerable": true,
+      "expected_facts": [],
+      "selection_reason": "Out-of-corpus control: irrelevant evidence rejection and honest attribution.",
+      "review_criteria": "Acknowledge that the supplied corpus does not establish the answer. Do not invent facts or supporting citations. General knowledge explicitly distinguished from retrieved evidence is permitted; total refusal is not required."
+    }
+  ]
+}

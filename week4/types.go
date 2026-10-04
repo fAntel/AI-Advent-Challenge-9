@@ -8,6 +8,11 @@ type Message struct {
 }
 
 type Settings struct {
+	RAGRewrite      bool     `json:"rag_rewrite,omitempty"`
+	RAGRerank       bool     `json:"rag_rerank,omitempty"`
+	RAGFilter       bool     `json:"rag_filter,omitempty"`
+	RAGCandidates   int      `json:"rag_candidates,omitempty"`
+	RAGThreshold    *int     `json:"rag_threshold,omitempty"`
 	RAG             bool     `json:"rag,omitempty"`
 	RAGStrategy     string   `json:"rag_strategy,omitempty"`
 	RAGPlatform     string   `json:"rag_platform,omitempty"`
@@ -57,27 +62,28 @@ type CallMetrics struct {
 }
 
 type Operation struct {
-	Evidence      *Evidence        `json:"evidence,omitempty"`
-	ID            string           `json:"id"`
-	State         string           `json:"state"`
-	Settings      Settings         `json:"settings"`
-	StartedAt     time.Time        `json:"started_at"`
-	FinishedAt    *time.Time       `json:"finished_at,omitempty"`
-	Error         string           `json:"error,omitempty"`
-	Warning       string           `json:"warning,omitempty"`
-	Diagnostics   string           `json:"diagnostics,omitempty"`
-	Metrics       Metrics          `json:"metrics"`
-	Calls         []CallMetrics    `json:"calls,omitempty"`
-	BaseCount     int              `json:"base_count"`
-	TaskBefore    *TaskState       `json:"task_before,omitempty"`
-	ToolMessages  []NativeMessage  `json:"tool_messages,omitempty"`
-	PendingTool   *PendingMCPCall  `json:"pending_tool,omitempty"`
-	ToolApproved  *bool            `json:"tool_approved,omitempty"`
-	PendingCalls  []NativeToolCall `json:"pending_calls,omitempty"`
-	ToolRounds    int              `json:"tool_rounds,omitempty"`
-	InternalCalls int              `json:"internal_calls,omitempty"`
-	InFlightTool  string           `json:"in_flight_tool,omitempty"`
-	MCPEvents     []MCPEvent       `json:"mcp_events,omitempty"`
+	RAGPreparation *RAGPreparation  `json:"rag_preparation,omitempty"`
+	Evidence       *Evidence        `json:"evidence,omitempty"`
+	ID             string           `json:"id"`
+	State          string           `json:"state"`
+	Settings       Settings         `json:"settings"`
+	StartedAt      time.Time        `json:"started_at"`
+	FinishedAt     *time.Time       `json:"finished_at,omitempty"`
+	Error          string           `json:"error,omitempty"`
+	Warning        string           `json:"warning,omitempty"`
+	Diagnostics    string           `json:"diagnostics,omitempty"`
+	Metrics        Metrics          `json:"metrics"`
+	Calls          []CallMetrics    `json:"calls,omitempty"`
+	BaseCount      int              `json:"base_count"`
+	TaskBefore     *TaskState       `json:"task_before,omitempty"`
+	ToolMessages   []NativeMessage  `json:"tool_messages,omitempty"`
+	PendingTool    *PendingMCPCall  `json:"pending_tool,omitempty"`
+	ToolApproved   *bool            `json:"tool_approved,omitempty"`
+	PendingCalls   []NativeToolCall `json:"pending_calls,omitempty"`
+	ToolRounds     int              `json:"tool_rounds,omitempty"`
+	InternalCalls  int              `json:"internal_calls,omitempty"`
+	InFlightTool   string           `json:"in_flight_tool,omitempty"`
+	MCPEvents      []MCPEvent       `json:"mcp_events,omitempty"`
 }
 
 // MCPEvent is a compact, ordered trace of model-directed MCP activity.

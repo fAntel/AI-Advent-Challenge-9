@@ -291,3 +291,95 @@ four-condition results and my question-by-question assessment, and
 [the Flash report](reports/task1/flash/comparison.md) for all twenty new answers
 and their independent factual/citation reviews. The original Pro artifacts are
 preserved. The report compares this single run, not general model reliability.
+
+
+## Task3: rewriting, reranking and relevance filtering
+
+The agent supports three independent opt-in enhancements. `--rag-rewrite` asks
+Flash to rewrite only the search query. `--rag-rerank` sorts candidates using
+Flash relevance scores. `--rag-filter` removes candidates scoring below
+`--rag-threshold` (default 2). Auxiliary calls always use `deepseek-v4-flash`,
+reasoning `none`, no tools and no temperature override, even if the answering
+model differs. All switches default off and persist through resume and branches.
+`--rag=false` skips retrieval and all auxiliary calls.
+
+The scoring rubric is 0 = unrelated/incompatible, 1 = topic only without answer
+support, 2 = useful partial support, 3 = direct support. These are ordinal model
+judgments, not probabilities. The filter accepts scores greater than or equal
+to the threshold (integer 0–3). Filtering alone preserves cosine order;
+reranking preserves cosine order for tied relevance scores. Both together sort
+and discard low scores. Scoring always targets the original question, including
+when search uses a rewrite. The answer always receives the original question.
+
+`--rag-candidates` retrieves 20 candidates by default; `--rag-limit` selects at
+most 5 after processing; the existing 6000-character whole-chunk budget is then
+applied without backfilling beyond the final limit. Candidates must be at least
+the final limit, and both must be in 1–100. Legacy settings with no candidate
+count normalize to at least 20 or their existing final limit. Zero surviving
+chunks are valid and instruct the answer to acknowledge insufficient corpus
+evidence. Plain diagnostic `kotlin-index search` continues to report cosine
+neighbors without hosted inference.
+
+After `make test` and `make build`, these examples use `week4/advent-agent` and
+`week4/.venv/bin/kotlin-index`:
+
+```sh
+./advent-agent --rag --rag-rewrite --rag-rerank --rag-filter --rag-candidates 20 --rag-limit 5 --rag-threshold 2 -p 'How can browser code call my Kotlin function?'
+./advent-agent rag compare --matrix enhanced --suite rag-task3-suite.json --output reports/task3/answers.json --model deepseek-v4-flash --reasoning none --rag-candidates 20 --rag-limit 5 --rag-threshold 2
+.venv/bin/python scripts/render_rag_matrix.py
+```
+
+The comparison defaults to Flash with reasoning disabled. `--matrix paired`
+retains the original plain-versus-RAG experiment; `--matrix enhanced` runs the
+four combinations of reranking/filtering both with and without rewriting,
+regardless of individual enhancement flags. The Task3 suite has ten unchanged
+Task1 questions and three out-of-corpus controls: 104 answers. Expected facts and
+review criteria never enter provider prompts. The rubric, cutoff and K values
+are frozen before this run; the report includes regressions rather than tuning
+settings against the answers.
+
+Preparation saves rewrites, all candidates, cosine/relevance scores, raw
+auxiliary requests/responses, decisions and metrics. Scoring batches contain at
+most five chunks and require a valid score for every ID; invalid responses stop
+the operation explicitly. Completed preparation stages survive interruption;
+saved final evidence is reused for answer retries and MCP continuations.
+Auxiliary calls appear in session/operation usage. Old daemons must be rebuilt
+and restarted before using the new client with RAG.
+
+Within the matrix, one rewrite and one candidate pool per query condition are
+shared across modes, as are applicable scores. Preparation and answers are
+checkpointed atomically. Resume skips completed work and rejects changed suite,
+index, settings or preparation version. Mode order rotates. Reports distinguish
+actual shared-call costs from each mode's full independent preparation cost;
+these independent costs must not be summed as experiment expenditure. Retrieval
+latency includes local subprocess and embedding work. Answer reviews are authored
+separately against saved sources and bound to complete answer hashes. Missing or
+stale reviews withhold quality summaries. This is one illustrative experiment,
+not a statistically established improvement or code-correctness guarantee.
+
+See [the Task3 comparison](reports/task3/comparison.md) for measured results,
+individual answers, source references and reviews. Prior Task1 artifacts remain
+unchanged. Use a new output path to regenerate rather than overwrite that run.
+
+
+### Task3 recorded result
+
+The completed Flash/no-reasoning run contains 104 independently reviewed answers.
+Expected-fact coverage was 27/30 for baseline RAG, 27/30 with reranking, 25/30
+with filtering, and 23/30 with both. With rewriting enabled, the corresponding
+figures were 23/30, 26/30, 28/30 and 28/30. These counts exclude partial facts;
+some omitted facts are useful caveats beyond the literal short question.
+
+Filtering removed all evidence for all three out-of-corpus controls. All eight
+modes already acknowledged corpus insufficiency on these controls, and several
+still volunteered erroneous general-knowledge advice. Rewriting improved packed
+designated-section hits from 9/10 to 10/10, but section presence did not guarantee
+complete answers. The report records citation failures, omissions and a clearly
+separated post-generation external check of PostgreSQL claims.
+
+The actual experiment used 221 hosted calls and 355,481 tokens, with estimated
+cost $0.050258 using the repository adapter's pricing. Scoring added approximately
+5.6–5.8 seconds per question; rewriting added 0.7 seconds. Enhancements remain
+opt-in: rewriting plus filtering was promising for this run, not an established
+universal improvement. Raw requests, responses, evidence and scores are retained
+in `reports/task3/answers.json`; hash-bound reviews are in `review.json`.

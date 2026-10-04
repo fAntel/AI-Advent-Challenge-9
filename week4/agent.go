@@ -709,7 +709,29 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	}
 	feedback := op.TaskBefore != nil && s.Task != nil && op.TaskBefore.ID == s.Task.ID && len(s.Messages) > op.BaseCount
 	if phaseSettings.RAG && op.Evidence == nil {
-		evidence, err := Retrieve(ctx, a.ragConfig, phaseSettings, retrievalQuery(s))
+		preparation, err := PrepareRAG(ctx, completionFunc(a.complete), a.ragConfig, phaseSettings, retrievalQuery(s), op.RAGPreparation, func(p *RAGPreparation) error {
+			a.mu.Lock()
+			defer a.mu.Unlock()
+			current := a.sessions[id]
+			if current == nil || current.session.Operation == nil || current.session.Operation.ID != opID {
+				return ErrConflict
+			}
+			operation := current.session.Operation
+			previous := 0
+			if operation.RAGPreparation != nil {
+				previous = len(operation.RAGPreparation.Calls)
+			}
+			for _, c := range p.Calls[previous:] {
+				m := Metrics{Requests: 1, Duration: c.Call.Duration, Usage: c.Call.Usage, CostUSD: c.Call.CostUSD}
+				a.recordCompletion(current.session, CompletionResponse{Call: c.Call, Metrics: m}, c.Purpose)
+			}
+			operation.RAGPreparation = clonePreparation(p)
+			return a.store.Save(current.session)
+		})
+		var evidence *Evidence
+		if err == nil {
+			evidence, err = SelectRAG(preparation, phaseSettings)
+		}
 		if err != nil {
 			a.failOperation(id, opID, err)
 			return
@@ -1436,6 +1458,7 @@ func cloneSession(s *Session) *Session {
 	c.Task = cloneTask(s.Task)
 	if s.Operation != nil {
 		o := *s.Operation
+		o.RAGPreparation = clonePreparation(s.Operation.RAGPreparation)
 		o.Calls = append([]CallMetrics(nil), s.Operation.Calls...)
 		o.MCPEvents = append([]MCPEvent(nil), s.Operation.MCPEvents...)
 		o.TaskBefore = cloneTask(s.Operation.TaskBefore)

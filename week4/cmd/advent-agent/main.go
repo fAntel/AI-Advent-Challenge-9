@@ -156,8 +156,7 @@ func parseOptions(args []string, defaults agent.Settings) (options, agent.Settin
 	fs.BoolVar(&s.RAG, "rag", defaults.RAG, "retrieve Kotlin documentation")
 	fs.StringVar(&s.RAGStrategy, "rag-strategy", defaults.RAGStrategy, "retrieval chunks: semantic or fixed")
 	fs.StringVar(&s.RAGPlatform, "rag-platform", defaults.RAGPlatform, "optional document platform filter")
-	fs.IntVar(&s.RAGLimit, "rag-limit", defaults.RAGLimit, "retrieval result count")
-	fs.IntVar(&s.RAGBudget, "rag-budget", defaults.RAGBudget, "evidence character budget")
+	agent.RAGFlags(fs, &s, defaults)
 	_ = fs.Parse(args)
 	fs.Visit(func(f *flag.Flag) {
 		if f.Name == "compression" {
@@ -229,7 +228,7 @@ func runNew(api *agent.APIClient, cfg agent.Config, args []string) {
 	fatalIf(err)
 	fatalIf(ensureDaemon(api, cfg))
 	if settings.RAG {
-		fatalIf(api.RequireRAG())
+		fatalIf(api.RequireRAG(true))
 	}
 	session, err := api.Create(agent.CreateSessionRequest{Profile: cfg.Profile, Chat: usesChatMode(o), ProjectID: projectID, ProjectPath: projectPath, Instructions: instructions, Settings: &settings, ContextWindowTokens: cfg.Agent.ContextWindowTokens, RecentMessages: cfg.Agent.RecentMessages, SummaryBatchMessages: cfg.Agent.SummaryBatchMessages})
 	fatalIf(err)
@@ -377,7 +376,7 @@ func runSession(api *agent.APIClient, cfg agent.Config, id, initial string, sett
 
 func runAttachedSession(api *agent.APIClient, cfg agent.Config, id, initial string, settings agent.Settings) string {
 	if settings.RAG {
-		fatalIf(api.RequireRAG())
+		fatalIf(api.RequireRAG(true))
 	}
 	reader := bufio.NewReader(os.Stdin)
 	lease, err := api.Attach(id)
@@ -960,7 +959,7 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 		return
 	}
 	answerCalls := make([]agent.CallMetrics, 0, len(s.Calls))
-	var summaryMetrics agent.Metrics
+	var summaryMetrics, ragMetrics agent.Metrics
 	addCall := func(metrics *agent.Metrics, call agent.CallMetrics) {
 		metrics.Requests++
 		metrics.Duration += call.Duration
@@ -973,11 +972,13 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 		switch call.Purpose {
 		case "summary":
 			addCall(&summaryMetrics, call)
+		case "rag_rewrite", "rag_score":
+			addCall(&ragMetrics, call)
 		default:
 			answerCalls = append(answerCalls, call)
 		}
 	}
-	latest := s.Calls[len(s.Calls)-1]
+	var latest agent.CallMetrics
 	if len(answerCalls) > 0 {
 		latest = answerCalls[len(answerCalls)-1]
 	}
@@ -987,17 +988,24 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 		limit = 1_000_000
 	}
 	percent := 100 * float64(u.PromptTokens) / float64(limit)
-	fmt.Fprintf(w, "  latest answer request: input context=%d (cache hit=%d, miss=%d), model answer=%d, total=%d\n", u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens, u.CompletionTokens, u.TotalTokens)
-	if u.ReasoningTokens > 0 {
-		fmt.Fprintf(w, "  latest reasoning tokens: %d\n", u.ReasoningTokens)
+	if len(answerCalls) > 0 {
+		fmt.Fprintf(w, "  latest answer request: input context=%d (cache hit=%d, miss=%d), model answer=%d, total=%d\n", u.PromptTokens, u.PromptCacheHitTokens, u.PromptCacheMissTokens, u.CompletionTokens, u.TotalTokens)
+		if u.ReasoningTokens > 0 {
+			fmt.Fprintf(w, "  latest reasoning tokens: %d\n", u.ReasoningTokens)
+		}
+		fmt.Fprintf(w, "  context window: %d / %d (%.2f%%)\n", u.PromptTokens, limit, percent)
+	} else {
+		fmt.Fprintln(w, "  no completed answer calls yet")
 	}
-	fmt.Fprintf(w, "  context window: %d / %d (%.2f%%)\n", u.PromptTokens, limit, percent)
 	t := s.Metrics
 	fmt.Fprintf(w, "  whole dialog: calls=%d, cumulative input=%d, model output=%d, total=%d\n", t.Requests, t.Usage.PromptTokens, t.Usage.CompletionTokens, t.Usage.TotalTokens)
 	fmt.Fprintf(w, "  estimated dialog cost: $%.8f USD\n", t.CostUSD)
 	fmt.Fprintf(w, "  history memory: summarized=%d messages, verbatim=%d messages, summary=%d tokens\n", s.SummarizedMessages, len(s.Messages), s.SummaryTokens)
 	if summaryMetrics.Requests > 0 {
 		fmt.Fprintf(w, "  compression overhead: calls=%d, input=%d, output=%d, total=%d, cost=$%.8f USD\n", summaryMetrics.Requests, summaryMetrics.Usage.PromptTokens, summaryMetrics.Usage.CompletionTokens, summaryMetrics.Usage.TotalTokens, summaryMetrics.CostUSD)
+	}
+	if ragMetrics.Requests > 0 {
+		fmt.Fprintf(w, "  RAG preparation: calls=%d, input=%d, output=%d, total=%d, cost=$%.8f USD\n", ragMetrics.Requests, ragMetrics.Usage.PromptTokens, ragMetrics.Usage.CompletionTokens, ragMetrics.Usage.TotalTokens, ragMetrics.CostUSD)
 	}
 	if s.BranchName != "" {
 		fmt.Fprintf(w, "  branch: %s (parent=%s)\n", s.BranchName, s.ParentSessionID)

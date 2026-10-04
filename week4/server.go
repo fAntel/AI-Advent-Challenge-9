@@ -43,7 +43,7 @@ func profile(r *http.Request) string {
 func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	if path == "v1/capabilities" && r.Method == http.MethodGet {
-		writeJSON(w, 200, map[string]bool{"rag": true})
+		writeJSON(w, 200, map[string]bool{"rag": true, "rag_enhanced": true})
 		return
 	}
 	if strings.HasPrefix(path, "v1/mcp") {

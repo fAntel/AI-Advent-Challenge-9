@@ -1,0 +1,2252 @@
+{
+  "basis": "Independent assistant review against saved source excerpts, full generated answers, and their packed evidence. Fact statuses and notes are authored explicitly; renderer only aggregates.",
+  "assessments": [
+    {
+      "question_id": "q01",
+      "mode": "rag",
+      "answer_sha256": "fa75ac263566729f05961d1fce8b0c2d72704c999ff085633ad439f2d0e3cec4",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. References [3] and [5] support resolution and declaration; [1] supports anonymous parameters."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-rerank",
+      "answer_sha256": "6123e91bf2a17d18fb0ebb22135c8087df37f596fc7f6d3315666a3d24e8e5e5",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. Correct historical preview caveat is supported by the retrieved Kotlin 2.2 note."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-filter",
+      "answer_sha256": "4eed90449f0814317157d2932c958890d6b169bfbe8fb9aa3a89595495aeb980",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct; the preview caveat is historical, not a claim that the feature is still preview."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "00f7a2531f8726057403a2448f856c27d9a9b2fbf2a320d9f71f0621d97a14c7",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct and source-supported, with a historical preview caveat."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-rewrite",
+      "answer_sha256": "18c83ca27c665ce7e98de0d45ad5ce4245a8aec9c28d58358c7045b1b9e37763",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct; [1] supports resolution and [2] anonymous parameters."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "06bde9dbef19efd8fd9811b295e23b550665d868c97f83bdea52a908ce111365",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. Mentions explicit context arguments without their experimental opt-in caveat; the retrieved selection ends before that caveat. This omission affects the optional extension, not the core example."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "63bec3139082a8cc9095c14a4d757d191ba82d068c8222a3cf47fa76e6dfefee",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. The optional explicit-selection example omits -Xexplicit-context-arguments; retrieved chunks do not include that caveat. Feature-availability caution is general rather than the specific opt-in guidance."
+    },
+    {
+      "question_id": "q01",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "22c817af3fed02cb5bb64309f62980ddc3ca345b9fb33a1dec1dc45897b2d8b7",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Declares context(users: UserService) before the function."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains call-site matching by type within the available context."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explicitly identifies same-scope compatible values as ambiguous."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. Optional explicit arguments are mentioned without the experimental opt-in caveat, which is outside the packed source span."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag",
+      "answer_sha256": "60ea19a7c09d510531aa05c4c8f4cd6e5ad235b09a2243a854b2b223c5311f7f",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Requires matching packages and coverage; signatures are only implicit."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct placement, packages and target coverage, but signature matching is not explicitly explained."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-rerank",
+      "answer_sha256": "6edf056d6313187e429e41aa7e915de614da0d9f4d70ab388684f6901eea0ae9",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Requires matching packages and coverage and explicitly matching signatures."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Covers all expected facts, including intermediate source sets and matching signatures."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-filter",
+      "answer_sha256": "afb22ee5e5c9475dd241f2c72b62b031fef029348d7b531b7ccf02b38c815a68",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Requires matching packages and coverage; signatures are only implicit."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Intermediate source sets are explained; signature compatibility is only implicit in matching declarations and the example."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "92477260b0223e3ae666cd8329d191786c0521aa32c8e0bbf3dfe2252ada8ae7",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Places actual in platform code; omits shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Requires matching packages and coverage; signatures are only implicit."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Omits the shared intermediate-source-set option and explicit signature matching, despite both being present in the supplied evidence."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-rewrite",
+      "answer_sha256": "57fb1e261496fd67ec2b3e96fb863f33c684fc090b063dc979564dc0b1a935f4",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Requires matching packages and coverage; signatures are only implicit."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct placement and package/coverage rules; explicit signature matching omitted."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "7c5646a4efdaffa13a46130db6d0eb4cdd0d2846831a6baef6abce931470bb70",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Requires matching packages and coverage; signatures are only implicit."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct intermediate-source-set guidance and package/coverage rules; signature matching remains implicit."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "9c164ef3d1af4e58cee0e4f543a5e0f8c56509eaa86e313e26dd3b8a7eed866d",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Requires matching packages and coverage; signatures are only implicit."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct placement, package and target coverage; does not explicitly identify matching signatures."
+    },
+    {
+      "question_id": "q11",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "77d658427e95cde2db2508eb490b838d97cbc4ff45a64127180631990db9de32",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Places implementation-free expect declarations in common code."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Places actual in platform code and allows shared intermediate source sets."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Requires matching packages and coverage and explicitly matching signatures."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Explicitly covers signatures, package, coverage and intermediate source sets. The extra characterization of intermediate sets as advanced is editorial, not established by the excerpt."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag",
+      "answer_sha256": "065076f207135ee76f4aeb5bbd13eb84518db08dc5b35a029f13e3c3711e0a20",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct alias mechanism, matching-contract requirement and package placement. The ellipsis constructor example is schematic, not compilable code."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-rerank",
+      "answer_sha256": "9cb8035728f781ea828cb978737d827031601802eacbd691c50244e01cb4c0f2",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All three expected facts are covered, including reuse without a wrapper and dependent expected types."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-filter",
+      "answer_sha256": "f7e5a2fc43c82bb7db6784eb8a452b5f1dc7ef25c556b0478e00b0b0d4392444",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct core alias guidance. The statement that all referenced platform types must become expect/actual is broader than the source example: this is needed for types exposed in the common contract."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "8f94e82edf5b93333af9660f12d30a31e02a26136bc6eefe3a52645a1228e687",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct alias, compatibility and package rules; the dependency wording is limited to expected types in the signature."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-rewrite",
+      "answer_sha256": "925c2dcb2b2c4fe6dba5553e3b7278c7ddb304d2030b288739982ed170d581eb",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Explains direct reuse without wrapping, but omits the complete API-compatibility requirement."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Explains aliasing without a wrapper and package placement, but does not clearly state that the target must satisfy every expected requirement."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "61811ecb7d3fb7a97781f5158872a951c38c2d11f8da8f7315c0315b83a2f2c1",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. The dependency remark should be read as referring to the common contract, not every implementation dependency."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "f7591c71782a93ada9749bff95ccb3bae5f731b9fff822165dfb7801db62cb74",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct; reference [3] supports compatibility and [1] supports alias placement."
+    },
+    {
+      "question_id": "q12",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "3c1abf3fe149169c2dac395f44dc3b8ceb88fa36cf6e561d6596416de6434099",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Uses actual typealias in JVM/platform code to map the common expected class to LocalDate."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explains direct reuse without wrapping and the requirement to satisfy the expected API."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Places the alias in the expect package and allows the target type to be defined elsewhere."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. Wording that the referred class must be elsewhere is stronger than necessary; the requirement concerns the alias package."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag",
+      "answer_sha256": "1eb6ee70cef7f4c7a7dadb396bbe4272332f31f5e5514c0110aed46c33b192b0",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "mixed",
+      "notes": "All core rules correct. The opening overgeneralizes Objective-C as understanding only checked errors; the source says that about Swift. The IOException example needs a Native-appropriate declaration/import; none is supplied."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-rerank",
+      "answer_sha256": "245aac60648fb0caaa8affe0d635df785df1142d038f4b8c95169c017d43604c",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core rules correctly track [1]. The illustrative IOException is not defined for Native; the retrieved Java example is not by itself a Native dependency declaration."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-filter",
+      "answer_sha256": "dc8cdcf5cba61b906098463a44ed79cf7cfe936b04abd75b7805192c0c201550",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected exception rules are correctly covered by the single retained source chunk."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "9f41a0eb37cccdaacbd984190365c47fae11b56b3b5bc2b02b37a2ddf3f77245",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected exception rules are correctly covered by the single retained source chunk."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-rewrite",
+      "answer_sha256": "11b5532688b230a8e4eb47e68b22337d7907fb106b19845f4fa7da3a6dbba77c",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete, source-supported exception rules, including cancellation and termination."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "9d9f6995eff8c1c6bb74081490540468d72a2ef9b2437b9957746e0b61f08d1e",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct and Java is distinguished from the Objective-C bridge. The IOException example needs a Native-appropriate declaration/import."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "fa9f4c3cec4620528dbd4e480cbba25b5500311a559a6334d7271e73090fc214",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected rules correct. The opening only-if statement is overbroad in isolation, but the later suspend/CancellationException exception explicitly corrects that scope."
+    },
+    {
+      "question_id": "q13",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "22df89478d3c3f58ab0ffdee9297a40dd77ea76d0d5053eba02a66af6f0834c7",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps non-suspend @Throws functions to Swift throws and Objective-C NSError methods."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Limits propagation to listed classes/subclasses and states termination for other escaping exceptions."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains suspend error parameters, CancellationException-only propagation without @Throws, and non-suspend non-propagation."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected exception rules correctly covered by the single retained source chunk."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag",
+      "answer_sha256": "f102f2d2694d91a4f24ca69e1670a6fc8ee58021b2af1b161cc8715b8dd54b08",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers and states Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "mixed",
+      "notes": "All expected facts covered, but the Alpha-in-2.4.0 claim cites [2], whose packed text contains concurrency support, not the status transition."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-rerank",
+      "answer_sha256": "c63d50a9c09d873af5a7d7eb130dee72fc7faaa558b027b14c0c66e75066f0ca",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers, but omits Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct async/try-await mapping and Objective-C distinction; omits the explicit Alpha status."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-filter",
+      "answer_sha256": "f3fbfb1aeea96dced2a3e20a864437a0d2783f4babd85dbc4e0292be970a080a",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers, but omits Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct mapping and bridge distinction; a general availability caveat does not state Alpha status."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "39c8a85aa0a74a0f99b2c8349461593781259aee9f55b375848c98ce3b2a7e8c",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers, but omits Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct mapping and bridge distinction, but omits Alpha status."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-rewrite",
+      "answer_sha256": "c4dbbd9cfbd38beb24af70eff6a24fc9e878f40fd2ab15874ec9e4ec0af9df13",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers and states Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All facts covered, including Alpha supported by the introductory Swift-export chunk [5]."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "7a40d46289594193b473a6de8a7aa9579a64573fa05153fed09ed5f09187d13f",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers, but omits Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct mapping, default dispatcher and bridge distinction; no explicit Alpha status."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "ca286114094862a23edb2e1c60663fcdc3021185d06191e6bccb5de1eb2e33bd",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers and states Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "mixed",
+      "notes": "States Alpha and distinguishes the bridges, but the cited release-note chunk [2] does not contain the Alpha claim."
+    },
+    {
+      "question_id": "q14",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "91f3b22235e436f1c588b99762ecf71e8a270e0eb6a909dced1bfb5ff18c1e47",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Maps suspend functions and functional types to Swift async counterparts."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Shows let msg = try await hello()."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Distinguishes Swift export from Objective-C completion handlers, but omits Alpha status."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct async mapping and bridge distinction; replaces Alpha status with a general version caveat."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag",
+      "answer_sha256": "560cb256144ad81cf83036dd31e43a3b69b3d8ebb215fa6fa6f0fc3b8a0681f8",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Describes an externally implemented API and/or bodyless declarations, but does not fully explain the compiler no-implementation rule."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Omits package-level scope, inherited external and definedExternally guidance."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct external mechanism, but no explicit compiler/no-body rules or package/nesting/default-argument guidance. The optional @nativeInvoke example introduces a Wasm-specific feature without clearly separating targets; its availability warning is generic."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-rerank",
+      "answer_sha256": "8110b33ca34159214dab7fc68b54aa48930773cb9ed2dfe2313bb212423748e4",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Describes an externally implemented API and/or bodyless declarations, but does not fully explain the compiler no-implementation rule."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Covers some package/nested external behavior but omits definedExternally."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Accurately scopes examples to Wasm, so it avoids making JsAny universal, but it does not supply the designated Kotlin/JS rules. No package-level or definedExternally guidance."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-filter",
+      "answer_sha256": "2b56a43df0ae389a43bbb86ab02f21b10a92f8901a8b037a71a6a11d9b3a6ad5",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Describes an externally implemented API and/or bodyless declarations, but does not fully explain the compiler no-implementation rule."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Omits package-level scope, inherited external and definedExternally guidance."
+        }
+      ],
+      "material_error": true,
+      "citations": "supported",
+      "notes": "Presents the Wasm JsAny module example as general Kotlin/JS guidance without identifying its target. The generic version caveat does not explain this platform restriction."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "b8fa2d6ccc883faa421e05e81a758aab12146931e8f01ef3e657629e0d1cb683",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Describes an externally implemented API and/or bodyless declarations, but does not fully explain the compiler no-implementation rule."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Covers some package/nested external behavior but omits definedExternally."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Clearly notes that its source and examples are Wasm-specific; core external guidance is useful, but package-level and definedExternally rules are omitted."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-rewrite",
+      "answer_sha256": "c5426b07bfd5a3728a64d58e7dd6e099154cf98674acbf8fc6020b0acf2262ed",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Describes an externally implemented API and/or bodyless declarations, but does not fully explain the compiler no-implementation rule."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Covers some package/nested external behavior but omits definedExternally."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct mechanism and explicit Wasm/JS distinction. Nested external behavior is covered, but no package-level or optional-argument rule."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "4880e816eaea921192554dfb9f25530b05928fdd94ab3e913a76382d15d7a937",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly says no Kotlin body and no generated JS implementation."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Covers some package/nested external behavior but omits definedExternally."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Rewriting plus reranking retrieves the designated JS section and covers no-body/no-code rules, package scope and inherited external. Optional definedExternally guidance is absent."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "ca3ad97a14ec0a59f198d12918ebdcb8558d48a05c6531b38db5f52ded46d6e2",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly says no Kotlin body and no generated JS implementation."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Covers some package/nested external behavior but omits definedExternally."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Covers the designated JS external rules and identifies JsAny as target-specific. Optional definedExternally guidance is absent."
+    },
+    {
+      "question_id": "q16",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "35ecbc5803e1ba25102a09988d59ec284bdac1842c0b1f5468035fea8ec8d973",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies external declarations for APIs implemented in JavaScript."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly says no Kotlin body and no generated JS implementation."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Covers some package/nested external behavior but omits definedExternally."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correctly separates Wasm examples from Kotlin/JS and covers package/nesting/no-body rules. Optional definedExternally guidance is absent."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag",
+      "answer_sha256": "4b3a4842b376975d169f7f44fcb1f4b0647b246e08833a53bb0fb46dfbbd88d6",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete source-supported handle creation and access pattern, including JS usage."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-rerank",
+      "answer_sha256": "b69aeba3c9631e654659de3a80b0f98125b0c714bc071ae1aba59b8ef0a73279",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete pattern, with correct Kotlin/Wasm versus Kotlin/JS distinction."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-filter",
+      "answer_sha256": "e095e5d3f77e66a641940f14fcda48b340f03f6906d09c0c44ff7852570a48c9",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete source-supported pattern; retained evidence includes the JS usage example and type correspondence."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "243718d1d2bd928b23da65a20b7024a338c0d0a12b85741267516e1ab1130662",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete pattern, with clear separation between the JS handle and Kotlin object access."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-rewrite",
+      "answer_sha256": "07fb383b1a699d78ab30bfde2ec097ddf42c12d54d0e8c3bd8b7e1cd4947b661",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All core facts correct. Prose loosely says expose a class with @JsExport; the actual code correctly exports factory/helper functions, not the class."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "fc0428a4c484737f998013f622dbb3facdcba7a6348806de4584be677bb46d7d",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete pattern and correct target distinction; Beta caveat is supported by the introductory chunk."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "1ebf85aab9144fa724b2e1dfa318c2ce22ab1db2440fe0335bebccb7faf7c0c5",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete pattern, with correct target distinction and no unsupported direct property access."
+    },
+    {
+      "question_id": "q17",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "a4d214611c77b5e5d6f57ac9963c798837e2f729a4f5e29c7f73265ed6587825",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies JsReference<T> as an opaque handle to a Kotlin object."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Creates the reference with toJsReference() and returns it from @JsExport createUser."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Explains that JS cannot inspect the object and demonstrates exported setUserName unwrapping with get()."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Complete pattern with source-supported opaque-reference semantics."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag",
+      "answer_sha256": "09d915298de4a393f1c4e5d72ecfa0a5bec00234285a224f7e4fe21baf6cca3b",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "States experimental introduction in Kotlin 2.0.20, distinct from stability."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct stabilization release and exceptions, with experimental introduction distinguished from later improvements."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-rerank",
+      "answer_sha256": "769a2b5485f566905927ed01e5451f1d6b330e86b745a9f54197def59f1a0f96",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "States experimental introduction in Kotlin 2.0.20, distinct from stability."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All facts covered concisely, including experimental introduction in 2.0.20."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-filter",
+      "answer_sha256": "de3f08b13df3740ab5b99e05476a571a6696969321b0e3c26224d79bc44b539f",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not discuss experimental introduction."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Answers the core stability question and exceptions correctly, but omits the 2.0.20 introduction/history fact."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "dd7c15a79255ced1d5f4e0a1200243c5959296bdb8669b018274a90a00279bd6",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Mentions earlier Experimental status but omits the 2.0.20 introduction."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct stability and exceptions; says previously Experimental but omits the introduction release."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-rewrite",
+      "answer_sha256": "717376d3925a33e63bd1ba0ba1ca45d92eba7c268f285495d37cd4cc5ff3347c",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "partial",
+          "evidence": "Mentions earlier Experimental status but omits the 2.0.20 introduction."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct stability and exceptions; mentions experimental status in 2.3.0 but not introduction in 2.0.20."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "148f844250bc550d26d41b911234d217710501d6dfafe3ec5d1577fc44cf3805",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "States experimental introduction in Kotlin 2.0.20, distinct from stability."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts covered, with introduction distinguished from stabilization."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "f0cdb1129fce5b07add8b01c72dc9da869396a6c4f0fd174aa106db52bb7a8eb",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "States experimental introduction in Kotlin 2.0.20, distinct from stability."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts covered, including 2.0.20 introduction and later experimental status."
+    },
+    {
+      "question_id": "q18",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "a016fbc93c17f82f7cebdf0ede6fe6e8b330ecb0153b269973c106a47bb42251",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "States Stable in Kotlin 2.4.0."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Explicitly retains Experimental/opt-in status for V4 and V7 generation."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "States experimental introduction in Kotlin 2.0.20, distinct from stability."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts covered with direct support in [1]."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag",
+      "answer_sha256": "8d3125d8ed9dd88b4f695fc99cb3ba4a468f3b91f85123f06a26db3e01850c93",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct; correctly distinguishes earlier suspend-function export from lambda export."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-rerank",
+      "answer_sha256": "f89612e9a16c09e8499db71c1c3b3b4c4383ae78db026796b605f78dca6ea737",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts and code pattern follow the saved release notes."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-filter",
+      "answer_sha256": "24e4bebdc505f50cd0f3a43c76e0ea83968244cb41bfaccd0a4eec1cbee658ae",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct; retained release-note sections include the flag and usage."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "a0af5ae71b17477a1b7a07dd79e0a0b53d87c34d7f16f8f7562f1f38bad0bb17",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct with direct source support."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-rewrite",
+      "answer_sha256": "519c5b33555a3f406d555233ade92a24c0a38a86d3e3ff700fed308ffddbf4cb",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct; mentions the pre-stable status without guessing a specific maturity level."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "334c602dd15f7046cb9587f6c837a36e61abdc79090d48601f82616738f949e0",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct with the exact flag and export pattern."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "6679ca4a2a92afb77db3a1c0e937c390ae7ac40ec5ff8c40e1f5ab5a75e46fc5",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct with the exact flag and export pattern."
+    },
+    {
+      "question_id": "q19",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "d2c0536d333148523287d4d3c8efdab75b3f864e6ee90b0613c40fafe9b9f4e8",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Identifies Kotlin 2.4.20 support for suspending lambdas exported as JS async functions."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Names the exact -Xsuspend-lambda-exporting flag."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Uses @JsExport and explains/shows the async-await bridge."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts correct, concisely states flag and shows export usage."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag",
+      "answer_sha256": "f554c9bd0461165d1b2eeac4e84e6b99c8c2a15b632555b25d3ae0c96d9271a6",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Describes the Kotlin open superclass and interface implemented/extended by Swift."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Passes the Swift implementation to Kotlin functions accepting its interface."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts covered, including open base class and calling back into Swift through the Kotlin interface."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-rerank",
+      "answer_sha256": "b703b2266ceb1f8be2cb7d1550c9a597c2640efe33584f611792386dda7af3e0",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Describes the Kotlin open superclass and interface implemented/extended by Swift."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Passes the Swift implementation to Kotlin functions accepting its interface."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct feature and reverse-import pattern; Kotlin example shows open base class and interface-dispatch function."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-filter",
+      "answer_sha256": "3d1345c791fc3ba9a26f527865f0c2e5e1ad068867fcf2a9e808f2a95889433a",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Describes the Kotlin open superclass and interface implemented/extended by Swift."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Passes the Swift implementation to Kotlin functions accepting its interface."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct open base/interface pattern and passing the Swift instance to Kotlin; dispatch is conveyed by Swift implementing the contract."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "0d78dbd39719600d1a1e7dac1b0ef98cad58f68c33372e7b2688b78e67263652",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Describes the Kotlin open superclass and interface implemented/extended by Swift."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not describe passing the Swift instance to Kotlin for dispatch."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Names the correct feature and open-class/interface pattern, but omits passing the Swift instance back to Kotlin for dispatch."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-rewrite",
+      "answer_sha256": "e9fa4d862f2e97297bcd34b4cbe9cb37359a3a07495e87f8e0f5d264fe0ead22",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "missing",
+          "evidence": "Does not explain the superclass/interface pattern."
+        },
+        {
+          "id": "f3",
+          "status": "missing",
+          "evidence": "Does not describe passing the Swift instance to Kotlin for dispatch."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correctly answers which feature in one sentence, but omits the richer expected pattern and dispatch details. This is incompleteness against the suite, not a wrong direct answer."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "a85006628d81d84997593a01734c35d99e004859aa0aae375b0bfb58be69053b",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "partial",
+          "evidence": "Describes superclass/interface implementation but omits the open-base requirement."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Passes the Swift implementation to Kotlin functions accepting its interface."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct inheritance/interface and pass-back pattern, but does not explicitly say the Kotlin base must be open."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "c996cf992205516f156d2a5f6acb7c950836de1dfa8d6be5822487d79dae48d5",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Describes the Kotlin open superclass and interface implemented/extended by Swift."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Passes the Swift implementation to Kotlin functions accepting its interface."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correct feature, open superclass/interface, and passing the Swift implementation to Kotlin consumers."
+    },
+    {
+      "question_id": "q20",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "ce2b640af02131bd12d3752e8ba08105d795903c0cdf78d959d4f3e9ff2c429e",
+      "facts": [
+        {
+          "id": "f1",
+          "status": "correct",
+          "evidence": "Names cross-language inheritance in Swift export for the requested 2.4.20 feature."
+        },
+        {
+          "id": "f2",
+          "status": "correct",
+          "evidence": "Describes the Kotlin open superclass and interface implemented/extended by Swift."
+        },
+        {
+          "id": "f3",
+          "status": "correct",
+          "evidence": "Passes the Swift implementation to Kotlin functions accepting its interface."
+        }
+      ],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "All expected facts covered with a Kotlin interface-dispatch example and explicit Swift inheritance."
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag",
+      "answer_sha256": "a7fed564d138e0a9626c59eb7117fc4d20951e823789cd4d3956ba0ddfb7a241",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Explicitly states the references contain no payroll endpoint and invents none. Adds an unnecessary categorical refusal to share even authorized internal endpoints.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-rerank",
+      "answer_sha256": "ca3888fdc073875b194a21a1092f35d2f78fdcb878599a010c8caf3bc5282929",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Explains that the cited Kotlin snippets contain no payroll endpoint and directs the user to internal documentation.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-filter",
+      "answer_sha256": "35dc0c7a9e47e7b2e7c9d38eca64198853ebfc6c20e8243d9bb613e490d69e81",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Acknowledges no evidence and invents no endpoint; adds unnecessary disclosure-policy language.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "cd2021716910e95e7cea7884d08a04629c46b9f9829a469b67c86f04ecb7a13c",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Acknowledges missing organization-specific evidence; configuration names are clearly illustrative, not claimed actual values.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-rewrite",
+      "answer_sha256": "49a8d36aa584aa5fbd9570b04a009531338a0f4234b7e8acbcc670488cda65c1",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correctly identifies irrelevant retrieved documents and no infrastructure access. Adds an unnecessary broad policy refusal.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "4c8c3dddd2f7d64268e748a7e59ae8c91a2b09d5ed154741947c1d6e79ea49b4",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correctly identifies missing payroll evidence. The claim that instructions prohibit such help is stronger than the actual instruction to answer Kotlin questions.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "f93794da1af2f6635fa439e37dd16181759d39fd513da5555a28659ebefd2263",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Acknowledges empty evidence; provides explicitly illustrative client code. The /api/v1/payroll suffix is an invented example path, not an established endpoint, and should not be copied as real configuration.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q21",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "016ea585a6e37f6dffc58c3139ff655b86c948c67328ace4db2198ef19f9e6e8",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Clearly acknowledges empty evidence and refuses to infer a hostname; example only reads an environment variable.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag",
+      "answer_sha256": "8e921cf5501bc7f8c173226fbed7ef987216e64773695b5cc498c8539809b241",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Explicitly separates known 2.x source facts from unknown 3.0 plans and invents no future breaking-change list.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-rerank",
+      "answer_sha256": "57be397b786999e3510abff462108ec04c1cfd29803adfdc1e7414a67775ce86",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Clearly states that no supplied source establishes a 3.0 breaking-change list.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "fb7a410b50c6f7c28615afddc4cd7926053e4f26dfd866f45f170ed283c877f6",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Acknowledges empty corpus evidence and qualifies unverified release-status background as potentially outdated knowledge; no concrete 3.0 commitments invented.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-rewrite",
+      "answer_sha256": "9cea8835231f83457e037ae4d670b4ec4a2c3609272e673f2674d4e2fa39ff0c",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Identifies corpus insufficiency and labels extrapolation as unconfirmed. Its opening assertion that 3.0 has not been released is not established by the corpus; the cited 2.x details are supported.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "72e054e2e454f7f6d8c49db4111e670dbc950e6d1da0486499b63921ee2a31bb",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correctly distinguishes supported historical changes from unsupported future plans; no concrete 3.0 claims.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "87820765c3ddcda6512ed69daf4fc4ac17783b2098497d3bd3705e20bc83083f",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Acknowledges lack of reliable knowledge and provides no invented change list or citations. Makes stronger unverified release-status claims despite its knowledge-cutoff caveat; empty retrieval alone cannot establish release status.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "35061a0256745ffcabf243e957103dbae1632a07910192f5017f0925f62f1d96",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Explicitly acknowledges empty evidence and lack of live verification; release-status background is qualified as knowledge-cutoff dependent.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q22",
+      "mode": "rag-filter",
+      "answer_sha256": "3a8bee42eb911e18def938e16024c0e7b742b233f65ef02a23a399ba6eaa47d4",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Explicitly acknowledges empty evidence and qualifies background as knowledge-cutoff dependent. No specific future change list or invented citation.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag",
+      "answer_sha256": "8aafc8e4c7b92862a1dccb09e2988b80ea5d91564daac95850d1c71dfebb4519",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Correctly identifies the irrelevant Kotlin evidence and declines a sourced answer; offers documentation/property pointers without presenting a configuration as corpus-supported.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-rerank",
+      "answer_sha256": "ac9aa0c96499e0e52b93efa57b408cafe6b75b66ec56deb5c3924825339b16ac",
+      "facts": [],
+      "material_error": true,
+      "citations": "none",
+      "notes": "Clearly separates general knowledge, but gives an incorrect slot-name default; see the post-generation external check. Its confident claim that slots are never created during snapshots is also unverified.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-filter",
+      "answer_sha256": "a065b4a99e5b7d736cab6dc7566eacefb9ddf842502975d8437459be7e769647",
+      "facts": [],
+      "material_error": true,
+      "citations": "none",
+      "notes": "Honest about missing sources, but incorrectly labels pgoutput as the default, lists wal2json as supported, and discourages valid manual creation; see external check.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-rerank-filter",
+      "answer_sha256": "f46b532ab3381a4e781291f366b3b8e54b2f63290c298257e722d76bc899e8e1",
+      "facts": [],
+      "material_error": true,
+      "citations": "none",
+      "notes": "Acknowledges empty evidence, but lists unsupported wal2json as an option; see external check. Other version-specific operational details are not exhaustively verified.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-rewrite",
+      "answer_sha256": "9cdc16a772af9cdc984f8fd84407ef3c4b164eca07556d6804f1a6147caf9e00",
+      "facts": [],
+      "material_error": false,
+      "citations": "supported",
+      "notes": "Explicitly separates general orientation from irrelevant Kotlin sources; no false claim that the corpus supports PostgreSQL configuration.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-rerank-rewrite",
+      "answer_sha256": "6fe258948b24cdf2f26709d59d5d2b2b76791474614b44b327abda9d1c356e62",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Acknowledges insufficient evidence and requests appropriate documentation; does not invent configuration details.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-filter-rewrite",
+      "answer_sha256": "e53f1f10deb2104c161cc8b419abd15cf8c5684ac82a7b23c5438c1de4fa6d86",
+      "facts": [],
+      "material_error": false,
+      "citations": "none",
+      "notes": "Explicitly labels instructions as unverified general knowledge. Slot default and manual-creation guidance agree with the external spot-check; this is not an exhaustive validation of deployment instructions.",
+      "honest_insufficiency": true
+    },
+    {
+      "question_id": "q23",
+      "mode": "rag-rerank-filter-rewrite",
+      "answer_sha256": "bb2b9bb5328a97bcb3cafd72c06499589be7331be5c7be2f9c252350c20defbc",
+      "facts": [],
+      "material_error": true,
+      "citations": "none",
+      "notes": "Clearly separates general knowledge, but invents a topic-prefix-derived slot default; see external check. Broad managed-service restrictions are unverified.",
+      "honest_insufficiency": true
+    }
+  ],
+  "external_check": {
+    "purpose": "Post-generation spot-check of unsolicited q23 configuration claims, separate from the frozen Kotlin corpus and never supplied to generation/scoring. Not a comprehensive PostgreSQL audit.",
+    "source": "https://debezium.io/documentation/reference/stable/connectors/postgresql.html",
+    "accessed": "2026-10-04",
+    "findings": "Official docs list slot.name default debezium, plugin.name default decoderbufs, supported plugins decoderbufs and pgoutput, and explicitly permit manual slot creation. This contradicts the flagged default-name, plugin, and manual-creation claims."
+  },
+  "summary": "In this single run, **rewriting + filtering** and **rewriting + reranking + filtering** covered **28/30 expected facts**, compared with **27/30 for baseline RAG**. Rewriting + filtering had no flagged material errors, but one citation-support problem; adding reranking removed that citation problem but produced an erroneous general-knowledge claim on the PostgreSQL control. This does not establish a universal winning mode.\n\nAll four filtering modes rejected all 60 candidates across the three out-of-corpus questions in each rewrite condition, leaving zero evidence. However, **all eight modes already acknowledged insufficient corpus evidence on all three controls**. Filtering therefore improved evidence selection without improving that particular answer-level score. Several modes still volunteered unverified general-knowledge instructions; four q23 answers contained spot-checked errors. Empty retrieval is not a guarantee against hallucination.\n\nRewriting increased designated-section presence in packed evidence from **9/10 to 10/10**. On q16, rewrite alone reached a nested external-interface subsection; combining it with scoring selected the more directly useful Kotlin/JS external-modifier rules. Section hits are a proxy and do not measure completeness. Filtering also removed two designated-section candidates without rewriting and four with rewriting; these were not necessarily useful to the specific question.\n\nThere were regressions: filtering without rewriting scored **25/30**, reranking + filtering without rewriting **23/30**, and rewriting alone **23/30**. Missing signatures, feature-status caveats and historical introduction dates contributed. The very short q20 rewrite-only answer correctly named the requested feature but omitted the broader pattern expected by the suite. Differences between answers sharing identical evidence also show generation variability.\n\nScoring cost about **5.6–5.8 seconds per question**, in addition to retrieval and answer generation. Rewriting added about **0.7 seconds per question**. Actual shared experiment expenditure was approximately **$0.0503 for 221 calls** using the repository pricing estimates. Keep enhancements opt-in: baseline was already strong, while rewriting + filtering is a promising choice for this corpus that warrants more questions and repeated trials."
+}

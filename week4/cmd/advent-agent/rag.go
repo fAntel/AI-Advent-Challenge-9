@@ -13,19 +13,22 @@ import (
 
 func runRAG(cfg agent.Config, args []string) {
 	if len(args) == 0 || args[0] != "compare" {
-		fatal(errors.New("usage: advent-agent rag compare --suite FILE --output FILE [--model MODEL --reasoning low --rag-strategy semantic]"))
+		fatal(errors.New("usage: advent-agent rag compare --suite FILE --output FILE [--matrix paired|enhanced --model MODEL --reasoning none --rag-strategy semantic]"))
 	}
 	fs := flag.NewFlagSet("rag compare", flag.ExitOnError)
 	suite := fs.String("suite", "rag-suite.json", "question suite (expected facts are never sent)")
 	output := fs.String("output", "reports/rag-answers.json", "resumable answer artifact; choose a new path to regenerate")
-	settings := agent.Settings{Model: agent.ProModel, Reasoning: "low"}
-	fs.StringVar(&settings.Model, "model", agent.ProModel, "generation model")
-	fs.StringVar(&settings.Reasoning, "reasoning", "low", "reasoning effort")
+	settings := agent.Settings{Model: agent.FlashModel, Reasoning: "none"}
+	fs.StringVar(&settings.Model, "model", agent.FlashModel, "generation model")
+	fs.StringVar(&settings.Reasoning, "reasoning", "none", "reasoning effort")
 	fs.StringVar(&settings.RAGStrategy, "rag-strategy", "semantic", "retrieval strategy")
 	fs.StringVar(&settings.RAGPlatform, "rag-platform", "", "platform filter")
-	fs.IntVar(&settings.RAGLimit, "rag-limit", 5, "retrieval results")
-	fs.IntVar(&settings.RAGBudget, "rag-budget", 6000, "evidence characters")
+	agent.RAGFlags(fs, &settings, settings)
+	matrix := fs.String("matrix", "paired", "comparison matrix: paired or enhanced (8 RAG modes)")
 	fatalIf(fs.Parse(args[1:]))
+	if *matrix != "paired" && *matrix != "enhanced" {
+		fatal(errors.New("matrix must be paired or enhanced"))
+	}
 	if fs.NArg() != 0 {
 		fatal(errors.New("unexpected comparison arguments"))
 	}
@@ -34,5 +37,9 @@ func runRAG(cfg agent.Config, args []string) {
 	client := &agent.DeepSeekClient{HTTP: &http.Client{Timeout: time.Duration(cfg.Daemon.RequestTimeout)}, Endpoint: cfg.DeepSeek.Endpoint, APIKey: key, Logger: agent.NewDebugLogger(cfg.Daemon, key)}
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-	fatalIf(agent.RunComparison(ctx, client, cfg.RAG, settings, *suite, *output))
+	if *matrix == "enhanced" {
+		fatalIf(agent.RunEnhancedComparison(ctx, client, cfg.RAG, settings, *suite, *output))
+	} else {
+		fatalIf(agent.RunComparison(ctx, client, cfg.RAG, settings, *suite, *output))
+	}
 }

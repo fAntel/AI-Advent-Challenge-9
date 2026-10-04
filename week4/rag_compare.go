@@ -137,7 +137,7 @@ func RunComparison(ctx context.Context, p Provider, cfg RAGConfig, s Settings, s
 			settings.RAG = mode == "rag"
 			var evidence *Evidence
 			if settings.RAG {
-				evidence, err = Retrieve(ctx, cfg, settings, q.Query)
+				evidence, err = Retrieve(ctx, cfg, settings, q.Query, p)
 				if err != nil {
 					return err
 				}
