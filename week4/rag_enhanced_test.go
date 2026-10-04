@@ -27,7 +27,7 @@ func (f *enhancedFake) Complete(ctx context.Context, r CompletionRequest) (Compl
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.calls = append(f.calls, r)
-	answer := "answer"
+	answer := fixtureGroundedAnswer(r.Messages)
 	switch r.Messages[0].Content {
 	case rewriteInstructions:
 		answer = `{"query":"rewritten Kotlin query"}`
@@ -174,7 +174,7 @@ func TestEnhancedComparisonResume(t *testing.T) {
 	data, _ := os.ReadFile(output)
 	var run EnhancedComparisonRun
 	_ = json.Unmarshal(data, &run)
-	if len(run.Answers) != 8 || len(run.Preparations) != 2 {
+	if len(run.Answers) != 4 || len(run.Preparations) != 2 {
 		t.Fatal("incomplete matrix")
 	}
 	rewrite, score := 0, 0
@@ -190,7 +190,7 @@ func TestEnhancedComparisonResume(t *testing.T) {
 			t.Fatal("label leakage")
 		}
 	}
-	if rewrite != 1 || score != 4 {
+	if rewrite != 1 || score != 2 {
 		t.Fatalf("rewrite=%d scoring=%d", rewrite, score)
 	}
 	before := len(next.calls)
@@ -324,8 +324,8 @@ func TestEnhancedCapabilityRejectsOldDaemon(t *testing.T) {
 	go server.Serve(listener)
 	defer server.Close()
 	client := NewAPIClient(socket, time.Second)
-	if err := client.RequireRAG(); err != nil {
-		t.Fatal(err)
+	if err := client.RequireRAG(); err == nil {
+		t.Fatal("old daemon silently accepted grounding")
 	}
 	if err := client.RequireRAG(true); err == nil {
 		t.Fatal("old daemon silently accepted enhancements")

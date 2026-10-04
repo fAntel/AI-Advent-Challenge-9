@@ -62,6 +62,8 @@ type CallMetrics struct {
 }
 
 type Operation struct {
+	RAGResult      *RAGResult       `json:"rag_result,omitempty"`
+	RAGRawAnswer   string           `json:"rag_raw_answer,omitempty"`
 	RAGPreparation *RAGPreparation  `json:"rag_preparation,omitempty"`
 	Evidence       *Evidence        `json:"evidence,omitempty"`
 	ID             string           `json:"id"`

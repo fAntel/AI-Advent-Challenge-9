@@ -20,7 +20,7 @@ type RAGMode struct {
 func EnhancedModes() []RAGMode {
 	modes := []RAGMode{}
 	for _, rewrite := range []bool{false, true} {
-		for _, base := range []RAGMode{{Name: "rag"}, {Name: "rag-rerank", Rerank: true}, {Name: "rag-filter", Filter: true}, {Name: "rag-rerank-filter", Rerank: true, Filter: true}} {
+		for _, base := range []RAGMode{{Name: "rag", Filter: true}, {Name: "rag-rerank", Rerank: true, Filter: true}} {
 			base.Rewrite = rewrite
 			if rewrite {
 				base.Name += "-rewrite"
@@ -32,17 +32,26 @@ func EnhancedModes() []RAGMode {
 }
 
 type EnhancedComparisonRun struct {
-	Version      string                     `json:"version"`
-	SuiteSHA256  string                     `json:"suite_sha256"`
-	IndexSHA256  string                     `json:"index_sha256"`
-	Settings     Settings                   `json:"settings"`
-	Modes        []RAGMode                  `json:"modes"`
-	StartedAt    time.Time                  `json:"started_at"`
-	Preparations map[string]*RAGPreparation `json:"preparations"`
-	Answers      []ComparisonAnswer         `json:"answers"`
+	FailedAttempts []ComparisonFailure        `json:"failed_attempts,omitempty"`
+	Version        string                     `json:"version"`
+	SuiteSHA256    string                     `json:"suite_sha256"`
+	IndexSHA256    string                     `json:"index_sha256"`
+	Settings       Settings                   `json:"settings"`
+	Modes          []RAGMode                  `json:"modes"`
+	StartedAt      time.Time                  `json:"started_at"`
+	Preparations   map[string]*RAGPreparation `json:"preparations"`
+	Answers        []ComparisonAnswer         `json:"answers"`
 }
 
 func RunEnhancedComparison(ctx context.Context, provider Provider, cfg RAGConfig, settings Settings, suitePath, output string) error {
+	return runRAGMatrix(ctx, provider, cfg, settings, suitePath, output, EnhancedModes())
+}
+
+func RunGroundedComparison(ctx context.Context, provider Provider, cfg RAGConfig, settings Settings, suitePath, output string) error {
+	return runRAGMatrix(ctx, provider, cfg, settings, suitePath, output, []RAGMode{{Name: "grounded", Filter: true, Rewrite: settings.RAGRewrite, Rerank: settings.RAGRerank}})
+}
+
+func runRAGMatrix(ctx context.Context, provider Provider, cfg RAGConfig, settings Settings, suitePath, output string, modes []RAGMode) error {
 	data, err := os.ReadFile(suitePath)
 	if err != nil {
 		return err
@@ -82,7 +91,7 @@ func RunEnhancedComparison(ctx context.Context, provider Provider, cfg RAGConfig
 	if err != nil {
 		return err
 	}
-	run := EnhancedComparisonRun{Version: RAGPreparationVersion, SuiteSHA256: fmt.Sprintf("%x", sha256.Sum256(data)), IndexSHA256: fp, Settings: s, Modes: EnhancedModes(), StartedAt: time.Now().UTC(), Preparations: map[string]*RAGPreparation{}, Answers: []ComparisonAnswer{}}
+	run := EnhancedComparisonRun{Version: RAGPreparationVersion, SuiteSHA256: fmt.Sprintf("%x", sha256.Sum256(data)), IndexSHA256: fp, Settings: s, Modes: modes, StartedAt: time.Now().UTC(), Preparations: map[string]*RAGPreparation{}, Answers: []ComparisonAnswer{}}
 	if saved, e := os.ReadFile(output); e == nil {
 		var old EnhancedComparisonRun
 		if err = json.Unmarshal(saved, &old); err != nil {
@@ -145,26 +154,16 @@ func RunEnhancedComparison(ctx context.Context, provider Provider, cfg RAGConfig
 			if err != nil {
 				return err
 			}
-			// Baseline modes must not inherit scoring calls made for another mode.
-			if !mode.Rerank && !mode.Filter {
-				evidence.Preparation.Scores = map[string]int{}
-				calls := []RAGCall{}
-				for _, c := range evidence.Preparation.Calls {
-					if c.Purpose != "rag_score" {
-						calls = append(calls, c)
-					}
-				}
-				evidence.Preparation.Calls = calls
-			}
 			messages := ComparisonMessages(q.Query, evidence)
-			result, err := provider.Complete(ctx, CompletionRequest{Messages: messages, Settings: modeSettings})
+			record, err := completeComparisonAnswer(ctx, provider, q, mode.Name, modeSettings, evidence, messages)
 			if err != nil {
+				run.FailedAttempts = append(run.FailedAttempts, ComparisonFailure{record, err.Error()})
+				if saveErr := save(); saveErr != nil {
+					return saveErr
+				}
 				return fmt.Errorf("%s: %w", key, err)
 			}
-			if strings.TrimSpace(result.Answer) == "" {
-				return fmt.Errorf("%s: empty answer", key)
-			}
-			run.Answers = append(run.Answers, ComparisonAnswer{QuestionID: q.ID, Mode: mode.Name, Messages: messages, Settings: modeSettings, Evidence: evidence, Answer: result.Answer, Call: result.Call, ReviewStatus: "unreviewed"})
+			run.Answers = append(run.Answers, record)
 			if err = save(); err != nil {
 				return err
 			}

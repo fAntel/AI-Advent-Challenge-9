@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -33,7 +34,7 @@ const fixtureEvidence = `[{"id":"c1","document_id":"doc","strategy":"semantic","
 func TestRAGSubprocessAndValidation(t *testing.T) {
 	cfg := ragFixture(t, "printf '%s' '"+fixtureEvidence+"'\n")
 	t.Chdir(t.TempDir())
-	e, err := Retrieve(context.Background(), cfg, Settings{}, "--question ' ; $(no-shell)")
+	e, err := Retrieve(context.Background(), cfg, Settings{}, "--question ' ; $(no-shell)", &enhancedFake{scoreOutput: `{"scores":[{"id":"c1","score":3}]}`})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +135,7 @@ func TestRAGQueryAndCapabilities(t *testing.T) {
 	}
 	r := httptest.NewRecorder()
 	Server{}.Handler().ServeHTTP(r, httptest.NewRequest(http.MethodGet, "/v1/capabilities", nil))
-	if r.Code != 200 || !strings.Contains(r.Body.String(), `"rag":true`) {
+	if r.Code != 200 || !strings.Contains(r.Body.String(), `"rag_grounded":true`) {
 		t.Fatal(r.Body.String())
 	}
 }
@@ -149,7 +150,10 @@ func (f *comparisonFake) Complete(ctx context.Context, r CompletionRequest) (Com
 	if f.failAt == len(f.requests) {
 		return CompletionResponse{}, errors.New("interrupted")
 	}
-	return CompletionResponse{Answer: "answer", Call: CallMetrics{Duration: time.Millisecond}}, nil
+	if r.Messages[0].Content == scoreInstructions {
+		return (&enhancedFake{scoreOutput: `{"scores":[{"id":"c1","score":3}]}`}).Complete(ctx, r)
+	}
+	return CompletionResponse{Answer: fixtureGroundedAnswer(r.Messages), Call: CallMetrics{Duration: time.Millisecond}}, nil
 }
 func TestComparisonIsolationAndResume(t *testing.T) {
 	cfg := ragFixture(t, "printf '%s' '"+fixtureEvidence+"'\n")
@@ -157,7 +161,7 @@ func TestComparisonIsolationAndResume(t *testing.T) {
 	suite := filepath.Join(dir, "suite.json")
 	out := filepath.Join(dir, "answers.json")
 	os.WriteFile(suite, []byte(`{"questions":[{"id":"a","query":"question a","expected_facts":"SECRET_EXPECTED"},{"id":"b","query":"question b"}]}`), 0600)
-	p := &comparisonFake{failAt: 3}
+	p := &comparisonFake{failAt: 4}
 	s := Settings{Model: ProModel, Reasoning: "low"}
 	if err := RunComparison(context.Background(), p, cfg, s, suite, out); err == nil {
 		t.Fatal("expected interruption")
@@ -166,7 +170,7 @@ func TestComparisonIsolationAndResume(t *testing.T) {
 	if err := RunComparison(context.Background(), next, cfg, s, suite, out); err != nil {
 		t.Fatal(err)
 	}
-	if len(next.requests) != 2 || !next.requests[0].Settings.RAG || next.requests[1].Settings.RAG {
+	if len(next.requests) != 3 || next.requests[0].Messages[0].Content != scoreInstructions || !next.requests[1].Settings.RAG || next.requests[2].Settings.RAG {
 		t.Fatal("resume/order")
 	}
 	for _, r := range append(p.requests, next.requests...) {
@@ -209,10 +213,10 @@ func TestRAGCompressionAndMCPReuse(t *testing.T) {
 		}
 		fake.mu.Lock()
 		defer fake.mu.Unlock()
-		if len(fake.requests) != 2 {
+		if len(fake.requests) != 3 {
 			t.Fatal("compression not tested")
 		}
-		data, _ := json.Marshal(fake.requests[1])
+		data, _ := json.Marshal(fake.requests[2])
 		if strings.Contains(string(data), "Reference fact") {
 			t.Fatal("evidence leaked to compression")
 		}
@@ -247,4 +251,15 @@ func TestRAGCompressionAndMCPReuse(t *testing.T) {
 			}
 		}
 	})
+}
+
+func fixtureGroundedAnswer(messages []Message) string {
+	for _, m := range messages {
+		if strings.Contains(m.Content, "chunk_id:") {
+			id := regexp.MustCompile(`chunk_id: ([^)]+)`).FindStringSubmatch(m.Content)[1]
+			data, _ := json.Marshal(map[string]any{"status": "answered", "answer": "Reference fact αβ [1].", "quotes": []RAGQuote{{id, "Reference fact αβ"}}, "clarification": ""})
+			return string(data)
+		}
+	}
+	return "answer"
 }

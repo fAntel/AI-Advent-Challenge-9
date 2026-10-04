@@ -21,21 +21,31 @@ type ComparisonSuite struct {
 	Questions []ComparisonQuestion `json:"questions"`
 }
 type ComparisonAnswer struct {
-	QuestionID   string      `json:"question_id"`
-	Mode         string      `json:"mode"`
-	Messages     []Message   `json:"messages"`
-	Settings     Settings    `json:"settings"`
-	Evidence     *Evidence   `json:"evidence,omitempty"`
-	Answer       string      `json:"answer"`
-	Call         CallMetrics `json:"call"`
-	ReviewStatus string      `json:"review_status"`
+	Result        *RAGResult  `json:"result,omitempty"`
+	RawAnswer     string      `json:"raw_answer,omitempty"`
+	AnswerSkipped bool        `json:"answer_skipped,omitempty"`
+	QuestionID    string      `json:"question_id"`
+	Mode          string      `json:"mode"`
+	Messages      []Message   `json:"messages"`
+	Settings      Settings    `json:"settings"`
+	Evidence      *Evidence   `json:"evidence,omitempty"`
+	Answer        string      `json:"answer"`
+	Call          CallMetrics `json:"call"`
+	ReviewStatus  string      `json:"review_status"`
 }
+type ComparisonFailure struct {
+	Record ComparisonAnswer `json:"record"`
+	Error  string           `json:"error"`
+}
+
 type ComparisonRun struct {
-	SuiteSHA256 string             `json:"suite_sha256"`
-	IndexSHA256 string             `json:"index_sha256"`
-	Settings    Settings           `json:"settings"`
-	StartedAt   time.Time          `json:"started_at"`
-	Answers     []ComparisonAnswer `json:"answers"`
+	FailedAttempts []ComparisonFailure `json:"failed_attempts,omitempty"`
+	Version        string              `json:"version"`
+	SuiteSHA256    string              `json:"suite_sha256"`
+	IndexSHA256    string              `json:"index_sha256"`
+	Settings       Settings            `json:"settings"`
+	StartedAt      time.Time           `json:"started_at"`
+	Answers        []ComparisonAnswer  `json:"answers"`
 }
 
 func SaveComparison(path string, v any) error {
@@ -100,7 +110,7 @@ func RunComparison(ctx context.Context, p Provider, cfg RAGConfig, s Settings, s
 	if err != nil {
 		return err
 	}
-	run := ComparisonRun{SuiteSHA256: fmt.Sprintf("%x", sha256.Sum256(data)), IndexSHA256: fp, Settings: s, StartedAt: time.Now().UTC(), Answers: []ComparisonAnswer{}}
+	run := ComparisonRun{Version: RAGGroundingVersion, SuiteSHA256: fmt.Sprintf("%x", sha256.Sum256(data)), IndexSHA256: fp, Settings: s, StartedAt: time.Now().UTC(), Answers: []ComparisonAnswer{}}
 	if saved, err := os.ReadFile(output); err == nil {
 		var old ComparisonRun
 		if err = json.Unmarshal(saved, &old); err != nil {
@@ -108,7 +118,7 @@ func RunComparison(ctx context.Context, p Provider, cfg RAGConfig, s Settings, s
 		}
 		a, _ := json.Marshal(old.Settings)
 		b, _ := json.Marshal(s)
-		if old.SuiteSHA256 != run.SuiteSHA256 || old.IndexSHA256 != fp || string(a) != string(b) {
+		if old.Version != run.Version || old.SuiteSHA256 != run.SuiteSHA256 || old.IndexSHA256 != fp || string(a) != string(b) {
 			return fmt.Errorf("comparison inputs changed; choose a new output path")
 		}
 		run = old
@@ -146,14 +156,15 @@ func RunComparison(ctx context.Context, p Provider, cfg RAGConfig, s Settings, s
 				}
 			}
 			messages := ComparisonMessages(q.Query, evidence)
-			result, err := p.Complete(ctx, CompletionRequest{Messages: messages, Settings: settings})
+			record, err := completeComparisonAnswer(ctx, p, q, mode, settings, evidence, messages)
 			if err != nil {
+				run.FailedAttempts = append(run.FailedAttempts, ComparisonFailure{record, err.Error()})
+				if saveErr := SaveComparison(output, run); saveErr != nil {
+					return saveErr
+				}
 				return fmt.Errorf("%s: %w", key, err)
 			}
-			if strings.TrimSpace(result.Answer) == "" {
-				return fmt.Errorf("%s: empty answer", key)
-			}
-			run.Answers = append(run.Answers, ComparisonAnswer{QuestionID: q.ID, Mode: mode, Messages: messages, Settings: settings, Evidence: evidence, Answer: result.Answer, Call: result.Call, ReviewStatus: "unreviewed"})
+			run.Answers = append(run.Answers, record)
 			if err = SaveComparison(output, run); err != nil {
 				return err
 			}
@@ -161,4 +172,34 @@ func RunComparison(ctx context.Context, p Provider, cfg RAGConfig, s Settings, s
 		}
 	}
 	return nil
+}
+
+// Both comparison commands use exactly the same grounding validator as the daemon.
+func completeComparisonAnswer(ctx context.Context, provider Provider, q ComparisonQuestion, mode string, settings Settings, evidence *Evidence, messages []Message) (ComparisonAnswer, error) {
+	record := ComparisonAnswer{QuestionID: q.ID, Mode: mode, Messages: messages, Settings: settings, Evidence: evidence, ReviewStatus: "unreviewed"}
+	if evidence != nil && len(evidence.Chunks) == 0 {
+		record.Result = unknownRAG()
+		record.Answer = record.Result.Render()
+		record.AnswerSkipped = true
+		return record, nil
+	}
+	response, err := provider.Complete(ctx, CompletionRequest{Messages: messages, Settings: settings})
+	record.Call = response.Call
+	record.RawAnswer = response.Answer
+	if err != nil {
+		return record, err
+	}
+	if strings.TrimSpace(response.Answer) == "" {
+		return record, fmt.Errorf("empty answer")
+	}
+	if evidence != nil {
+		record.Result, err = ValidateRAGAnswer(response.Answer, evidence)
+		if err != nil {
+			return record, err
+		}
+		record.Answer = record.Result.Render()
+	} else {
+		record.Answer = response.Answer
+	}
+	return record, nil
 }

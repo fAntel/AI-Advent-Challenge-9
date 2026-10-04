@@ -525,3 +525,27 @@ inspects, and calls an appropriate Everything tool. The staged inventory
 keeps full schemas out of the initial context. Other servers worth considering
 for a separate comparison are Filesystem, Git, Fetch, Time, and Memory; none
 is scanned or registered automatically.
+
+
+## Week4 RAG grounding
+
+Enable retrieval with `--rag`; plain sessions remain unchanged. RAG always scores
+candidates with Flash, filters below `--rag-threshold` (default 2 on the 0–3 rubric),
+and requires cited answers with exact quotes. `--rag-filter` remains accepted for
+compatibility but neither value disables filtering. Rewriting and reranking are
+optional. Sources include URL, section and chunk ID and are generated from stored
+metadata. The answer model supplies quotes, which the harness validates against
+packed evidence before rendering Answer, Sources and Quotes.
+
+No usable evidence yields a deterministic “I don't know” plus clarification without
+an answer-model call or MCP execution. A task remains blocked awaiting context;
+chat can continue with a clarified question. Partial answers must identify missing
+coverage. Invalid JSON, references or quotes fail with a retryable diagnostic;
+`/retry` reuses evidence. Sources and quotes are unavailable for unknown responses.
+A verbatim match does not automatically establish semantic support.
+
+The operation API adds `rag_result` (status, answer, clarification, quotes and sources)
+and `rag_raw_answer`. Evidence carries `grounding_version`. New clients require the
+`rag_grounded` daemon capability. Rebuild/restart an older daemon; discard and
+resubmit pending operations with incompatible evidence. Historical answers stay readable.
+See README for the grounded ten-question comparison and its reproducible commands.

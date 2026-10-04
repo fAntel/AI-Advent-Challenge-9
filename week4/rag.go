@@ -100,16 +100,17 @@ type EvidenceChunk struct {
 	Availability   string   `json:"availability"`
 }
 type Evidence struct {
-	Preparation *RAGPreparation `json:"preparation,omitempty"`
-	Decisions   []RAGDecision   `json:"decisions,omitempty"`
-	Reranked    bool            `json:"reranked,omitempty"`
-	Filtered    bool            `json:"filtered,omitempty"`
-	Threshold   *int            `json:"threshold,omitempty"`
-	Query       string          `json:"query"`
-	Strategy    string          `json:"strategy"`
-	Fingerprint string          `json:"index_sha256"`
-	Chunks      []EvidenceChunk `json:"chunks"`
-	Characters  int             `json:"characters"`
+	GroundingVersion string          `json:"grounding_version,omitempty"`
+	Preparation      *RAGPreparation `json:"preparation,omitempty"`
+	Decisions        []RAGDecision   `json:"decisions,omitempty"`
+	Reranked         bool            `json:"reranked,omitempty"`
+	Filtered         bool            `json:"filtered,omitempty"`
+	Threshold        *int            `json:"threshold,omitempty"`
+	Query            string          `json:"query"`
+	Strategy         string          `json:"strategy"`
+	Fingerprint      string          `json:"index_sha256"`
+	Chunks           []EvidenceChunk `json:"chunks"`
+	Characters       int             `json:"characters"`
 }
 
 func IndexFingerprint(path string) (string, error) {
@@ -129,10 +130,10 @@ func chunkReference(c EvidenceChunk, n int) string {
 	if c.ReleaseVersion != nil {
 		version = *c.ReleaseVersion
 	}
-	return fmt.Sprintf("[%d] %s — %s\n%s (normalized source lines %d-%d; release %s; availability %s)\n", n, c.Title, strings.Join(c.Sections, " / "), c.Source, c.LineStart, c.LineEnd, version, c.Availability)
+	return fmt.Sprintf("[%d] %s — %s\n%s (normalized source lines %d-%d; release %s; availability %s; chunk_id: %s)\n", n, c.Title, strings.Join(c.Sections, " / "), c.Source, c.LineStart, c.LineEnd, version, c.Availability, c.ID)
 }
 func PackEvidence(query, strategy, fingerprint string, chunks []EvidenceChunk, budget int) *Evidence {
-	e := &Evidence{Query: query, Strategy: strategy, Fingerprint: fingerprint, Chunks: []EvidenceChunk{}}
+	e := &Evidence{GroundingVersion: RAGGroundingVersion, Query: query, Strategy: strategy, Fingerprint: fingerprint, Chunks: []EvidenceChunk{}}
 	for _, c := range chunks {
 		size := utf8.RuneCountInString(chunkReference(c, len(e.Chunks)+1) + c.Text + "\n\n")
 		if e.Characters+size > budget {
@@ -208,6 +209,7 @@ func WithEvidence(messages []Message, e *Evidence) []Message {
 	}
 	// Use a user data message, never promote source text to system instructions.
 	out := append([]Message(nil), messages...)
+	out = append([]Message{{Role: "system", Content: groundingInstructions}}, out...)
 	pos := len(out) - 1
 	if pos < 0 {
 		pos = 0

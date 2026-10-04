@@ -39,6 +39,9 @@ func (f *fakeCompleter) Complete(ctx context.Context, m []Message, s Settings) (
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.requests = append(f.requests, append([]Message(nil), m...))
+	if len(m) > 0 && m[0].Content == scoreInstructions {
+		return (&enhancedFake{scoreOutput: `{"scores":[{"id":"c1","score":3}]}`}).Complete(ctx, CompletionRequest{Messages: m, Settings: s})
+	}
 	if len(f.failures) > 0 {
 		failure := f.failures[0]
 		f.failures = f.failures[1:]
@@ -47,6 +50,9 @@ func (f *fakeCompleter) Complete(ctx context.Context, m []Message, s Settings) (
 		}
 	}
 	answer := "ok"
+	if s.RAG {
+		answer = fixtureGroundedAnswer(m)
+	}
 	if len(f.answers) > 0 {
 		answer = f.answers[0]
 		f.answers = f.answers[1:]

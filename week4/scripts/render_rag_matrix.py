@@ -1,4 +1,4 @@
-"""Render the eight-mode experiment; judgments must be authored separately."""
+"""Render historical or current RAG matrices; judgments are authored separately."""
 import argparse
 import hashlib
 import json
@@ -17,7 +17,7 @@ def matched(chunk, question):
 
 
 def calls_for(answer):
-    return [c['call'] for c in answer['evidence']['preparation']['calls']] + [answer['call']]
+    return [c['call'] for c in answer['evidence']['preparation']['calls']] + ([] if answer.get('answer_skipped') else [answer['call']])
 
 
 def valid_review(answer, review, question):
@@ -47,7 +47,7 @@ def summarize(run, review, suite):
         controls = [a for a in rows if questions[a['question_id']].get('unanswerable')]
         stages = {}
         for purpose in ('rag_rewrite', 'retrieval', 'rag_score', 'answer'):
-            calls = ([a['call'] for a in rows] if purpose == 'answer' else
+            calls = ([a['call'] for a in rows if not a.get('answer_skipped')] if purpose == 'answer' else
                      [c['call'] for a in rows for c in a['evidence']['preparation']['calls'] if c['purpose'] == purpose])
             stages[purpose] = {'seconds': (sum(a['evidence']['preparation']['retrieval_duration'] for a in rows) if purpose == 'retrieval' else sum(c.get('duration', 0) for c in calls)) / 1e9,
                                'tokens': sum(c.get('usage', {}).get('total_tokens', 0) for c in calls),
@@ -68,7 +68,7 @@ def summarize(run, review, suite):
                            problematic_citations=sum(r['citations'] in ('mixed', 'unsupported') for r in reviews),
                            honest_controls=sum(assessments[a['question_id'] + '/' + a['mode']]['honest_insufficiency'] for a in controls))
         modes[mode['name']] = metrics
-    actual_calls = [a['call'] for a in run['answers']] + [c['call'] for p in run['preparations'].values() for c in p['calls']]
+    actual_calls = [f['record']['call'] for f in run.get('failed_attempts', [])] + [a['call'] for a in run['answers'] if not a.get('answer_skipped')] + [c['call'] for p in run['preparations'].values() for c in p['calls']]
     return {'review_complete': complete, 'modes': modes,
             'actual_calls': len(actual_calls), 'actual_cost_usd': sum(c.get('cost_usd', 0) for c in actual_calls),
             'actual_tokens': sum(c.get('usage', {}).get('total_tokens', 0) for c in actual_calls)}
@@ -81,7 +81,7 @@ def render(run, review, suite):
     settings = run['settings']
     n_answerable = sum(not q.get('unanswerable') for q in suite['questions'])
     n_controls = len(suite['questions']) - n_answerable
-    lines = ['# Task 3: eight-mode RAG comparison', '',
+    lines = [('# Task 3: eight-mode RAG comparison' if len(run['modes']) == 8 else f"# RAG comparison: {len(run['modes'])} modes"), '',
              f"{len(suite['questions'])} questions × {len(run['modes'])} modes. Model `{settings['model']}`, reasoning `{settings['reasoning']}`. Index SHA-256: `{run['index_sha256']}`.", '',
              f"Candidate K={settings['rag_candidates']}; final K={settings['rag_limit']}; minimum relevance={settings['rag_threshold']}; evidence budget={settings['rag_budget']} characters.", '',
              '## Findings', '', review.get('summary', '') if stats['review_complete'] else '**UNREVIEWED**: answers or hash-bound reviews are incomplete; quality summary withheld.', '',
@@ -125,6 +125,8 @@ def render(run, review, suite):
         lines += ['', f"Material error: {r['material_error']}. Citations: {r['citations']}. {r['notes']}", '']
         if q.get('source_review'):
             lines += [f"Reference excerpt: [{q['source_review']['excerpt']}](../../{q['source_review']['excerpt']}).", '']
+    if run.get('version') == 'flash-relevance-grounded-v2':
+        lines = [line.replace('Controls pass when corpus insufficiency is honestly acknowledged without invented support; general knowledge may be provided if distinguished from evidence.', 'All modes filter weak chunks and require verified quotes. Controls pass by returning unknown with clarification and no unsupported factual answer. Empty context skips answer generation.') for line in lines]
     return '\n'.join(lines).rstrip() + '\n'
 
 

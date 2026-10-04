@@ -220,8 +220,9 @@ chat uses the current question. Compression never retrieves.
 Whole chunks are packed in relevance order, skipping chunks that do not fit.
 Evidence includes source titles, sections, URLs, normalized line ranges and
 version caveats. It is untrusted reference data subordinate to instructions and
-invariants. Answers are asked to cite sources and acknowledge insufficient
-coverage. Retrieval is not a guarantee of correctness or version compatibility.
+invariants. RAG answers now require validated source references and verbatim quotes. Weak
+context produces a harness-owned unknown response (see the grounding section below).
+Retrieval is not a guarantee of correctness or version compatibility.
 A compact retrieval summary and references appear after answers.
 
 Evidence is saved with each operation before provider calls and reused by
@@ -293,7 +294,11 @@ and their independent factual/citation reviews. The original Pro artifacts are
 preserved. The report compares this single run, not general model reliability.
 
 
-## Task3: rewriting, reranking and relevance filtering
+## Earlier experiment: rewriting, reranking and relevance filtering
+
+This section records the earlier opt-in experiment. Current RAG always scores and
+filters evidence, and requires quotes; the grounding section below supersedes the
+old filtering defaults. Saved reports retain their original eight-mode behavior.
 
 The agent supports three independent opt-in enhancements. `--rag-rewrite` asks
 Flash to rewrite only the search query. `--rag-rerank` sorts candidates using
@@ -383,3 +388,80 @@ cost $0.050258 using the repository adapter's pricing. Scoring added approximate
 opt-in: rewriting plus filtering was promising for this run, not an established
 universal improvement. Raw requests, responses, evidence and scores are retained
 in `reports/task3/answers.json`; hash-bound reviews are in `review.json`.
+
+
+## Task3: quotes, sources and unknown responses
+
+`--rag` now enables the full grounding contract without additional flags. Every
+factual answer includes an Answer, Sources and Quotes section. Sources come from
+saved chunk metadata: URL, title, section and chunk ID. Quotes are model-selected,
+verbatim substrings of packed chunks. The harness rejects malformed output,
+unknown citations, missing quotes and altered fragments before displaying an answer.
+Exact matching proves provenance; it does not prove that every claim follows from
+its quote. The separate ten-question review checks meaning against the quotes.
+
+All RAG retrievals use Flash relevance scoring (0–3) and discard scores below
+`--rag-threshold` (default 2). The existing 0–3 threshold range is retained; setting
+0 deliberately accepts every scored candidate. Scoring adds hosted calls in batches
+of up to five candidates, even without reranking. Rewriting and reranking remain
+opt-in. `--rag-filter` is deprecated: either value leaves filtering enabled.
+`--rag=false` still skips all retrieval and auxiliary calls.
+
+If no chunks survive filtering, selection and the character budget, the harness
+returns “I don't know based on the available sources” and asks for the Kotlin
+feature, platform, version or documentation. It does not call the answering model
+or execute MCP tools. Sources and quotes are explicitly unavailable. With some
+support, the model must answer only supported parts and clarify missing coverage;
+it may also return unknown. No background-knowledge supplementation is allowed.
+Unknown task responses block the current phase until feedback supplies context;
+`/continue` cannot advance them. Existing project-invariant refusals take precedence
+when an answer is generated. Invalid generated output is a retryable error, not an
+unknown response.
+
+Operations retain the raw response and validated structured result, alongside
+saved evidence and scoring calls. Answer retries reuse that evidence. Old completed
+sessions remain readable; incompatible pending evidence must be discarded and
+resubmitted. New clients require the daemon's `rag_grounded` capability: rebuild
+and restart the service to upgrade it. Old comparison checkpoints require a new
+output path. Historical Task1 and earlier eight-mode reports are preserved.
+New enhanced comparisons have four distinct rewrite/rerank combinations, all filtered.
+
+After `make test` and `make build`, from `week4/`, use the rebuilt
+`week4/advent-agent` and `week4/.venv/bin/kotlin-index`:
+
+```sh
+./advent-agent --rag -p 'When did the common Kotlin UUID API become stable?'
+./advent-agent --rag -p 'What breaking changes will Kotlin 3.0 ship with?'
+./advent-agent rag compare --matrix grounded --suite rag-grounding-suite.json --output reports/grounding/answers.json
+.venv/bin/python scripts/render_rag_grounding.py
+```
+
+The grounding suite contains seven existing answerable questions and all three
+out-of-corpus controls. The single-condition comparison defaults to Flash with
+reasoning disabled, no rewriting or reranking, cutoff 2, 20 candidates, five final
+chunks and a 6000-character budget. Expected facts never enter provider messages.
+Raw answers, quotes, metadata, scores and costs are retained. Failed attempts are
+saved separately; empty-context responses do not count as generation calls.
+Semantic reviews are separately authored in `reports/grounding/review.json` and
+bound to complete answer hashes. Missing/stale reviews withhold quality totals.
+The renderer checks quote/source provenance without manufacturing semantic judgments.
+
+
+### Grounding recorded result
+
+The [ten-question review](reports/grounding/comparison.md) produced seven factual
+answers, all with source metadata and exact verbatim quotes, and three correct
+unknown responses that skipped answer generation. No answerable question was refused.
+Four factual answers were fully supported by their displayed quotes. Three received
+partial semantic-support assessments: Swift async and JS lambda answers omitted
+some supporting details from the displayed quotes despite having them in the full
+chunks; the JS interop answer did not clearly identify its Wasm source scope.
+These limitations are retained in the report rather than counted as full passes.
+
+The run recorded 48 API attempts (47 completed calls plus one TLS-handshake failure
+retried from a checkpoint), 100,031 tokens and estimated generation/scoring cost
+$0.006089 using the repository adapter's rates. Three answer calls were skipped.
+See `reports/grounding/answers.json` for exact inputs, raw responses and evidence,
+and `reports/grounding/review.json` for the separately authored hash-bound judgments.
+The corpus is unchanged; these checks assess support against saved documentation,
+not an independent verification of current Kotlin behavior.

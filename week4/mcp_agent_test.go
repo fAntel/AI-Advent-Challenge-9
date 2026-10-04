@@ -67,7 +67,10 @@ func TestMCPApprovedWriteExecutesOnce(t *testing.T) {
 	}
 }
 
-func (p *scriptedNative) Complete(context.Context, CompletionRequest) (CompletionResponse, error) {
+func (p *scriptedNative) Complete(ctx context.Context, r CompletionRequest) (CompletionResponse, error) {
+	if len(r.Messages) > 0 && r.Messages[0].Content == scoreInstructions {
+		return (&enhancedFake{scoreOutput: `{"scores":[{"id":"c1","score":3}]}`}).Complete(ctx, r)
+	}
 	return CompletionResponse{Answer: "legacy"}, nil
 }
 func (p *scriptedNative) CompleteNative(_ context.Context, messages []NativeMessage, _ Settings, _ []NativeTool) (NativeRound, error) {
@@ -86,6 +89,14 @@ func (p *scriptedNative) CompleteNative(_ context.Context, messages []NativeMess
 	} else {
 		r.Message = NativeMessage{Role: "assistant", Content: "Final answer"}
 		r.Completion.Answer = "Final answer"
+		var plain []Message
+		for _, m := range messages {
+			plain = append(plain, Message{Role: m.Role, Content: fmt.Sprint(m.Content)})
+		}
+		if answer := fixtureGroundedAnswer(plain); answer != "answer" {
+			r.Completion.Answer = answer
+			r.Message.Content = answer
+		}
 	}
 	return r, nil
 }

@@ -751,11 +751,19 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 		}
 		op.Evidence = evidence
 	}
+	if op.Evidence != nil && op.Evidence.GroundingVersion != RAGGroundingVersion {
+		a.failOperation(id, opID, errors.New("saved RAG evidence uses an older grounding contract; discard this operation and submit again"))
+		return
+	}
 	messages := WithEvidence(contextRequestMessagesWithInvariantFeedback(s, invariants, memoryView, phaseSettings, false, feedback), op.Evidence)
 	var completion CompletionResponse
 	var err error
-	nativeUsed := a.native != nil && (len(a.MCP.List()) > 0 || len(op.ToolMessages) > 0)
-	if nativeUsed {
+	weakContext := op.Evidence != nil && len(op.Evidence.Chunks) == 0
+	var grounded *RAGResult
+	nativeUsed := !weakContext && a.native != nil && (len(a.MCP.List()) > 0 || len(op.ToolMessages) > 0)
+	if weakContext {
+		grounded = unknownRAG()
+	} else if nativeUsed {
 		completion, err = a.completeWithMCP(ctx, id, opID, messages, phaseSettings)
 	} else {
 		completion, err = a.complete(ctx, messages, phaseSettings)
@@ -763,10 +771,10 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	if errors.Is(err, errToolApprovalPending) {
 		return
 	}
-	completionReceived := err == nil
+	completionReceived := err == nil && !weakContext
 	answer := completion.Answer
 	var decision invariantDecision
-	if err == nil && len(invariants) > 0 {
+	if err == nil && !weakContext && len(invariants) > 0 {
 		var parsed invariantDecision
 		parsed, err = parseInvariantDecision(completion.Answer, invariants)
 		if err == nil {
@@ -778,17 +786,31 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 			}
 		}
 	}
+	if err == nil && op.Evidence != nil && decision.Decision != "refuse" {
+		if !weakContext {
+			grounded, err = ValidateRAGAnswer(answer, op.Evidence)
+		}
+		if err == nil {
+			answer = grounded.Render()
+		}
+	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	r = a.sessions[id]
 	if r == nil || r.session.Operation == nil || r.session.Operation.ID != opID {
 		return
 	}
+	if op.Evidence != nil {
+		r.session.Operation.RAGRawAnswer = completion.Answer
+		r.session.Operation.RAGResult = grounded
+	}
 	if err == nil && containsUnsupportedToolCall(answer) {
-		if !nativeUsed {
+		if !nativeUsed && !weakContext {
 			a.recordCompletion(r.session, completion, "answer")
 		}
-		a.logUsage(id, opID, completion, "answer")
+		if !weakContext {
+			a.logUsage(id, opID, completion, "answer")
+		}
 		completionReceived = false
 		if r.session.Task != nil {
 			now := time.Now().UTC()
@@ -798,10 +820,12 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	}
 	if err != nil {
 		if completionReceived {
-			if !nativeUsed {
+			if !nativeUsed && !weakContext {
 				a.recordCompletion(r.session, completion, "answer")
 			}
-			a.logUsage(id, opID, completion, "answer")
+			if !weakContext {
+				a.logUsage(id, opID, completion, "answer")
+			}
 		}
 		if len(invariants) > 0 && r.session.Task != nil && !containsAttemptForOperation(r.session.Task, op.StartedAt) {
 			now := time.Now().UTC()
@@ -823,10 +847,12 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 		a.logger.Log("workflow.failed", id, opID, err.Error())
 	} else {
 		r.session.Messages = append(r.session.Messages, Message{Role: "assistant", Content: answer})
-		if !nativeUsed {
+		if !nativeUsed && !weakContext {
 			a.recordCompletion(r.session, completion, "answer")
 		}
-		a.logUsage(id, opID, completion, "answer")
+		if !weakContext {
+			a.logUsage(id, opID, completion, "answer")
+		}
 		if r.session.Task != nil {
 			now := time.Now().UTC()
 			supersedeAttempts(r.session.Task, r.session.Task.Phase)
@@ -835,7 +861,7 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 				attemptStatus = "truncated"
 			}
 			r.session.Task.Attempts = append(r.session.Task.Attempts, invariantAttempt(r.session.Task.Phase, answer, attemptStatus, op.StartedAt, now, invariants, decision))
-			if decision.Decision == "refuse" {
+			if decision.Decision == "refuse" || (grounded != nil && grounded.Status == "unknown") {
 				r.session.Task.Status = TaskStatusBlocked
 			} else if r.session.Task.Phase == TaskPhaseDone {
 				r.session.Task.Status = TaskStatusTerminal
@@ -843,6 +869,9 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 				r.session.Task.Status = TaskStatusPaused
 			}
 			r.session.Task.ExpectedAction = taskExpectedAction(r.session.Task.Phase, r.session.Task.Status)
+			if grounded != nil && grounded.Status == "unknown" {
+				r.session.Task.ExpectedAction = "provide clarification or relevant documentation, or use /clear"
+			}
 			r.session.Task.UpdatedAt = now
 		}
 		if op.Settings.Debug {
@@ -1459,6 +1488,12 @@ func cloneSession(s *Session) *Session {
 	if s.Operation != nil {
 		o := *s.Operation
 		o.RAGPreparation = clonePreparation(s.Operation.RAGPreparation)
+		if s.Operation.RAGResult != nil {
+			data, _ := json.Marshal(s.Operation.RAGResult)
+			var result RAGResult
+			_ = json.Unmarshal(data, &result)
+			o.RAGResult = &result
+		}
 		o.Calls = append([]CallMetrics(nil), s.Operation.Calls...)
 		o.MCPEvents = append([]MCPEvent(nil), s.Operation.MCPEvents...)
 		o.TaskBefore = cloneTask(s.Operation.TaskBefore)

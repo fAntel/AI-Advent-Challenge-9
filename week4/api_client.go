@@ -287,7 +287,7 @@ func (c *APIClient) Events(ctx context.Context) (io.ReadCloser, error) {
 func (c *APIClient) RequireRAG(enhanced ...bool) error {
 	var caps map[string]bool
 	_, err := c.do("GET", "/v1/capabilities", "", nil, &caps)
-	if err != nil || !caps["rag"] || (len(enhanced) > 0 && enhanced[0] && !caps["rag_enhanced"]) {
+	if err != nil || !caps["rag"] || !caps["rag_grounded"] || (len(enhanced) > 0 && enhanced[0] && !caps["rag_enhanced"]) {
 		return fmt.Errorf("running daemon lacks RAG capability; rebuild week4 and reinstall/restart advent-agent service")
 	}
 	return nil

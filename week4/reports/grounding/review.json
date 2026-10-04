@@ -1,0 +1,76 @@
+{
+  "reviewer": "Implementing assistant; separate manual review after generation, not the Flash relevance scorer",
+  "basis": "Saved answer text, selected verbatim quotes, full packed chunks and pre-generation suite criteria. No external correctness check; snapshot-relative support only.",
+  "assessments": [
+    {
+      "question_id": "q01",
+      "answer_sha256": "904ffee06dfeb0de27a8edcbf76bf2030d55027fe2b72fc084911d75dc05ab26",
+      "meaning_matches_quotes": "yes",
+      "appropriate_unknown": false,
+      "notes": "The declaration syntax, UserService example, call-site/type resolution, ambiguity rule and anonymous context parameter behavior all agree with the displayed fragments. The short example quote shows the declared dependency; the prose quote explains context parameters. No unsupported version claim is added."
+    },
+    {
+      "question_id": "q13",
+      "answer_sha256": "bcadc1bff3a2190c5eee6e646c1e62846b31de7e18475f718853251974ce7f78",
+      "meaning_matches_quotes": "yes",
+      "appropriate_unknown": false,
+      "notes": "The quoted Errors and exceptions section supports the @Throws mapping, NSError/throws representations, suspend completion-handler error parameter, subclass propagation, termination for other exceptions and CancellationException exception. The answer follows the saved documentation, including its simplified description of Swift error handling. The final uncertainty statement does not invent a version guarantee."
+    },
+    {
+      "question_id": "q14",
+      "answer_sha256": "52d54285140a549ab66c99a7961c868c4a88fc8963632fd8df216049ef358e50",
+      "meaning_matches_quotes": "partial",
+      "appropriate_unknown": false,
+      "notes": "The async mapping and Dispatchers.Default claims match the displayed quotes. However, the try await hello() example and the withContext() recommendation are not in the selected quotes. Both are present in the cited full chunks (references 1/2 and 3 respectively), so this is incomplete quote coverage rather than fabrication. The answer also omits the suite’s Alpha-status caveat; the displayed quotes do not establish it."
+    },
+    {
+      "question_id": "q16",
+      "answer_sha256": "9bd2f9572e49e44bdf767999388b0c011d36ca03d82738e3b6f670bee9c76e00",
+      "meaning_matches_quotes": "partial",
+      "appropriate_unknown": false,
+      "notes": "The external modifier, bodyless declaration, greet example, @JsModule behavior and @nativeInvoke warning are all verbatim-supported. However, every cited source is the Kotlin/Wasm interoperability guide, while the answer presents the extra module/callable-object guidance without identifying that platform scope or asking which target the user means. The core external declaration answer is supported; the broader platform framing is only partially supported. The designated Kotlin/JS source was not packed."
+    },
+    {
+      "question_id": "q18",
+      "answer_sha256": "6846c4a5a3f0fc4c94cd026d26802844c7eb5053f99cce9c18185f82a2de4f5d",
+      "meaning_matches_quotes": "yes",
+      "appropriate_unknown": false,
+      "notes": "The first quote explicitly establishes Kotlin 2.4.0 stabilization of kotlin.uuid.Uuid and the V4/V7 Experimental opt-in exceptions. The other quotes corroborate common-standard-library stabilization. The answer does not confuse introduction with stabilization. It omits the optional historical introduction fact, which does not undermine support for the answer actually given."
+    },
+    {
+      "question_id": "q19",
+      "answer_sha256": "d8f02e9cd941c11fd98425393867040c5f73bfb3170c7c68abc684ee656b03fb",
+      "meaning_matches_quotes": "partial",
+      "appropriate_unknown": false,
+      "notes": "The new export support, automatic async/await bridge, @JsExport requirement and both example programs agree with the displayed quotes. The important -Xsuspend-lambda-exporting flag and freeCompilerArgs location appear in the answer but are omitted from the selected quote: it ends immediately before the Gradle code. The full cited chunk contains the exact flag and configuration, so this is incomplete quote coverage, not an invented flag."
+    },
+    {
+      "question_id": "q20",
+      "answer_sha256": "332da6b6f2178965d0626d75257d8cd1df98ad6a603711955e99111862408cef",
+      "meaning_matches_quotes": "yes",
+      "appropriate_unknown": false,
+      "notes": "The quoted section names cross-language inheritance and Kotlin 2.4.20, then explicitly describes the Kotlin superclass/interface, Swift implementation and passing the object to Kotlin functions. The open base class sentence is also quoted. All factual assertions in this answer have direct support."
+    },
+    {
+      "question_id": "q21",
+      "answer_sha256": "6d4a39584bd5346b0f591ebc80cb0b501030f82bedf0b74557f062df6a119387",
+      "meaning_matches_quotes": "N/A",
+      "appropriate_unknown": true,
+      "notes": "All candidates fell below the cutoff, leaving no packed evidence. The harness returned unknown and a clarification request, made no answer-model call, and supplied no private payroll endpoint or fabricated sources. The generic Kotlin clarification is less tailored than a payroll-specific request, but asking for relevant documentation still provides a way forward."
+    },
+    {
+      "question_id": "q22",
+      "answer_sha256": "1026ac39494c309d80d81f6b85d1b32e3ba51ec265787a290bcd047b9aff9eb2",
+      "meaning_matches_quotes": "N/A",
+      "appropriate_unknown": true,
+      "notes": "No evidence passed the cutoff for future Kotlin 3.0 breaking changes. The harness returned unknown with a version/documentation clarification request and no speculative release claims. No answer-model call, sources or quotes were fabricated."
+    },
+    {
+      "question_id": "q23",
+      "answer_sha256": "d994469fa3a5c1b9e5ef53996cda4f5248733b06a43ac6dd71ad067ca856f5f7",
+      "meaning_matches_quotes": "N/A",
+      "appropriate_unknown": true,
+      "notes": "No evidence passed the cutoff for PostgreSQL/Debezium configuration. The harness returned unknown with a documentation clarification request and no general-knowledge configuration advice. The Kotlin-oriented wording is generic for this out-of-domain question. No answer-model call, sources or quotes were fabricated."
+    }
+  ]
+}
