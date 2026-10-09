@@ -1,0 +1,703 @@
+{
+  "created_at": "2026-10-09T22:14:28.158929+00:00",
+  "artifact": "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+  "profile": "local",
+  "settings": {
+    "provider": {
+      "name": "ollama"
+    },
+    "ollama": {
+      "endpoint": "http://127.0.0.1:11434",
+      "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+      "output_tokens": 1024,
+      "summary_tokens": 256,
+      "keep_alive": "10m"
+    },
+    "daemon": {
+      "socket_path": "/Users/keldzh/.local/state/advent-agent/local/agent.sock",
+      "session_dir": "/Users/keldzh/.local/state/advent-agent/local",
+      "log_path": "/Users/keldzh/.local/state/advent-agent/local/agentd.log",
+      "request_timeout": "10m",
+      "debug": false
+    },
+    "agent": {
+      "context_window_tokens": 4096,
+      "compression_enabled": true,
+      "context_strategy": "summary",
+      "recent_messages": 4,
+      "summary_batch_messages": 2
+    },
+    "client": {
+      "autostart": true
+    }
+  },
+  "cloud_key_passed": false,
+  "commands": [
+    {
+      "argv": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+        "--profile",
+        "local",
+        "-p",
+        "Our project is named Cedar, a Go CLI for offline notes. Answer in one sentence: what is our project and language?",
+        "--stats"
+      ],
+      "stdin": null,
+      "stdout": "Agent: Cedar is a Go-based command-line interface for creating and managing offline notes.\n",
+      "stderr": "Session: 92c69b552bee8e72784153a769c6fb80\nSession token stats:\n  context strategy: summary\n  latest answer request: input context=41 (cache hit=0, miss=0), model answer=17, total=58\n  context window: 41 / 4096 (1.00%)\n  whole dialog: calls=1, cumulative input=41, model output=17, total=58\n  local generation API charges: $0 USD (hardware costs excluded)\n  history memory: summarized=0 messages, verbatim=2 messages, summary=0 tokens\n  latest finish reason: stop\n",
+      "exit_code": 0,
+      "elapsed_seconds": 5.150143625000055
+    },
+    {
+      "argv": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+        "--profile",
+        "local",
+        "resume",
+        "92c69b552bee8e72784153a769c6fb80"
+      ],
+      "stdin": "/remember working language Go\nName one appropriate standard-library package for storing our notes. Answer in one sentence.\nSuggest a simple file format for the notes. Answer in one sentence.\n/summary\n/exit\n",
+      "stdout": "Agent: Cedar is a Go-based command-line interface for creating and managing offline notes.\nYou: You: Agent: [Output]\nsqlite (the `database/sql` package)\nYou: Agent: A suitable simple file format for storing Cedar's notes would be the SQLite database file, utilizing the lightweight and standard `.sqlite` extension.\nYou: Conversation summary (2 messages):\nCedar is a Go-based command-line interface for creating and managing offline notes.\nYou: ",
+      "stderr": "Session: 92c69b552bee8e72784153a769c6fb80\nSession token stats:\n  context strategy: summary\n  latest answer request: input context=152 (cache hit=0, miss=0), model answer=31, total=183\n  context window: 152 / 4096 (3.71%)\n  whole dialog: calls=4, cumulative input=466, model output=80, total=546\n  local generation API charges: $0 USD (hardware costs excluded)\n  history memory: summarized=2 messages, verbatim=4 messages, summary=17 tokens\n  compression overhead: calls=1, input=157, output=17, total=174, cost=$0.00000000 USD\n  input-context growth: 41 -> 152 (+111 tokens)\n  latest finish reason: stop\n",
+      "exit_code": 0,
+      "elapsed_seconds": 6.845059958000093
+    },
+    {
+      "argv": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd",
+        "--profile",
+        "local",
+        "stop"
+      ],
+      "stdin": null,
+      "stdout": "",
+      "stderr": "advent-agentd stopped\n",
+      "exit_code": 0,
+      "elapsed_seconds": 0.01969204200031527
+    },
+    {
+      "argv": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+        "--profile",
+        "local",
+        "resume",
+        "92c69b552bee8e72784153a769c6fb80"
+      ],
+      "stdin": "What is our project name, language and purpose? Answer in one sentence.\n/summary\n/exit\n",
+      "stdout": "Agent: A suitable simple file format for storing Cedar's notes would be the SQLite database file, utilizing the lightweight and standard `.sqlite` extension.\nYou: Agent: Cedar is a Go-based command-line interface designed to create and manage offline notes.\nYou: Conversation summary (4 messages):\nCedar is a Go-based command-line interface for creating and managing offline notes. The appropriate standard-library package for storing notes is `sqlite` (from the `database/sql` package).\nYou: ",
+      "stderr": "Session: 92c69b552bee8e72784153a769c6fb80\nSession token stats:\n  context strategy: summary\n  latest answer request: input context=211 (cache hit=0, miss=0), model answer=18, total=229\n  context window: 211 / 4096 (5.15%)\n  whole dialog: calls=6, cumulative input=846, model output=138, total=984\n  local generation API charges: $0 USD (hardware costs excluded)\n  history memory: summarized=4 messages, verbatim=4 messages, summary=40 tokens\n  compression overhead: calls=2, input=326, output=57, total=383, cost=$0.00000000 USD\n  input-context growth: 41 -> 211 (+170 tokens)\n  latest finish reason: stop\n",
+      "exit_code": 0,
+      "elapsed_seconds": 5.882346583000071
+    },
+    {
+      "argv": [
+        "ollama",
+        "ps"
+      ],
+      "stdin": null,
+      "stdout": "NAME                                       ID              SIZE      PROCESSOR    CONTEXT    RUNNER    UNTIL              \nhf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M    49f49d0f084f    2.7 GB    100% GPU     4096                 9 minutes from now    \n",
+      "stderr": "",
+      "exit_code": 0,
+      "elapsed_seconds": 0.20144749999963096
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "92c69b552bee8e72784153a769c6fb80",
+      "chat": true,
+      "created_at": "2026-10-09T22:14:28.234572Z",
+      "updated_at": "2026-10-09T22:14:33.134117Z",
+      "profile": "local",
+      "project_id": "cdb4ee2aea69cc6a83331bbe96dc2caa",
+      "project_path": ".",
+      "settings": {
+        "rag_candidates": 20,
+        "rag_threshold": 2,
+        "rag_strategy": "semantic",
+        "rag_limit": 5,
+        "rag_budget": 6000,
+        "provider": "ollama",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "reasoning": "none",
+        "approach": "none",
+        "roles": [
+          "Business analyst",
+          "Engineer",
+          "Critic"
+        ],
+        "stats": true,
+        "compression": true,
+        "context_strategy": "summary"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Our project is named Cedar, a Go CLI for offline notes. Answer in one sentence: what is our project and language?"
+        },
+        {
+          "role": "assistant",
+          "content": "Cedar is a Go-based command-line interface for creating and managing offline notes."
+        }
+      ],
+      "operation": {
+        "id": "8f8349bb02521f1f272be2b4a1543f35",
+        "state": "completed",
+        "settings": {
+          "rag_candidates": 20,
+          "rag_threshold": 2,
+          "rag_strategy": "semantic",
+          "rag_limit": 5,
+          "rag_budget": 6000,
+          "provider": "ollama",
+          "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+          "reasoning": "none",
+          "approach": "none",
+          "roles": [
+            "Business analyst",
+            "Engineer",
+            "Critic"
+          ],
+          "stats": true,
+          "compression": true,
+          "context_strategy": "summary"
+        },
+        "started_at": "2026-10-09T22:14:28.254679Z",
+        "finished_at": "2026-10-09T22:14:33.134117Z",
+        "metrics": {
+          "requests": 1,
+          "duration": 4835212750,
+          "usage": {
+            "prompt_tokens": 41,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 17,
+            "reasoning_tokens": 0,
+            "total_tokens": 58
+          },
+          "cost_usd": 0
+        },
+        "calls": [
+          {
+            "started_at": "2026-10-09T22:14:28.298533Z",
+            "duration": 4835212750,
+            "usage": {
+              "prompt_tokens": 41,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 0,
+              "completion_tokens": 17,
+              "reasoning_tokens": 0,
+              "total_tokens": 58
+            },
+            "cost_usd": 0,
+            "finish_reason": "stop",
+            "purpose": "answer"
+          }
+        ],
+        "base_count": 0
+      },
+      "metrics": {
+        "requests": 1,
+        "duration": 4835212750,
+        "usage": {
+          "prompt_tokens": 41,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 0,
+          "completion_tokens": 17,
+          "reasoning_tokens": 0,
+          "total_tokens": 58
+        },
+        "cost_usd": 0
+      },
+      "calls": [
+        {
+          "started_at": "2026-10-09T22:14:28.298533Z",
+          "duration": 4835212750,
+          "usage": {
+            "prompt_tokens": 41,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 17,
+            "reasoning_tokens": 0,
+            "total_tokens": 58
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        }
+      ],
+      "context_window_tokens": 4096,
+      "token_accounting_complete": true,
+      "recent_messages": 4,
+      "summary_batch_messages": 2,
+      "root_session_id": "92c69b552bee8e72784153a769c6fb80",
+      "preview": "Our project is named Cedar, a Go CLI for offline notes. Answ"
+    },
+    {
+      "id": "92c69b552bee8e72784153a769c6fb80",
+      "chat": true,
+      "created_at": "2026-10-09T22:14:28.234572Z",
+      "updated_at": "2026-10-09T22:14:40.039142Z",
+      "profile": "local",
+      "project_id": "cdb4ee2aea69cc6a83331bbe96dc2caa",
+      "project_path": ".",
+      "settings": {
+        "rag_candidates": 20,
+        "rag_threshold": 2,
+        "rag_strategy": "semantic",
+        "rag_limit": 5,
+        "rag_budget": 6000,
+        "provider": "ollama",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "reasoning": "none",
+        "approach": "none",
+        "roles": [
+          "Business analyst",
+          "Engineer",
+          "Critic"
+        ],
+        "compression": true,
+        "context_strategy": "summary"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Name one appropriate standard-library package for storing our notes. Answer in one sentence."
+        },
+        {
+          "role": "assistant",
+          "content": "[Output]\nsqlite (the `database/sql` package)"
+        },
+        {
+          "role": "user",
+          "content": "Suggest a simple file format for the notes. Answer in one sentence."
+        },
+        {
+          "role": "assistant",
+          "content": "A suitable simple file format for storing Cedar's notes would be the SQLite database file, utilizing the lightweight and standard `.sqlite` extension."
+        }
+      ],
+      "operation": {
+        "id": "18ae9a282a1e50a4f30cc322f25d5967",
+        "state": "completed",
+        "settings": {
+          "rag_candidates": 20,
+          "rag_threshold": 2,
+          "rag_strategy": "semantic",
+          "rag_limit": 5,
+          "rag_budget": 6000,
+          "provider": "ollama",
+          "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+          "reasoning": "none",
+          "approach": "none",
+          "roles": [
+            "Business analyst",
+            "Engineer",
+            "Critic"
+          ],
+          "compression": true,
+          "context_strategy": "summary"
+        },
+        "started_at": "2026-10-09T22:14:35.365243Z",
+        "finished_at": "2026-10-09T22:14:40.039142Z",
+        "metrics": {
+          "requests": 2,
+          "duration": 4655563749,
+          "usage": {
+            "prompt_tokens": 309,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 48,
+            "reasoning_tokens": 0,
+            "total_tokens": 357
+          },
+          "cost_usd": 0
+        },
+        "calls": [
+          {
+            "started_at": "2026-10-09T22:14:35.37489Z",
+            "duration": 2477302208,
+            "usage": {
+              "prompt_tokens": 152,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 0,
+              "completion_tokens": 31,
+              "reasoning_tokens": 0,
+              "total_tokens": 183
+            },
+            "cost_usd": 0,
+            "finish_reason": "stop",
+            "purpose": "answer"
+          },
+          {
+            "started_at": "2026-10-09T22:14:37.860435Z",
+            "duration": 2178261541,
+            "usage": {
+              "prompt_tokens": 157,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 0,
+              "completion_tokens": 17,
+              "reasoning_tokens": 0,
+              "total_tokens": 174
+            },
+            "cost_usd": 0,
+            "finish_reason": "stop",
+            "purpose": "summary"
+          }
+        ],
+        "base_count": 4
+      },
+      "metrics": {
+        "requests": 4,
+        "duration": 11296095749,
+        "usage": {
+          "prompt_tokens": 466,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 0,
+          "completion_tokens": 80,
+          "reasoning_tokens": 0,
+          "total_tokens": 546
+        },
+        "cost_usd": 0
+      },
+      "calls": [
+        {
+          "started_at": "2026-10-09T22:14:28.298533Z",
+          "duration": 4835212750,
+          "usage": {
+            "prompt_tokens": 41,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 17,
+            "reasoning_tokens": 0,
+            "total_tokens": 58
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:33.357882Z",
+          "duration": 1805319250,
+          "usage": {
+            "prompt_tokens": 116,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 15,
+            "reasoning_tokens": 0,
+            "total_tokens": 131
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:35.37489Z",
+          "duration": 2477302208,
+          "usage": {
+            "prompt_tokens": 152,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 31,
+            "reasoning_tokens": 0,
+            "total_tokens": 183
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:37.860435Z",
+          "duration": 2178261541,
+          "usage": {
+            "prompt_tokens": 157,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 17,
+            "reasoning_tokens": 0,
+            "total_tokens": 174
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "summary"
+        }
+      ],
+      "context_window_tokens": 4096,
+      "token_accounting_complete": true,
+      "summary": "Cedar is a Go-based command-line interface for creating and managing offline notes.",
+      "summary_tokens": 17,
+      "summarized_messages": 2,
+      "recent_messages": 4,
+      "summary_batch_messages": 2,
+      "root_session_id": "92c69b552bee8e72784153a769c6fb80",
+      "preview": "Name one appropriate standard-library package for storing ou"
+    },
+    {
+      "id": "92c69b552bee8e72784153a769c6fb80",
+      "chat": true,
+      "created_at": "2026-10-09T22:14:28.234572Z",
+      "updated_at": "2026-10-09T22:14:46.05242Z",
+      "profile": "local",
+      "project_id": "cdb4ee2aea69cc6a83331bbe96dc2caa",
+      "project_path": ".",
+      "settings": {
+        "rag_candidates": 20,
+        "rag_threshold": 2,
+        "rag_strategy": "semantic",
+        "rag_limit": 5,
+        "rag_budget": 6000,
+        "provider": "ollama",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "reasoning": "none",
+        "approach": "none",
+        "roles": [
+          "Business analyst",
+          "Engineer",
+          "Critic"
+        ],
+        "compression": true,
+        "context_strategy": "summary"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "Suggest a simple file format for the notes. Answer in one sentence."
+        },
+        {
+          "role": "assistant",
+          "content": "A suitable simple file format for storing Cedar's notes would be the SQLite database file, utilizing the lightweight and standard `.sqlite` extension."
+        },
+        {
+          "role": "user",
+          "content": "What is our project name, language and purpose? Answer in one sentence."
+        },
+        {
+          "role": "assistant",
+          "content": "Cedar is a Go-based command-line interface designed to create and manage offline notes."
+        }
+      ],
+      "operation": {
+        "id": "63fb20945cc5a34593c69475f00a847e",
+        "state": "completed",
+        "settings": {
+          "rag_candidates": 20,
+          "rag_threshold": 2,
+          "rag_strategy": "semantic",
+          "rag_limit": 5,
+          "rag_budget": 6000,
+          "provider": "ollama",
+          "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+          "reasoning": "none",
+          "approach": "none",
+          "roles": [
+            "Business analyst",
+            "Engineer",
+            "Critic"
+          ],
+          "compression": true,
+          "context_strategy": "summary"
+        },
+        "started_at": "2026-10-09T22:14:40.258762Z",
+        "finished_at": "2026-10-09T22:14:46.05242Z",
+        "metrics": {
+          "requests": 2,
+          "duration": 5774661584,
+          "usage": {
+            "prompt_tokens": 380,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 58,
+            "reasoning_tokens": 0,
+            "total_tokens": 438
+          },
+          "cost_usd": 0
+        },
+        "calls": [
+          {
+            "started_at": "2026-10-09T22:14:40.269615Z",
+            "duration": 2625312417,
+            "usage": {
+              "prompt_tokens": 211,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 0,
+              "completion_tokens": 18,
+              "reasoning_tokens": 0,
+              "total_tokens": 229
+            },
+            "cost_usd": 0,
+            "finish_reason": "stop",
+            "purpose": "answer"
+          },
+          {
+            "started_at": "2026-10-09T22:14:42.902541Z",
+            "duration": 3149349167,
+            "usage": {
+              "prompt_tokens": 169,
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 0,
+              "completion_tokens": 40,
+              "reasoning_tokens": 0,
+              "total_tokens": 209
+            },
+            "cost_usd": 0,
+            "finish_reason": "stop",
+            "purpose": "summary"
+          }
+        ],
+        "base_count": 4
+      },
+      "metrics": {
+        "requests": 6,
+        "duration": 17070757333,
+        "usage": {
+          "prompt_tokens": 846,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 0,
+          "completion_tokens": 138,
+          "reasoning_tokens": 0,
+          "total_tokens": 984
+        },
+        "cost_usd": 0
+      },
+      "calls": [
+        {
+          "started_at": "2026-10-09T22:14:28.298533Z",
+          "duration": 4835212750,
+          "usage": {
+            "prompt_tokens": 41,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 17,
+            "reasoning_tokens": 0,
+            "total_tokens": 58
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:33.357882Z",
+          "duration": 1805319250,
+          "usage": {
+            "prompt_tokens": 116,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 15,
+            "reasoning_tokens": 0,
+            "total_tokens": 131
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:35.37489Z",
+          "duration": 2477302208,
+          "usage": {
+            "prompt_tokens": 152,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 31,
+            "reasoning_tokens": 0,
+            "total_tokens": 183
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:37.860435Z",
+          "duration": 2178261541,
+          "usage": {
+            "prompt_tokens": 157,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 17,
+            "reasoning_tokens": 0,
+            "total_tokens": 174
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "summary"
+        },
+        {
+          "started_at": "2026-10-09T22:14:40.269615Z",
+          "duration": 2625312417,
+          "usage": {
+            "prompt_tokens": 211,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 18,
+            "reasoning_tokens": 0,
+            "total_tokens": 229
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "answer"
+        },
+        {
+          "started_at": "2026-10-09T22:14:42.902541Z",
+          "duration": 3149349167,
+          "usage": {
+            "prompt_tokens": 169,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 40,
+            "reasoning_tokens": 0,
+            "total_tokens": 209
+          },
+          "cost_usd": 0,
+          "finish_reason": "stop",
+          "purpose": "summary"
+        }
+      ],
+      "context_window_tokens": 4096,
+      "token_accounting_complete": true,
+      "summary": "Cedar is a Go-based command-line interface for creating and managing offline notes. The appropriate standard-library package for storing notes is `sqlite` (from the `database/sql` package).",
+      "summary_tokens": 40,
+      "summarized_messages": 4,
+      "recent_messages": 4,
+      "summary_batch_messages": 2,
+      "root_session_id": "92c69b552bee8e72784153a769c6fb80",
+      "preview": "Suggest a simple file format for the notes. Answer in one se"
+    }
+  ],
+  "project_directory": "/var/folders/xy/r81n58dd5h136qjmdw30m8z80000gn/T/week5-local-chat-zg4tqecr",
+  "session_id": "92c69b552bee8e72784153a769c6fb80",
+  "capabilities": {
+    "provider_ollama": true,
+    "rag": false,
+    "rag_enhanced": false,
+    "rag_grounded": false
+  },
+  "mcp_catalog": [],
+  "ollama_version": {
+    "version": "0.35.1"
+  },
+  "ollama_ps": {
+    "models": [
+      {
+        "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "size": 2743074814,
+        "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "spark2_5",
+          "families": [
+            "spark2_5"
+          ],
+          "parameter_size": "4.11B",
+          "quantization_level": "unknown"
+        },
+        "expires_at": "2026-10-10T01:24:46.051524+03:00",
+        "size_vram": 2743074814,
+        "context_length": 4096
+      }
+    ]
+  },
+  "ollama_ps_text": "NAME                                       ID              SIZE      PROCESSOR    CONTEXT    RUNNER    UNTIL              \nhf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M    49f49d0f084f    2.7 GB    100% GPU     4096                 9 minutes from now    \n",
+  "status": "completed",
+  "artifact_sha256": "4fa3a0dc15e451d38f7e2bea1d97042e7efe0c760172ad18c0c68128c82360a6",
+  "working_memory_ini": "[working]\nlanguage = Go\n"
+}

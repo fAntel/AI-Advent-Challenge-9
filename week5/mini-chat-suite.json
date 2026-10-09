@@ -1,0 +1,38 @@
+{
+  "dialogs": [
+    {
+      "name": "Kotlin JavaScript browser library",
+      "questions": [
+        "Our goal is to design a Kotlin library consumed by browser JavaScript. Keep the target Kotlin/JS, not Wasm. By client I mean the browser JavaScript consumer. Use Kotlin-only code examples. How do I export a top-level function to the client?",
+        "Which types can that exported function accept and return?",
+        "Can I export a class for the client in the same way?",
+        "How should I give an exported declaration a predictable JavaScript name?",
+        "Can the client pass a lambda to Kotlin?",
+        "How do I declare an existing JavaScript API so Kotlin can call it?",
+        "Change the examples constraint: from now on, use both Kotlin and JavaScript examples. How do external interfaces describe JavaScript objects?",
+        "The examples are TypeScript-only. How would I describe a JavaScript options object?",
+        "Keep our saved Kotlin and JavaScript examples constraint; do not switch to TypeScript-only. Can I use dynamic for an object whose shape I do not know?",
+        "How should I handle undefined or null when calling an external JavaScript function?",
+        "What exact breaking changes will Kotlin 3.0 introduce for our client?",
+        "Return to our original goal and definition of client. Summarize the supported export approach and one key interop limitation, respecting the constraints we fixed."
+      ]
+    },
+    {
+      "name": "Kotlin Swift interoperability",
+      "questions": [
+        "Our goal is to design a Kotlin library consumed by an iOS Swift app. Use the Objective-C export bridge, not experimental direct Swift export. By client I mean the iOS Swift caller. Use Kotlin-only code examples. How does the client access a Kotlin class?",
+        "How do Kotlin exceptions reach the client through that bridge?",
+        "How do suspend functions appear to the client?",
+        "Can that suspend API be called with Swift async/await?",
+        "How are Kotlin strings mapped to the client?",
+        "What happens to Kotlin collection types across the bridge?",
+        "Change the examples constraint: from now on, use both Kotlin and Swift examples. How do I rename a Kotlin declaration for Swift callers?",
+        "The bridge uses experimental direct Swift export. How should I expose a class?",
+        "Keep our saved Objective-C export bridge constraint; do not switch to direct Swift export. How can I hide a Kotlin declaration from the client?",
+        "How do Kotlin generic types appear in the generated Objective-C interfaces?",
+        "What exact breaking changes will Kotlin 3.0 introduce for our client?",
+        "Return to our original goal and definition of client. Summarize the supported bridge and one key limitation, respecting the constraints we fixed."
+      ]
+    }
+  ]
+}

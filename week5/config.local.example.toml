@@ -1,0 +1,28 @@
+# Copy to ~/.config/advent-agent/profiles/local/config.toml, or use
+# python3 scripts/install-local-profile.py to resolve XDG locations.
+[provider]
+name = "ollama"
+
+[ollama]
+endpoint = "http://127.0.0.1:11434"
+model = "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M"
+output_tokens = 1024
+summary_tokens = 256
+keep_alive = "10m"
+
+[daemon]
+socket_path = "~/.local/state/advent-agent/local/agent.sock"
+session_dir = "~/.local/state/advent-agent/local"
+log_path = "~/.local/state/advent-agent/local/agentd.log"
+request_timeout = "10m"
+debug = false
+
+[agent]
+context_window_tokens = 4096
+compression_enabled = true
+context_strategy = "summary"
+recent_messages = 4
+summary_batch_messages = 2
+
+[client]
+autostart = true

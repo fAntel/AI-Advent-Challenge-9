@@ -1,0 +1,8 @@
+{
+  "artifact": "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+  "session_id": "74b46e8f4ed33f80edf38bcb568c74ac",
+  "stdin": "/model\nReply with exactly OK.\n/model\n/exit\n",
+  "stdout": "You: Model: hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M\nYou: Agent: OK\nYou: Model: hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M\nYou: ",
+  "stderr": "Session: 74b46e8f4ed33f80edf38bcb568c74ac\nSession token stats:\n  context strategy: summary\n  latest answer request: input context=56 (cache hit=0, miss=0), model answer=2, total=58\n  context window: 56 / 4096 (1.37%)\n  whole dialog: calls=1, cumulative input=56, model output=2, total=58\n  local generation API charges: $0 USD (hardware costs excluded)\n  history memory: summarized=0 messages, verbatim=2 messages, summary=0 tokens\n  latest finish reason: stop\n",
+  "exit_code": 0
+}
