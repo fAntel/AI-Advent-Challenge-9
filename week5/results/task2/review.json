@@ -1,0 +1,260 @@
+{
+  "1/q01": {
+    "sha256": "4188531e279d0300351885db01ac5c9bb2fc6299db6a736324b10a577f9a0783",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected before publication: a quoted block was assigned to a chunk that does not contain that exact fragment. The raw answer describes context parameters and resolution, but it cannot count as a valid grounded answer. Source-ID syntax was valid; the quote-to-source association failed."
+  },
+  "1/q13": {
+    "sha256": "b767feb6dbf4855be3a566c38ce3d5f2f5b21604a6882cd4642f05cc0d6cde26",
+    "facts": [
+      "partial",
+      "partial",
+      "partial"
+    ],
+    "support": "partial",
+    "correct_unknown": false,
+    "notes": "Exact quotes validate. The prose explains NSError propagation and the unannotated suspend/non-suspend distinction, but omits the explicit Swift throws/Objective-C method mapping, the program-termination consequence, and the always-present suspend error parameter. The phrase “function or its ancestor throws” confuses inheritance of the @Throws annotation with where an exception is thrown. Completion-handler detail has support in the full chunk but not in the selected quote fragments."
+  },
+  "1/q14": {
+    "sha256": "044f857afb77e96031533a1c5549500a7f7aae18b605ba48c95c3c0dcdee031e",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected before publication because a quote was not an exact fragment of its assigned chunk. The raw response also includes a JavaScript-export quotation while answering a Swift-export question, and includes quoted sources not cited in the prose. The main async mapping is plausible, but rejected output does not count as a valid grounded answer."
+  },
+  "1/q16": {
+    "sha256": "83226aac04b8e8a123b3420e51572922bf1bbb40e3339aafd7f5e09d4bcef3d0",
+    "facts": [
+      "no",
+      "no",
+      "no"
+    ],
+    "support": "no",
+    "correct_unknown": false,
+    "notes": "Incorrect interoperability direction. The question asks Kotlin to consume an existing JavaScript implementation, requiring external declarations. The answer instead recommends @JsNoRuntime for exporting Kotlin interfaces to JavaScript/TypeScript. Exact quotes describe export and do not support this use as an import mechanism. The expect-interface recommendation also disagrees with the displayed actual-interface example. None of the three expected facts is supplied. The packed context did include an external-declarations passage as source [1]; the answer ignored it in favor of export material. Local scoring also rejected some other external-declaration candidates that the cloud run retained."
+  },
+  "1/q18": {
+    "sha256": "785d29bd1d05886f419e278a60a0c1f49a5ede1ff6b71ae0ebc459c204fa2893",
+    "facts": [
+      "yes",
+      "no",
+      "yes"
+    ],
+    "support": "partial",
+    "correct_unknown": false,
+    "notes": "Correctly states stabilization in Kotlin 2.4.0 and experimental introduction in 2.0.20. The prose omits the experimental V4/V7 generation caveat, although it appears in a displayed quote. The selected quotes support stabilization but do not display the introduction date; that fact is present elsewhere in the packed source. Consequently quote-level support is partial."
+  },
+  "1/q19": {
+    "sha256": "e4cfefb589807ffd632fa7ccea4dc6f4ca5cd66294eaf34433254542578fdf22",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "The answer exhausted the 1,024-token limit while reproducing long examples and quotes, leaving incomplete JSON. It is retained as a truncation failure and was not published. The raw response mentions the export flag and async mapping, but an incomplete response does not count as a successful grounded answer."
+  },
+  "1/q20": {
+    "sha256": "040c3d9278d6f8b24f0633871f5265e9e2be38d89dae2d85109ec683146470bf",
+    "facts": [
+      "yes",
+      "partial",
+      "yes"
+    ],
+    "support": "yes",
+    "correct_unknown": false,
+    "notes": "The feature name, release, reverse-import pattern, and passing a Swift implementation to a Kotlin interface parameter are supported by the displayed exact quotations. The prose explains inheritance but does not explicitly name the open modifier on the Kotlin base class, so the detailed second expected fact is partial. No unsupported implementation claim is added."
+  },
+  "1/q21": {
+    "sha256": "37d6d026d648c76c8f459125f69a0b088b417061a8439d0d5a1a0171e65ad1a8",
+    "facts": [],
+    "support": "N/A",
+    "correct_unknown": true,
+    "notes": "Correct unknown control. All candidates were filtered out and answer generation was skipped. The system does not invent a private payroll endpoint; it requests clarification or relevant documentation. The standard clarification is Kotlin-oriented, but makes no unsupported factual claim."
+  },
+  "1/q22": {
+    "sha256": "e56ca5da3661c34d9e1b5cc69697a036c34f3bcc6f88755f616b3c86eaae64b4",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected unknown response: the model selected status=unknown but also returned nonempty answer text and a quote. It recognized that Kotlin 3.0 details were unsupported, yet supplemented that admission with prior-release generalities and copied the prompt placeholder as its clarification. This is a failed control rather than a valid unknown response."
+  },
+  "1/q23": {
+    "sha256": "a0d694c5ef7464f18a7353a2e035a2e61e9853cf66365ec4f184168952bb39ac",
+    "facts": [],
+    "support": "N/A",
+    "correct_unknown": true,
+    "notes": "Correct out-of-corpus unknown. All Kotlin-document candidates were filtered out and answer generation was skipped. No PostgreSQL or Debezium configuration was invented; the response asks for relevant documentation, although the stock clarification remains Kotlin-oriented."
+  },
+  "2/q01": {
+    "sha256": "e9945ec60c48211a6ca8b954a01b6aa07cbf173f2fe51c299f59175666d043d9",
+    "facts": [
+      "yes",
+      "yes",
+      "yes"
+    ],
+    "support": "partial",
+    "correct_unknown": false,
+    "notes": "All three core expected facts are present and supported: declaration syntax, scope/type resolution, and ambiguity. The quote from source [1] only concerns contextOf and does not support the declaration claim, although [3] and [4] do. The extra claim about unknown release metadata is attached to the Kotlin 2.2.0 release source [4], which has an explicit release; the displayed quotes do not establish this caveat. Core factual coverage is complete but overall quote-level support is partial."
+  },
+  "2/q13": {
+    "sha256": "e321bf59074a58a7cb039230390ea68db2cd0ce7b8827d0fae2fb8d085b75ef9",
+    "facts": [
+      "yes",
+      "yes",
+      "partial"
+    ],
+    "support": "partial",
+    "correct_unknown": false,
+    "notes": "Covers the non-suspend Swift throws/Objective-C NSError mapping, allowed exception classes/subclasses, and termination for unhandled exceptions. Mentions suspend completion-handler errors but omits the unannotated CancellationException/non-suspend distinction. The displayed quotes support propagation and termination; method representations and completion-handler mapping are supported only by other text in the full chunk, so quote support remains partial."
+  },
+  "2/q14": {
+    "sha256": "e67d7d1caa0da09699efbfbd7b2ef05843f5c230bd104355e43527135a575d80",
+    "facts": [
+      "yes",
+      "yes",
+      "no"
+    ],
+    "support": "yes",
+    "correct_unknown": false,
+    "notes": "Correct async mapping and try await example, with exact quotations supporting both. The answer does not mention Alpha status or explicitly contrast the Objective-C completion-handler bridge. The mixed Kotlin/Swift example is clearly labeled by comments, although contained in one Kotlin code fence."
+  },
+  "2/q16": {
+    "sha256": "4f46ddc095942ae89575a8742254a136c8a10cb484b72e6a53b440e67764835b",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected quote mismatch. The raw answer again reverses interoperability direction, recommending @JsNoRuntime export instead of external declarations for consuming JavaScript. It also assigns an export quote to a chunk that does not contain that exact fragment. This rejected answer is not credited as delivered factual coverage. The packed context did include an external-declarations passage as source [1]; the answer ignored it in favor of export material. Local scoring also rejected some other external-declaration candidates that the cloud run retained."
+  },
+  "2/q18": {
+    "sha256": "99ae810a78fad8218d0ea327703477f1e05c69267054d4217ddf1e3947960ee0",
+    "facts": [
+      "yes",
+      "yes",
+      "no"
+    ],
+    "support": "yes",
+    "correct_unknown": false,
+    "notes": "Concise, correct answer to the stabilization question. The exact displayed quote supports both Kotlin 2.4.0 stability and the experimental V4/V7 exception. The answer does not include the suite’s additional historical fact about experimental introduction in Kotlin 2.0.20. All claims it does make are supported."
+  },
+  "2/q19": {
+    "sha256": "6fc82d794380b80abef36dd0d59a94a97992c309cf0653de8977ae22c85b9f46",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected for non-verbatim quotations. The first quote matches only after whitespace normalization, which Week4’s exact contract forbids; the final code quotation does not match its assigned chunk even after whitespace normalization. The raw answer describes the new async export and compiler flag but omits @JsExport. This is a protocol failure, not a published answer."
+  },
+  "2/q20": {
+    "sha256": "b16c75786eff56e69d9e30e6cca65c1e3db651166dd4ce43f2d23698f92948cf",
+    "facts": [
+      "yes",
+      "yes",
+      "yes"
+    ],
+    "support": "yes",
+    "correct_unknown": false,
+    "notes": "Correct feature/release and reverse-import pattern, including an inheritable Kotlin base, an interface implemented on the Swift side, and passing the Swift object back through the Kotlin interface. The displayed feature and pattern paragraphs support these claims. All three expected facts are covered."
+  },
+  "2/q21": {
+    "sha256": "01f291f6b8d813476ae9dc1e49008841f3e613347093c18a05fc92a701f26d01",
+    "facts": [],
+    "support": "N/A",
+    "correct_unknown": true,
+    "notes": "Correct unknown control, consistent with pass one. Every candidate was filtered out; no answer-generation call or invented endpoint. The stock clarification asks for relevant documentation."
+  },
+  "2/q22": {
+    "sha256": "6deb9aec14a4c8133ecaaef7db40f3433b4515bc7287ed6b1be08473f35a961b",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Again rejected because status=unknown requires an empty answer field. The raw response recognizes the absence of Kotlin 3.0 documentation and asks for release notes, but places explanatory prose in answer. This is a repeatable contract failure rather than a valid user-facing unknown response."
+  },
+  "2/q23": {
+    "sha256": "22cbd2aaaf32684f4c671085d285d177416807a1d73f44581bf6da6acb9b1c8c",
+    "facts": [],
+    "support": "N/A",
+    "correct_unknown": true,
+    "notes": "Correct unknown, consistent with pass one. The filter rejected all candidate passages and generation was skipped. No PostgreSQL/Debezium configuration is invented."
+  },
+  "3/q01": {
+    "sha256": "fc240a4ce4f962ac2bade065cef18a5724d1043b7a99f24d8c9a6899c6c40840",
+    "facts": [
+      "yes",
+      "yes",
+      "yes"
+    ],
+    "support": "partial",
+    "correct_unknown": false,
+    "notes": "All expected core facts are present and supported by the declaration and resolution quotations. The added object/call-site example is not shown in the selected quotations and does not explain how the object is brought into the context scope. Full chunks give more context, but displayed quote support for the complete example is partial."
+  },
+  "3/q13": {
+    "sha256": "74f7158daaca18fd202a4fcebaad706c0bf5052e01a7c77f52a329029f5bc4ab",
+    "facts": [
+      "yes",
+      "yes",
+      "yes"
+    ],
+    "support": "yes",
+    "correct_unknown": false,
+    "notes": "All three expected facts are present, including non-suspend Swift/Objective-C representations, permitted exception propagation and termination, and the unannotated suspend/non-suspend distinction. The displayed exact quotations cover each claim. This is the most complete and fully quoted exception answer across the three runs; review is relative to the saved documentation."
+  },
+  "3/q14": {
+    "sha256": "b4b0aa182c674d259e511e9e5108a4c6ff2276439c569189eb4887a5a2b5f24c",
+    "facts": [
+      "partial",
+      "yes",
+      "no"
+    ],
+    "support": "yes",
+    "correct_unknown": false,
+    "notes": "The direct question is answered correctly: suspend functions map to Swift async and the example uses try await. Both claims are supported by exact displayed passages and code. The prose does not mention suspending functional types, Alpha status, or the distinction from the Objective-C bridge; these broader suite criteria are partial/absent rather than contradictions."
+  },
+  "3/q16": {
+    "sha256": "7dafaf8454f13c0f270e64585cfa8a97111d7e77c44a4978594d143fcaebcbb5",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected quote/source mismatch; the raw prose also has no numbered citations. It begins with the correct external-declarations concept but then conflates importing JavaScript APIs with @JsNoRuntime export and adds unsupported version restrictions. Correct import evidence was present as source [1], yet the response mixed incompatible directions. No valid answer was delivered for this question in any pass."
+  },
+  "3/q18": {
+    "sha256": "ac007ea3bc6c72362e1b9f3bec25ef7f213f575bb9319c568af6d1ee7cda814c",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected because citation [2] lacks a matching quoted source. The raw answer includes the expected stabilization, introduction, and V4/V7 caveat, but the displayed fragments do not support every cited source or the introduction date. This is a grounding-contract failure despite largely correct raw factual content."
+  },
+  "3/q19": {
+    "sha256": "5a0a890dc874698154e61fcdcdb9189c5be304b6e224ae30d9af0596e18ab1c8",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected altered quotations: paragraphs and code are flattened/combined rather than copied exactly from the assigned chunks. The answer also cites [5] without a corresponding quote. The raw prose covers the export feature, compiler flag, and @JsExport, but no publishable grounded response was produced. This question failed in all three runs."
+  },
+  "3/q20": {
+    "sha256": "9e8e7c763061607d89d82f55fd8524a5300c724a35c49cc274db84f474717afb",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Rejected citation/quote-set mismatch. The response uses grouped [1,2] syntax despite the required separate citations, and includes quoted sources not properly cited. Two displayed quotes are only headings and cannot support the detailed pattern/example. The raw feature identification is correct, but this third attempt is not a valid published answer."
+  },
+  "3/q21": {
+    "sha256": "97a91f65496a10162d518d59baa98c9c1bbe94fe8ae7b6071fa8e56aa6b95a05",
+    "facts": [],
+    "support": "N/A",
+    "correct_unknown": true,
+    "notes": "Correct deterministic unknown in all three passes. All candidates were filtered out, generation was skipped, and no private endpoint was fabricated."
+  },
+  "3/q22": {
+    "sha256": "7a57f1a07603e82fe987b4d1e772e022b90a8b4c9aae720f1e1b1cd08e5224d9",
+    "facts": [],
+    "support": "invalid",
+    "correct_unknown": false,
+    "notes": "Third occurrence of the same invalid unknown contract: status=unknown with nonempty answer text. The model correctly recognizes missing Kotlin 3.0 information, but the harness must reject the response. The clarification is also a statement about missing information rather than a useful concrete question. No valid unknown was delivered for this control in any pass."
+  },
+  "3/q23": {
+    "sha256": "58956473104155a01f137eedb2fdf3012fa8049b947017ab7a2f19f7947b321e",
+    "facts": [],
+    "support": "N/A",
+    "correct_unknown": true,
+    "notes": "Correct deterministic unknown in all three passes. All Kotlin-document candidates were filtered out, answer generation was skipped, and no unsupported PostgreSQL/Debezium instructions were produced."
+  }
+}

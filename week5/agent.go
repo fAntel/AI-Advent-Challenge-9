@@ -779,7 +779,7 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 		a.failOperation(id, opID, errors.New("saved RAG evidence uses an older grounding contract; discard this operation and submit again"))
 		return
 	}
-	if a.local != nil {
+	if a.local != nil && (op.Evidence == nil || len(op.Evidence.Chunks) > 0) {
 		if err := a.fitLocalHistory(ctx, id, opID, phaseSettings, memoryView, invariants); err != nil {
 			a.failOperation(id, opID, err)
 			return
@@ -788,6 +788,8 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 		s = cloneSession(a.sessions[id].session)
 		a.mu.Unlock()
 	}
+	ctx = context.WithValue(ctx, ragInvariantEnvelopeKey, len(invariants) > 0)
+	ctx = context.WithValue(ctx, ragEvidenceKey, op.Evidence)
 	messages := WithEvidence(contextRequestMessagesWithInvariantFeedback(s, invariants, memoryView, phaseSettings, false, feedback), op.Evidence)
 	var completion CompletionResponse
 	var err error
@@ -804,7 +806,7 @@ func (a *Agent) run(ctx context.Context, id, opID string) {
 	if errors.Is(err, errToolApprovalPending) {
 		return
 	}
-	completionReceived := err == nil && !weakContext
+	completionReceived := !weakContext && (err == nil || completion.Metrics.Requests > 0)
 	answer := completion.Answer
 	var decision invariantDecision
 	if err == nil && !weakContext && len(invariants) > 0 {

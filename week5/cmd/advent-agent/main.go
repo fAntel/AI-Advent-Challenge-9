@@ -34,9 +34,6 @@ func main() {
 		fatal(err)
 	}
 	if len(args) > 0 && args[0] == "rag" {
-		if cfg.Provider.Name == "ollama" {
-			fatal(errors.New("local RAG is deferred to Task2"))
-		}
 		runRAG(cfg, args[1:])
 		return
 	}

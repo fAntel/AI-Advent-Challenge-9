@@ -178,7 +178,7 @@ func TestLocalValidationAndBudget(t *testing.T) {
 			t.Fatalf("accepted %s", endpoint)
 		}
 	}
-	for _, change := range []func(*Settings){func(s *Settings) { s.RAG = true }, func(s *Settings) { s.Reasoning = "high" }, func(s *Settings) { s.Model = "foo:cloud" }} {
+	for _, change := range []func(*Settings){func(s *Settings) { s.Reasoning = "high" }, func(s *Settings) { s.Model = "foo:cloud" }} {
 		s := DefaultSettings(c)
 		change(&s)
 		if ValidateSettings(s) == nil {

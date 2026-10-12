@@ -44,7 +44,7 @@ func (s Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.Trim(r.URL.Path, "/")
 	if path == "v1/capabilities" && r.Method == http.MethodGet {
 		local := s.Agent != nil && s.Agent.local != nil
-		writeJSON(w, 200, map[string]bool{"rag": !local, "rag_enhanced": !local, "rag_grounded": !local, "provider_ollama": local})
+		writeJSON(w, 200, map[string]bool{"rag": true, "rag_enhanced": true, "rag_grounded": true, "provider_ollama": local})
 		return
 	}
 	if strings.HasPrefix(path, "v1/mcp") {

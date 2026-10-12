@@ -17,8 +17,14 @@ import (
 
 const LocalModel = "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M"
 const purposeContextKey contextKey = "completion-purpose"
+const ragInvariantEnvelopeKey contextKey = "rag-invariant-envelope"
+const ragEvidenceKey contextKey = "rag-evidence"
 
-const localCapabilityPrompt = "You are an offline local chat assistant. You have no tools, file access, shell access, internet access, or live documentation lookup. Answer using the supplied conversation and your learned knowledge. Return text, never tool-call syntax. Do not claim to have searched or read files. For questions requiring current information, including the latest software release, state that you cannot verify it offline; do not invent a current version."
+// Ollama constrains syntax; the existing validator still checks citations and quotes.
+var localGroundedSchema = json.RawMessage(`{"type":"object","properties":{"status":{"type":"string","enum":["answered","unknown"]},"answer":{"type":"string"},"quotes":{"type":"array","items":{"type":"object","properties":{"chunk_id":{"type":"string"},"text":{"type":"string"}},"required":["chunk_id","text"],"additionalProperties":false}},"clarification":{"type":"string"}},"required":["status","answer","quotes","clarification"],"additionalProperties":false}`)
+var localScoreSchema = json.RawMessage(`{"type":"object","properties":{"scores":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string"},"score":{"type":"integer","minimum":0,"maximum":3}},"required":["id","score"],"additionalProperties":false}}},"required":["scores"],"additionalProperties":false}`)
+
+const localCapabilityPrompt = "You are an offline local chat assistant. You have no tools, file access, shell access, internet access, or live documentation lookup. When retrieved references are supplied, use only that evidence and follow the requested grounded JSON format. Otherwise answer using the supplied conversation and your learned knowledge. Return text, never tool-call syntax. Do not claim to have searched or read files. For questions requiring current information, including the latest software release, state that you cannot verify it offline; do not invent a current version."
 
 func withLocalCapabilities(messages []Message) []Message {
 	out := append([]Message(nil), messages...)
@@ -44,10 +50,7 @@ func validateOllamaSettings(s Settings) error {
 		return errors.New("Ollama cloud models are not supported by the local provider")
 	}
 	if s.Reasoning != "none" {
-		return errors.New("local Task1 requires reasoning=none")
-	}
-	if s.RAG {
-		return errors.New("local RAG is deferred to Task2")
+		return errors.New("local provider requires reasoning=none")
 	}
 	if s.Temperature != nil && (*s.Temperature < 0 || *s.Temperature > 2) {
 		return errors.New("temperature must be between 0 and 2")
@@ -167,6 +170,12 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 	}
 	request.Messages = withLocalCapabilities(request.Messages)
 	output := c.Config.OutputTokens
+	if request.Purpose == "" {
+		request.Purpose = completionPurpose(ctx)
+	}
+	if request.Purpose == "rag_score" || request.Purpose == "rag_rewrite" {
+		output = 256
+	}
 	if request.Purpose == "summary" {
 		output = c.Config.SummaryTokens
 	}
@@ -193,6 +202,15 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 		options["temperature"] = *request.Settings.Temperature
 	}
 	body := map[string]any{"model": request.Settings.Model, "messages": request.Messages, "stream": false, "think": false, "keep_alive": c.Config.KeepAlive, "options": options}
+	if request.Settings.RAG || strings.HasPrefix(request.Purpose, "rag_") {
+		body["format"] = "json"
+		if request.Purpose == "rag_score" {
+			body["format"] = localScoreSchema
+		}
+		if request.Settings.RAG && ctx.Value(ragInvariantEnvelopeKey) != true {
+			body["format"] = groundedLocalSchema(ctx)
+		}
+	}
 	var raw struct {
 		Message struct {
 			Content string `json:"content"`
@@ -218,5 +236,28 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 	}
 	usage := Usage{PromptTokens: raw.Prompt, CompletionTokens: raw.Generated, TotalTokens: raw.Prompt + raw.Generated}
 	call := CallMetrics{StartedAt: started.UTC(), Duration: time.Since(started), Usage: usage, FinishReason: raw.DoneReason}
-	return CompletionResponse{Answer: raw.Message.Content, Usage: usage, Metrics: Metrics{Requests: 1, Duration: call.Duration, Usage: usage}, Call: call}, nil
+	response := CompletionResponse{Answer: raw.Message.Content, Usage: usage, Metrics: Metrics{Requests: 1, Duration: call.Duration, Usage: usage}, Call: call}
+	if raw.DoneReason == "length" && (request.Settings.RAG || strings.HasPrefix(request.Purpose, "rag_")) {
+		return response, errors.New("local RAG response reached the output token limit")
+	}
+	return response, nil
+}
+
+// Restrict generated source IDs to the actual immutable evidence, not text parsed
+// from potentially hostile source content. Quote text still requires validation.
+func groundedLocalSchema(ctx context.Context) any {
+	e, _ := ctx.Value(ragEvidenceKey).(*Evidence)
+	if e == nil || len(e.Chunks) == 0 {
+		return localGroundedSchema
+	}
+	var schema map[string]any
+	_ = json.Unmarshal(localGroundedSchema, &schema)
+	ids := []string{}
+	for _, c := range e.Chunks {
+		ids = append(ids, c.ID)
+	}
+	properties := schema["properties"].(map[string]any)
+	quotes := properties["quotes"].(map[string]any)["items"].(map[string]any)["properties"].(map[string]any)
+	quotes["chunk_id"].(map[string]any)["enum"] = ids
+	return schema
 }

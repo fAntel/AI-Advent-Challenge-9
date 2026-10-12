@@ -1,0 +1,136 @@
+{
+  "artifact": "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+  "artifact_sha256": "d8ab8ce252a79bc8f383ef139bd3917bbbfd2621b0cc3d0b3758adf6a99526ca",
+  "profile": "local-rag",
+  "cloud_key_passed": false,
+  "commands": [
+    {
+      "argv": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+        "--profile",
+        "local-rag",
+        "--rag",
+        "-p",
+        "When did the common Kotlin UUID API become stable? Answer briefly and use one short exact quote.",
+        "--stats"
+      ],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "Session: 96f65fb3507f54364bd95590220f9c64\nagent: failed: RAG search failed: exit status 1: error: Index embedding model/configuration mismatch; rebuild index; check rag paths, index model and Ollama service\n",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5980572080006823
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "96f65fb3507f54364bd95590220f9c64",
+      "chat": true,
+      "created_at": "2026-10-12T08:45:51.955411Z",
+      "updated_at": "2026-10-12T08:45:52.238358Z",
+      "profile": "local-rag",
+      "project_id": "cdb4ee2aea69cc6a83331bbe96dc2caa",
+      "project_path": ".",
+      "settings": {
+        "rag_candidates": 20,
+        "rag_threshold": 2,
+        "rag": true,
+        "rag_strategy": "semantic",
+        "rag_limit": 5,
+        "rag_budget": 6000,
+        "provider": "ollama",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "reasoning": "none",
+        "approach": "none",
+        "roles": [
+          "Business analyst",
+          "Engineer",
+          "Critic"
+        ],
+        "stats": true,
+        "compression": true,
+        "context_strategy": "summary"
+      },
+      "messages": [
+        {
+          "role": "user",
+          "content": "When did the common Kotlin UUID API become stable? Answer briefly and use one short exact quote."
+        }
+      ],
+      "operation": {
+        "rag_preparation": {
+          "identity": "{\"Provider\":\"ollama\",\"Model\":\"hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M\",\"Strategy\":\"semantic\",\"Platform\":\"\",\"Candidates\":20,\"Batch\":2}/short-ids-schema-v2",
+          "version": "flash-relevance-grounded-v2",
+          "query": "When did the common Kotlin UUID API become stable? Answer briefly and use one short exact quote.",
+          "search_query": "When did the common Kotlin UUID API become stable? Answer briefly and use one short exact quote.",
+          "rewrite": false,
+          "index_sha256": "",
+          "candidates": null,
+          "retrieved": false,
+          "retrieval_duration": 0,
+          "scores": {},
+          "calls": []
+        },
+        "id": "4f0d2b4110087b684fe20d857a5eebc0",
+        "state": "failed",
+        "settings": {
+          "rag_candidates": 20,
+          "rag_threshold": 2,
+          "rag": true,
+          "rag_strategy": "semantic",
+          "rag_limit": 5,
+          "rag_budget": 6000,
+          "provider": "ollama",
+          "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+          "reasoning": "none",
+          "approach": "none",
+          "roles": [
+            "Business analyst",
+            "Engineer",
+            "Critic"
+          ],
+          "stats": true,
+          "compression": true,
+          "context_strategy": "summary"
+        },
+        "started_at": "2026-10-12T08:45:51.964578Z",
+        "finished_at": "2026-10-12T08:45:52.238358Z",
+        "error": "RAG search failed: exit status 1: error: Index embedding model/configuration mismatch; rebuild index; check rag paths, index model and Ollama service",
+        "metrics": {
+          "requests": 0,
+          "duration": 0,
+          "usage": {
+            "prompt_tokens": 0,
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 0,
+            "completion_tokens": 0,
+            "reasoning_tokens": 0,
+            "total_tokens": 0
+          },
+          "cost_usd": 0
+        },
+        "base_count": 0
+      },
+      "metrics": {
+        "requests": 0,
+        "duration": 0,
+        "usage": {
+          "prompt_tokens": 0,
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 0,
+          "completion_tokens": 0,
+          "reasoning_tokens": 0,
+          "total_tokens": 0
+        },
+        "cost_usd": 0
+      },
+      "context_window_tokens": 16384,
+      "token_accounting_complete": true,
+      "recent_messages": 4,
+      "summary_batch_messages": 2,
+      "root_session_id": "96f65fb3507f54364bd95590220f9c64",
+      "preview": "When did the common Kotlin UUID API become stable? Answer br"
+    }
+  ],
+  "project_directory": "/var/folders/xy/r81n58dd5h136qjmdw30m8z80000gn/T/week5-local-rag-7ogwsg3j",
+  "session_id": "96f65fb3507f54364bd95590220f9c64"
+}

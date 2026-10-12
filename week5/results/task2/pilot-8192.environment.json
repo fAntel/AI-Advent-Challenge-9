@@ -1,0 +1,329 @@
+{
+  "recorded_at": "2026-10-12T06:45:57.715846+00:00",
+  "artifact": "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+  "artifact_sha256": "3a155f9e253699f71feed4a7a79599444ff91cdae64539f2f5e1e931b0c555f9",
+  "cloud_key_passed": false,
+  "network_policy": "(version 1)(allow default)(deny network*)(allow network-outbound (remote ip \"localhost:*\"))(allow network* (local unix-socket) (remote unix-socket))",
+  "version": {
+    "version": "0.40.1"
+  },
+  "models": {
+    "embeddinggemma:300m": {
+      "details": {
+        "parent_model": "embeddinggemma:300m-bf16",
+        "format": "gguf",
+        "family": "gemma3",
+        "families": [
+          "gemma3"
+        ],
+        "parameter_size": "307.58M",
+        "quantization_level": "BF16"
+      },
+      "model_info": {
+        "gemma3.attention.causal": false,
+        "gemma3.attention.head_count": 3,
+        "gemma3.attention.head_count_kv": 1,
+        "gemma3.attention.key_length": 256,
+        "gemma3.attention.layer_norm_rms_epsilon": 1e-06,
+        "gemma3.attention.sliding_window": 512,
+        "gemma3.attention.sliding_window_pattern": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "gemma3.attention.value_length": 256,
+        "gemma3.block_count": 24,
+        "gemma3.context_length": 2048,
+        "gemma3.embedding_length": 768,
+        "gemma3.feed_forward_length": 1152,
+        "gemma3.pooling_type": 1,
+        "gemma3.rope.freq_base": 1000000,
+        "general.architecture": "gemma3",
+        "general.basename": "embeddinggemma",
+        "general.file_type": 32,
+        "general.license": "gemma",
+        "general.parameter_count": 307581696,
+        "general.quantization_version": 2,
+        "general.size_label": "300M",
+        "general.tags": [
+          "sentence-transformers",
+          "sentence-similarity",
+          "feature-extraction",
+          "text-embeddings-inference",
+          "sentence-similarity"
+        ],
+        "general.type": "model",
+        "tokenizer.ggml.add_bos_token": true,
+        "tokenizer.ggml.add_eos_token": true,
+        "tokenizer.ggml.add_sep_token": false,
+        "tokenizer.ggml.add_space_prefix": false,
+        "tokenizer.ggml.bos_token_id": 2,
+        "tokenizer.ggml.eos_token_id": 1,
+        "tokenizer.ggml.model": "llama",
+        "tokenizer.ggml.padding_token_id": 0,
+        "tokenizer.ggml.pre": "default",
+        "tokenizer.ggml.scores": [],
+        "tokenizer.ggml.token_type": [],
+        "tokenizer.ggml.tokens": [],
+        "tokenizer.ggml.unknown_token_id": 3
+      },
+      "remote_model": null,
+      "remote_host": null
+    },
+    "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M": {
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "spark2_5",
+        "families": [
+          "spark2_5"
+        ],
+        "parameter_size": "4.11B",
+        "quantization_level": "Q4_K_M"
+      },
+      "model_info": {
+        "general.architecture": "spark2_5",
+        "general.file_type": 15,
+        "general.parameter_count": 4112079360,
+        "general.quantization_version": 2,
+        "general.sampling.temp": 1,
+        "general.sampling.top_k": -1,
+        "general.sampling.top_p": 0.95,
+        "general.size_label": "4.1B",
+        "general.type": "model",
+        "spark2_5.attention.head_count": 16,
+        "spark2_5.attention.head_count_kv": 4,
+        "spark2_5.attention.key_length": 256,
+        "spark2_5.attention.layer_norm_rms_epsilon": 1e-06,
+        "spark2_5.attention.sliding_window": 512,
+        "spark2_5.attention.sliding_window_pattern": [
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false
+        ],
+        "spark2_5.attention.value_length": 256,
+        "spark2_5.block_count": 36,
+        "spark2_5.context_length": 1048576,
+        "spark2_5.embedding_length": 2560,
+        "spark2_5.feed_forward_length": 10240,
+        "spark2_5.rope.dimension_count": 64,
+        "spark2_5.rope.dimension_count_swa": 256,
+        "spark2_5.rope.freq_base": 5000000,
+        "spark2_5.rope.freq_base_swa": 10000,
+        "spark2_5.vocab_size": 131072,
+        "tokenizer.ggml.add_bos_token": false,
+        "tokenizer.ggml.add_eos_token": false,
+        "tokenizer.ggml.bos_token_id": 0,
+        "tokenizer.ggml.eos_token_id": 1,
+        "tokenizer.ggml.merges": [],
+        "tokenizer.ggml.model": "gpt2",
+        "tokenizer.ggml.padding_token_id": 2,
+        "tokenizer.ggml.pre": "spark2_5",
+        "tokenizer.ggml.token_type": [],
+        "tokenizer.ggml.tokens": [],
+        "tokenizer.ggml.unknown_token_id": 5
+      },
+      "remote_model": null,
+      "remote_host": null
+    }
+  },
+  "tags": {
+    "models": [
+      {
+        "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "modified_at": "2026-10-10T00:31:38.230617042+03:00",
+        "size": 2600225381,
+        "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "spark2_5",
+          "families": [
+            "spark2_5"
+          ],
+          "parameter_size": "4.11B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 1048576,
+          "embedding_length": 2560,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "tools",
+          "thinking",
+          "completion"
+        ]
+      },
+      {
+        "name": "embeddinggemma:300m",
+        "model": "embeddinggemma:300m",
+        "modified_at": "2026-10-03T16:32:06.785545983+03:00",
+        "size": 621875917,
+        "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+        "details": {
+          "parent_model": "embeddinggemma:300m-bf16",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3"
+          ],
+          "parameter_size": "307.58M",
+          "quantization_level": "BF16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      }
+    ]
+  },
+  "memory_before": {
+    "argv": [
+      "vm_stat"
+    ],
+    "exit_code": 0,
+    "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3730.\nPages active:                                  90724.\nPages inactive:                                88439.\nPages speculative:                              1575.\nPages throttled:                                   0.\nPages wired down:                              86809.\nPages purgeable:                                   2.\n\"Translation faults\":                       29256274.\nPages copy-on-write:                         1389423.\nPages zero filled:                          11086537.\nPages reactivated:                           6637385.\nPages purged:                                 388559.\nFile-backed pages:                             61048.\nAnonymous pages:                              119690.\nPages stored in compressor:                   655696.\nPages occupied by compressor:                 217085.\nDecompressions:                              5481221.\nCompressions:                                6711854.\nPageins:                                     1528259.\nPageouts:                                      28904.\nSwapins:                                       28693.\nSwapouts:                                     127604.\n",
+    "stderr": ""
+  },
+  "swap_before": {
+    "argv": [
+      "sysctl",
+      "vm.swapusage"
+    ],
+    "exit_code": 0,
+    "stdout": "vm.swapusage: total = 2048.00M  used = 1553.81M  free = 494.19M  (encrypted)\n",
+    "stderr": ""
+  },
+  "ps_before": {
+    "models": []
+  },
+  "external_network_probe": {
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-p",
+      "(version 1)(allow default)(deny network*)(allow network-outbound (remote ip \"localhost:*\"))(allow network* (local unix-socket) (remote unix-socket))",
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import socket; s=socket.socket(); s.settimeout(2); s.connect((\"1.1.1.1\",80))"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import socket; s=socket.socket(); s.settimeout(2); s.connect((\"1.1.1.1\",80))\n                                                       ~~~~~~~~~^^^^^^^^^^^^^^^^\nPermissionError: [Errno 1] Operation not permitted\n"
+  },
+  "argv": [
+    "/usr/bin/sandbox-exec",
+    "-p",
+    "(version 1)(allow default)(deny network*)(allow network-outbound (remote ip \"localhost:*\"))(allow network* (local unix-socket) (remote unix-socket))",
+    "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+    "--profile",
+    "local-rag",
+    "rag",
+    "compare",
+    "--matrix",
+    "repeated",
+    "--suite",
+    "/Users/keldzh/Develop/AiAdventChallenge/week5/data/task2-pilot-suite.json",
+    "--output",
+    "/Users/keldzh/Develop/AiAdventChallenge/week5/results/task2/pilot-8192.json",
+    "--runs",
+    "1"
+  ],
+  "exit_code": 1,
+  "ps_after": {
+    "models": [
+      {
+        "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "size": 2764046334,
+        "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "spark2_5",
+          "families": [
+            "spark2_5"
+          ],
+          "parameter_size": "4.11B",
+          "quantization_level": "unknown"
+        },
+        "expires_at": "2026-10-12T09:57:15.803961+03:00",
+        "size_vram": 2764046334,
+        "context_length": 8192,
+        "runner": "llamacpp"
+      }
+    ]
+  },
+  "memory_after": {
+    "argv": [
+      "vm_stat"
+    ],
+    "exit_code": 0,
+    "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     6861.\nPages active:                                  45303.\nPages inactive:                                40834.\nPages speculative:                              3888.\nPages throttled:                                   0.\nPages wired down:                             264133.\nPages purgeable:                                   2.\n\"Translation faults\":                       31539633.\nPages copy-on-write:                         1393514.\nPages zero filled:                          11651457.\nPages reactivated:                           7931890.\nPages purged:                                 410843.\nFile-backed pages:                             34745.\nAnonymous pages:                               55280.\nPages stored in compressor:                   750916.\nPages occupied by compressor:                 127440.\nDecompressions:                              6673328.\nCompressions:                                8080782.\nPageins:                                     1924323.\nPageouts:                                      30027.\nSwapins:                                       47346.\nSwapouts:                                     308916.\n",
+    "stderr": ""
+  },
+  "swap_after": {
+    "argv": [
+      "sysctl",
+      "vm.swapusage"
+    ],
+    "exit_code": 0,
+    "stdout": "vm.swapusage: total = 5120.00M  used = 4090.81M  free = 1029.19M  (encrypted)\n",
+    "stderr": ""
+  }
+}

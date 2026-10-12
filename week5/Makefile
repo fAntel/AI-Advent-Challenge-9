@@ -19,5 +19,6 @@ build:
 	./supplier-mcp --help >/dev/null
 
 test:
+	python3 -m unittest discover -s scripts -p 'test_*.py'
 	go test ./...
 	go test -race ./...

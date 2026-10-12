@@ -41,6 +41,7 @@ func (a *Agent) fitLocalHistory(ctx context.Context, id, opID string, settings S
 			return ErrConflict
 		}
 		messages := contextRequestMessagesWithInvariantFeedback(r.session, invariants, memory, settings, false, false)
+		messages = WithEvidence(messages, r.session.Operation.Evidence)
 		err := checkLocalBudget(withLocalCapabilities(messages), a.contextWindowTokens, a.local.OutputTokens)
 		if err == nil {
 			return nil

@@ -176,6 +176,9 @@ func RunComparison(ctx context.Context, p Provider, cfg RAGConfig, s Settings, s
 
 // Both comparison commands use exactly the same grounding validator as the daemon.
 func completeComparisonAnswer(ctx context.Context, provider Provider, q ComparisonQuestion, mode string, settings Settings, evidence *Evidence, messages []Message) (ComparisonAnswer, error) {
+	if settings.Provider == "ollama" {
+		messages = withLocalCapabilities(messages)
+	}
 	record := ComparisonAnswer{QuestionID: q.ID, Mode: mode, Messages: messages, Settings: settings, Evidence: evidence, ReviewStatus: "unreviewed"}
 	if evidence != nil && len(evidence.Chunks) == 0 {
 		record.Result = unknownRAG()
@@ -183,11 +186,15 @@ func completeComparisonAnswer(ctx context.Context, provider Provider, q Comparis
 		record.AnswerSkipped = true
 		return record, nil
 	}
+	ctx = context.WithValue(ctx, ragEvidenceKey, evidence)
 	response, err := provider.Complete(ctx, CompletionRequest{Messages: messages, Settings: settings})
 	record.Call = response.Call
 	record.RawAnswer = response.Answer
 	if err != nil {
 		return record, err
+	}
+	if response.Call.FinishReason == "length" {
+		return record, fmt.Errorf("answer reached output token limit")
 	}
 	if strings.TrimSpace(response.Answer) == "" {
 		return record, fmt.Errorf("empty answer")

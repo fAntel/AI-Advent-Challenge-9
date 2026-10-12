@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-10-12T08:36:52.284024+00:00",
+  "network_policy": "(version 1)(allow default)(deny network*)(allow network-outbound (remote ip \"localhost:*\"))(allow network-inbound (local ip \"localhost:*\"))(allow network-bind (local ip \"localhost:*\"))(allow network* (local unix-socket) (remote unix-socket))",
+  "external_probe_error": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import socket; s=socket.socket(); s.settimeout(2); s.connect((\"1.1.1.1\",80))\n                                                       ~~~~~~~~~^^^^^^^^^^^^^^^^\nPermissionError: [Errno 1] Operation not permitted\n",
+  "endpoint": "http://127.0.0.1:11435",
+  "server_and_clients_sandboxed": true,
+  "server_pid": 13600,
+  "version": {
+    "version": "0.40.3"
+  },
+  "exit_code": 1,
+  "ps_after": {
+    "models": []
+  }
+}

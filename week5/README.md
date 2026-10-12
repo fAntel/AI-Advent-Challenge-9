@@ -1,4 +1,6 @@
-# Week5 Task0 — Local LLM launch
+# Week5 — Local LLM, agent and RAG
+
+## Task0 — Local LLM launch
 
 Run a local text-generation model with Ollama and demonstrate three requests of
 increasing difficulty. `local-llm` is a standalone Go CLI using only the standard
@@ -175,8 +177,8 @@ Task0's CLI and tests now live under `cmd/local-llm`; its executable, commands
 and recorded results are preserved. `make test` runs all carried Go tests plus
 race checks. `make build` builds eight Go executables, including `local-llm`,
 `advent-agent` and `advent-agentd`, and checks their help commands. Python indexing
-and the old virtual environment are not needed for Task1. The other carried
-executables retain their inherited cloud/RAG behavior and are not the local app.
+and the old virtual environment are not needed for Task1. Task2 below adds fully local grounded RAG to `advent-agent`. The other carried
+executables, including `mini-chat`, retain their inherited cloud behavior.
 See [HARNESS.md](HARNESS.md) for inherited features and
 [config.local.example.toml](config.local.example.toml) for local settings.
 
@@ -253,9 +255,9 @@ browsing and tools are unavailable, and that current releases cannot be verified
 offline. Unsupported tool syntax remains rejected; `/retry` adds a corrective
 text-only instruction, including for failed sessions created before this fix.
 Rejected tool text is retained on the current operation for inspection and is
-not added to accepted conversation history. Local RAG requests and task-lifecycle sessions are rejected
-before generation; use `--chat` for interactive local conversations. Fully local
-retrieval/scoring and autonomous tool calling remain future work.
+not added to accepted conversation history. Task-lifecycle sessions are rejected before generation; use `--chat` for
+interactive local conversations. Task2 below enables local retrieval/scoring and
+grounded answers. Autonomous tool calling remains unsupported.
 
 Mock tests cover provider options, usage, errors, deadlines, model locality,
 context guards, summary recovery, restart/resume, explicit memory, daemon
@@ -331,3 +333,200 @@ between runs. That response includes unverified release claims and is retained
 only as diagnostic evidence. Capability instructions reduce unsupported tool
 attempts; they do not make a small model's claims reliable or give it live data.
 The existing guard continues rejecting unsupported tool syntax.
+
+
+## Task2 — Fully local grounded RAG
+
+`advent-agent --profile local-rag --rag` reuses Week4's full pipeline: local
+Ollama embeddings, SQLite cosine retrieval, model relevance scoring, filtering,
+and grounded answer generation. Both scoring and answering use the installed
+Spark model. Requests run sequentially; scoring uses batches of two candidates
+and a 256-token output limit. Scoring requests use short IDs mapped back to
+immutable chunk IDs, avoiding long-hash copying errors; raw mappings are saved.
+Local scoring and grounded answers use Ollama JSON schemas and retain strict
+application validation. Sessions requiring the project-invariant outer envelope
+use JSON mode and the existing envelope validator. No cloud credentials or fallback are used.
+
+Retrieval keeps Week4's semantic chunks, 20 candidates, minimum relevance score
+2/3, five final chunks and 6,000-character whole-chunk budget. Rewriting and
+reranking remain opt-in and use the same local model. Empty filtered evidence
+returns an explicit unknown response without answer generation. Generated
+answers must pass the existing citation and exact-quote validator. This proves
+provenance, not semantic correctness. Malformed scores, invalid answers and
+truncation are retained as failures, never replaced with unfiltered retrieval.
+
+### Setup and usage
+
+The Week4 Python environment, its built index, `embeddinggemma:300m`, and Task0's
+Spark model must already be installed. The installer copies and verifies the
+index into ignored `week5/data/`, so query-cache writes do not alter Week4 data.
+A Week5 wrapper invokes Week4's Python indexer; keep the two week directories
+together. It rejects HTTP redirects and remote embedding models. Ollama 0.40 can
+add `runner`/`format` fields and alternate-runner manifest metadata: the wrapper
+accepts this only when removing that packaging metadata reproduces the index's
+exact old manifest hash. All inference layers and configuration stay checked.
+Changed weights or parameters still fail compatibility checks.
+The isolated profile does not change Task1's `local` profile or Week4's service.
+
+From `week5/`, test and rebuild before running these commands:
+
+```sh
+make test
+make build
+export XDG_CONFIG_HOME="$PWD/data/task2-config"
+export XDG_STATE_HOME="$PWD/data/task2-state"
+/opt/homebrew/bin/python3.14 scripts/install-local-rag.py --context 16384
+./advent-agent --profile local-rag --rag -p 'When did the common Kotlin UUID API become stable?' --stats
+./advent-agent --profile local-rag --rag --chat
+./advent-agent --profile local-rag resume SESSION_ID
+./advent-agentd --profile local-rag stop
+```
+
+These commands use the freshly built
+`/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent` and its sibling
+`advent-agentd`. The installer respects XDG paths and refuses to replace different
+existing configuration. Without the exports, it installs in the usual user
+configuration directory. The default context is 16,384, selected after the pilot showed the inherited
+evidence budget can exceed the conservative 8,192-token guard. `--context 8192`
+remains available for smaller inputs. Existing profiles require a deliberate
+edit and daemon restart.
+Evidence and grounding instructions count toward the conservative input guard.
+Older eligible exchanges can be summarized locally; oversized current input
+fails explicitly instead of silently dropping sources or instructions.
+
+A rejected generated answer is a failed operation, not an unknown response.
+Resume the printed session and use `/retry` to regenerate with saved evidence,
+or `/discard` to abandon it. The measured comparison deliberately does not retry
+failed trials.
+
+### Repeated comparison
+
+After a successful test/build, run the frozen ten-question Week4 suite:
+
+```sh
+./advent-agent --profile local-rag rag compare --matrix repeated --runs 3 --suite ../week4/rag-grounding-suite.json --output results/task2/answers.json
+/opt/homebrew/bin/python3.14 scripts/render-local-rag.py
+```
+
+Each pass independently repeats retrieval, scoring and answering. The evaluator
+saves every completed trial, continues after errors, and exits unsuccessfully
+if any trial failed. Rerunning resumes unfinished work without retrying terminal
+failures. Use one evaluator per output file. Changed suite, index, model, context or settings require a new output
+path. A process interruption can repeat an in-flight request whose response was
+not checkpointed. Expected facts and review criteria never enter model prompts.
+
+For a macOS capture with external network connections denied, use
+`scripts/capture-local-rag.py` instead of the direct comparison command. It uses
+the workspace XDG paths above, verifies external-network denial, permits loopback,
+and saves model, binary, memory and swap metadata beside the answers. It refuses
+to overwrite an environment capture; resume directly with the CLI if needed.
+
+Quality reviews are authored separately against saved evidence and bound to
+complete trial hashes. Missing/stale reviews withhold semantic totals. Speed is
+split into retrieval, scoring and answer generation. Stability records failures
+and variation over three passes. The historical DeepSeek baseline is
+`../week4/reports/grounding/`; no new cloud calls are made. Different relevance
+scores can select different evidence, so the comparison measures pipelines,
+not generation models in isolation. Cloud repeated-run stability is unavailable.
+
+
+### Development checks and recording
+
+Development pilots are retained separately as `results/task2/pilot-8192.json`
+and `results/task2/pilot-16384.json`. They exposed long source-ID copying errors,
+missing response fields, and Ollama's manifest metadata migration. They are not
+part of the final three-pass measurements. The local provider now constrains
+answer source IDs to actual evidence through its JSON schema; exact quote and
+citation checks still reject unsupported output.
+
+To capture the CLI workflow after tests/build and workspace profile setup:
+
+```sh
+/opt/homebrew/bin/python3.14 scripts/demo-local-rag.py
+```
+
+The script uses a temporary project, saves CLI output and session snapshots,
+asks an answerable and an unsupported question, stops only the `local-rag`
+daemon, then resumes the saved session after automatic daemon restart. It
+refuses to overwrite a capture. For a video, show tests/build, the model settings,
+one grounded answer with sources/quotes, one unknown response, session resume,
+and the comparison report. Video recording/upload remain with the user.
+
+
+For the stronger offline check, `scripts/offline-local-rag.py` starts an isolated
+Ollama server on loopback port 11435 and runs the CLI restart/resume demonstration
+with both server and clients denied external network access. It uses its own
+workspace profile/state directories and stops its server afterward. Existing
+models must already be installed. Avoid running it concurrently with the full
+benchmark on an 8 GB machine; a second Ollama server can duplicate loaded weights.
+The retrieval wrapper honors `OLLAMA_HOST` for this alternate loopback port.
+The offline harness pins the original embedding manifest in an isolated model
+store (sharing installed blobs with pruning disabled), because Ollama 0.40.3
+otherwise selects different weights under the same tag. Initial compatibility
+failures are retained in the offline diagnostic captures.
+
+
+### Task2 observed comparison
+
+The three-pass run completed on **October 12, 2026**, on the **MacBook Air M1,
+8 GB RAM**, using Spark Q4_K_M and a 16,384-token context. All 30 trials and their
+raw evidence/requests are in [answers.json](results/task2/answers.json); the
+hash-bound manual review and full comparison are in
+[comparison.md](results/task2/comparison.md). No new DeepSeek calls were made.
+
+| Measurement | Local pipeline | Historical DeepSeek pipeline |
+| --- | ---: | ---: |
+| Valid saved responses | 18/30 first attempts | 10/10 after a recorded TLS retry |
+| Factual answers fully supported by displayed quotes | 6/12 accepted factual answers | 4/7 |
+| Correct unknown controls | 6/9 | 3/3 |
+| Median retrieval | 0.48 s | 0.21 s |
+| Median scoring | 106.30 s | 5.70 s |
+| Median answer generation (excluding skips) | 63.85 s | 2.45 s |
+| Median local trial / cloud recorded-stage sum | 148.70 s | 7.85 s |
+
+Cloud stage sums exclude unrecorded orchestration time and are not wall-clock
+trial measurements. The runs happened on different dates; the cloud report has
+one pass, so equivalent repeated-run cloud stability is unavailable. Local
+passes returned 6/10, 7/10, and 5/10 valid responses. All 300 scoring calls
+completed; there were no scoring-format, retrieval, or timeout failures in the
+final run. Answer failures comprised quotation/citation errors, three invalid
+unknown responses, and one output-limit truncation. They were never silently
+retried or published as valid answers.
+
+The separate source review found 23 fully covered, six partially covered, and
+seven omitted/incorrect expected facts across the accepted factual answers.
+Rejected answers receive no delivered-answer credit. In particular, the model
+repeatedly confused importing JavaScript APIs with exporting Kotlin interfaces,
+even with a relevant external-declarations passage in the packed context.
+Quote provenance alone did not prevent that semantic error. The payroll and
+PostgreSQL controls consistently filtered all evidence and skipped generation;
+the Kotlin 3.0 control consistently returned an invalid unknown envelope.
+
+The run recorded **324 local calls and 362,966 provider tokens**. Generation API
+charges were zero, excluding hardware/electricity. Runtime metadata is retained
+in [answers.environment.json](results/task2/answers.environment.json). Ollama's
+API reported version 0.40.1 and a loaded Spark allocation of 2,805,999,860 bytes
+at the finish. System swap was already 7,244.88 MB at the start and rose to
+16,128.94 MB. These system-wide snapshots do not attribute all memory use to RAG,
+but they show substantial memory pressure; this was not an idle-machine memory
+benchmark. The models used by the task were unloaded afterward.
+
+The full pipeline runs locally on this machine, but its latency, grounding
+failures, and observed memory pressure are practical limitations. Two suite
+questions were used during protocol-development pilots, so this is an
+illustrative evaluation, not a held-out benchmark.
+
+### Final offline verification
+
+`make test` (including Go race checks) and `make build` passed. The rebuilt
+artifact used was `/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent`.
+[The isolated-server capture](results/task2/offline-demo-pinned.json) and
+[environment record](results/task2/offline-demo-pinned.environment.json) show
+Ollama 0.40.3 and the client running with external networking denied and no
+cloud key. A grounded UUID answer passed exact-quote validation; the unsupported
+payroll question returned unknown. The saved session retained local RAG settings
+after daemon stop and automatic restart, but its next answer was rejected for
+a missing citation/quote. The demo therefore exited 1; this is a recorded model
+validation failure, not a fully passing three-turn demo. The owned daemon and
+isolated server were stopped afterward. Initial embedding compatibility failures
+are preserved in the other offline captures; no index or validator was weakened.
