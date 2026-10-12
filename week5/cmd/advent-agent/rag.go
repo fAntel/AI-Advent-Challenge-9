@@ -12,6 +12,10 @@ import (
 )
 
 func runRAG(cfg agent.Config, args []string) {
+	if len(args) > 0 && args[0] == "score-bench" {
+		runScoreBench(cfg, args[1:])
+		return
+	}
 	if len(args) == 0 || args[0] != "compare" {
 		fatal(errors.New("usage: advent-agent rag compare --suite FILE --output FILE [--matrix paired|enhanced|grounded|repeated --model MODEL --reasoning none --rag-strategy semantic]"))
 	}
@@ -52,4 +56,27 @@ func runRAG(cfg agent.Config, args []string) {
 	} else {
 		fatalIf(agent.RunComparison(ctx, client, cfg.RAG, settings, *suite, *output))
 	}
+}
+
+func runScoreBench(cfg agent.Config, args []string) {
+	fs := flag.NewFlagSet("rag score-bench", flag.ExitOnError)
+	input := fs.String("input", "results/task2/answers.json", "frozen Task2 repeated comparison")
+	output := fs.String("output", "results/task3/scoring.json", "resumable scoring report")
+	questions := fs.String("questions", "", "comma-separated question IDs; default all")
+	runs := fs.Int("runs", 3, "independent measured passes, excluding warmup")
+	baseline := fs.String("baseline", "", "single-pass scoring report for per-question deadlines")
+	factor := fs.Float64("timeout-factor", 0, "deadline as a fraction of baseline duration (e.g. 0.6)")
+	warmup := fs.Duration("warmup-timeout", 0, "separate warmup deadline; zero disables")
+	fatalIf(fs.Parse(args))
+	if fs.NArg() != 0 {
+		fatal(errors.New("unexpected benchmark arguments"))
+	}
+	if cfg.Provider.Name != "ollama" {
+		fatal(errors.New("score-bench requires an Ollama profile"))
+	}
+	client, err := agent.NewConfiguredProvider(cfg, &http.Client{Timeout: time.Duration(cfg.Daemon.RequestTimeout)}, agent.NewDebugLogger(cfg.Daemon, ""), "")
+	fatalIf(err)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	fatalIf(agent.RunScoreBench(ctx, client, cfg, agent.DefaultSettings(cfg), *input, *output, *questions, *runs, agent.ScoreBenchOptions{Baseline: *baseline, TimeoutFactor: *factor, WarmupTimeout: *warmup}))
 }

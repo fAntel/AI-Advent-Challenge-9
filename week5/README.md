@@ -530,3 +530,107 @@ a missing citation/quote. The demo therefore exited 1; this is a recorded model
 validation failure, not a fully passing three-turn demo. The owned daemon and
 isolated server were stopped afterward. Initial embedding compatibility failures
 are preserved in the other offline captures; no index or validator was weakened.
+
+## Task3 — Local relevance scorer optimization
+
+Task3 keeps the installed **Spark Q4_K_M** weights fixed and tunes only the
+local relevance scorer. Quantization is deliberately excluded: the existing
+quantized model is already required by this machine's memory budget. Answer
+settings, embeddings, twenty retrieved candidates, the 2/3 relevance threshold,
+five-chunk limit, and 6,000-character evidence budget stay fixed.
+
+Optional `[rag.scorer]` settings configure `temperature`,
+`context_window_tokens`, `output_tokens`, `batch_size`, and `prompt_version`.
+Omitted fields retain Task2 behavior: temperature 1, the agent's context window,
+256 output tokens, batches of two, and `legacy-v2`. Explicit temperature zero
+is supported. `compact-v1` uses a shorter evidence-classification prompt and
+removes retrieval bookkeeping from candidate inputs while retaining complete
+text, titles, sections, platforms, release versions, and availability. It also
+replaces the general chat capability preamble with scorer-specific instructions.
+`compact-v2` additionally returns an ordered score array, with exact array length
+constrained by the schema. The application maps positions back to immutable IDs
+and rejects missing, extra, null, or out-of-range scores. These settings do not
+affect answers, summaries, or query rewriting.
+
+Set `rerank = true` inside `[rag]` to enable score sorting by default for a
+profile. Filtering and sorting reuse the same scores; sorting itself makes no
+additional model calls. Existing profiles continue using their old defaults.
+Scoring keeps schema-constrained JSON, short-ID mapping, exact candidate
+coverage, and strict score validation. Oversized inputs and truncated outputs
+fail explicitly. Changed scorer settings invalidate saved preparations rather
+than mixing scores from different experiments.
+
+### Bounded evaluation
+
+The original three-pass, ten-question comparison was stopped to avoid hours of
+runtime. The default `all` workflow now ends with one bounded scoring pass;
+expensive repeated `final` and `answers` stages require explicit selection.
+The selected candidate uses temperature 0, `compact-v2`, batch size 4, an
+8,192-token scoring context, and 64 output tokens. Screening measured about
+2× lower median scoring time on four questions. The bounded validation measured
+**84.5 → 34.8 seconds (2.43× faster)**, with all four deadlines met, filtering
+recall 90.9% → 100%, and packed-evidence recall unchanged at 81.8%. Filtering
+precision fell from 52.6% to 45.8%, and nDCG@5 from 90.7% to 85.2%. This is a
+development result, not evidence of equivalent answer quality across the full
+suite. Sampled RSS did not improve; see the report for resource measurements.
+
+The bounded pass reuses the controlled screening baseline for q01, q13, q19,
+and q23. Each measured question gets **60% of its own recorded baseline time**.
+Warmup has a separate 60-second cap. A timeout cancels the request, saves a
+terminal failure, and is never retried automatically. Failed trials receive no
+delivered relevance credit. The target remains **2× median scoring speedup**,
+with no scoring failures and at most a five-percentage-point loss in filtering
+or packed-evidence recall; the 0.6 cutoff is a looser rejection threshold.
+Saved baseline hashes and budgets prevent incompatible resumes.
+
+From `week5/`, after rebuilding and testing:
+
+```sh
+make test
+make build
+python3 scripts/run-score-bench.py bounded
+python3 scripts/render-score-bench.py
+```
+
+The runner invokes `/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent`,
+creates isolated profiles in `data/task3-config/`, and records measurements in
+`results/task3/`. It removes the cloud key from child environments and never
+downloads another model. Both runs unload the model before their recorded
+warmup. The cancelled repeated run and uncontrolled-cache pilot are excluded.
+Existing captures cannot be resumed with a different binary or command.
+
+Equivalent standalone replay against the saved baseline:
+
+```sh
+XDG_CONFIG_HOME="$PWD/data/task3-config" \
+XDG_STATE_HOME="$PWD/data/task3-state" \
+./advent-agent --profile task3-finalist rag score-bench \
+  --input results/task3/candidates.json \
+  --questions q01,q13,q19,q23 --runs 1 \
+  --baseline results/task3/screen-baseline-1.json \
+  --timeout-factor 0.6 --warmup-timeout 60s \
+  --output results/task3/manual-bounded.json
+```
+
+For a new experiment, `prepare-score-bench.py --output-dir PATH` freezes Task2's
+first-pass candidates and separate relevance labels. Pass that directory to
+`run-score-bench.py screen`, then `extra`, then `bounded`, and to the renderer.
+Screening itself runs several variants and takes longer; reuse the recorded
+baseline and finalist when only validating the runtime cutoff. Input contains
+full candidate passages but no expected answers or labels. The implementing
+assistant labelled the examples before tuning; they are not an independent or
+held-out test set.
+
+See [the measured comparison](results/task3/comparison.md) for the outcome and
+resource samples. Model allocation, process RSS, and system swap are distinct;
+five-second samples can miss peaks and swap cannot be attributed solely to the
+model. Answer generation settings stay fixed, but selected evidence can change.
+Two optional answer spot checks (`run-score-bench.py spot`) cover q01 and q23,
+with a 90-second deadline per complete pipeline trial and no retries. They only
+run after the bounded scoring gate passes. Their Task2 first-pass answers provide
+a historical comparison; this is not a new controlled full-suite experiment.
+In the recorded run, q01 finished scoring but answer generation hit the
+90-second deadline; q23 correctly returned unknown in 62.3 seconds. The scorer
+speed target passed, but end-to-end answer quality and speed remain unproven.
+The baseline remains the default unless both speed and reviewed answer-quality
+gates pass; `install-fast-rag.py` refuses an unqualified result.

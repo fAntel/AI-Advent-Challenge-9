@@ -181,6 +181,9 @@ func DiscoverProfiles(configDir string) ([]string, error) {
 }
 
 func (c Config) Validate() error {
+	if err := c.RAG.Scorer.Validate(); err != nil {
+		return err
+	}
 	if _, _, err := c.RAG.Paths(); err != nil {
 		return err
 	}
@@ -221,7 +224,7 @@ func DefaultSettings(c Config) Settings {
 	if c.Provider.Name == "ollama" {
 		model, reasoning, temperature = c.Ollama.Model, "none", nil
 	}
-	return normalizeSettings(Settings{Provider: c.Provider.Name, Model: model, Reasoning: reasoning, Temperature: temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}, Compression: strategy == "summary", ContextStrategy: strategy})
+	return normalizeSettings(Settings{RAGRerank: c.RAG.Rerank, Provider: c.Provider.Name, Model: model, Reasoning: reasoning, Temperature: temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}, Compression: strategy == "summary", ContextStrategy: strategy})
 }
 func ValidateSettings(s Settings) error {
 	if err := validateRAG(s); err != nil {

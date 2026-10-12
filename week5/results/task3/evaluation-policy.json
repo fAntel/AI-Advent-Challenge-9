@@ -1,0 +1,26 @@
+{
+  "policy": "bounded development validation",
+  "reason": "User requested avoiding hours of evaluation; per-question timeout is 0.6 of recorded baseline.",
+  "timeout_factor": 0.6,
+  "warmup_timeout_seconds": 60,
+  "passes": 1,
+  "questions": [
+    "q01",
+    "q13",
+    "q19",
+    "q23"
+  ],
+  "baseline": "screen-baseline-1.json",
+  "finalist": "bounded-finalist-1.json",
+  "answer_spot_questions": [
+    "q01",
+    "q23"
+  ],
+  "answer_spot_timeout_seconds": 90,
+  "excluded": [
+    "pilot-uncontrolled-cache/",
+    "interrupted-before-ordered/",
+    "final-baseline-1.json"
+  ],
+  "excluded_reason": "Pilot had uncontrolled cache; repeated evaluation was cancelled, not a completed comparison."
+}

@@ -1,0 +1,5 @@
+{
+  "status": "diagnostic pilot, excluded from final comparisons",
+  "reason": "Cross-configuration cache state was uncontrolled. Temperature-only changes reused identical prompt text while compact/batched variants changed it. Restart final measurements with a model unload plus warmup before each configuration.",
+  "interrupted": "batch4 screening; prior completed configurations retained"
+}

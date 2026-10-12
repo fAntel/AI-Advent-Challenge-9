@@ -29,3 +29,12 @@ autostart = true
 [rag]
 executable = "@INDEXER@"
 database = "@DATABASE@"
+
+# Optional scorer overrides for Task3 experiments. Defaults preserve Task2.
+# [rag.scorer]
+# temperature = 1.0
+# context_window_tokens = 16384 # omit to inherit agent context
+# output_tokens = 256
+# batch_size = 2
+# prompt_version = "legacy-v2" # or "compact-v1" / "compact-v2" (ordered scores)
+# Set rerank = true in [rag] to sort by the same relevance scores.

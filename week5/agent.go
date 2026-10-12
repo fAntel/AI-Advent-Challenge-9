@@ -112,12 +112,13 @@ type Agent struct {
 }
 
 func NewAgent(cfg Config, provider any, logger *DebugLogger) (*Agent, error) {
+	cfg = cfg.scoringConfig()
 	root := cfg.Daemon.SessionDir
 	var complete func(context.Context, []Message, Settings) (CompletionResponse, error)
 	switch p := provider.(type) {
 	case Provider:
 		complete = func(ctx context.Context, m []Message, s Settings) (CompletionResponse, error) {
-			return p.Complete(ctx, CompletionRequest{Messages: m, Settings: s, Purpose: completionPurpose(ctx)})
+			return p.Complete(ctx, CompletionRequest{Messages: m, Settings: s, Purpose: completionPurpose(ctx), Scorer: scoringFromContext(ctx)})
 		}
 	case Completer:
 		complete = p.Complete

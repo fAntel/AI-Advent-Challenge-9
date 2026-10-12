@@ -1,0 +1,38 @@
+{
+  "historical baseline/q01": {
+    "support": "N/A",
+    "correct_unknown": false,
+    "facts": [
+      "no",
+      "no",
+      "no"
+    ],
+    "notes": "Rejected by exact-quote validation; no answer delivered.",
+    "sha256": "4188531e279d0300351885db01ac5c9bb2fc6299db6a736324b10a577f9a0783"
+  },
+  "historical baseline/q23": {
+    "support": "N/A",
+    "correct_unknown": true,
+    "facts": [],
+    "notes": "Correct abstention: supplied Kotlin documentation does not answer the Debezium/PostgreSQL question.",
+    "sha256": "a0d694c5ef7464f18a7353a2e035a2e61e9853cf66365ec4f184168952bb39ac"
+  },
+  "finalist/q01": {
+    "support": "N/A",
+    "correct_unknown": false,
+    "facts": [
+      "no",
+      "no",
+      "no"
+    ],
+    "notes": "The complete pipeline hit its 90-second deadline during answer generation; no answer delivered. Scoring had completed.",
+    "sha256": "63d7b26b5a5354c42b30882ef3fa9d912dd2914c06c83bad2c603bb08748792d"
+  },
+  "finalist/q23": {
+    "sha256": "f6ec63a1c14a1ad0137755eb00fb4e31d0f86e3b8ad7b3b67407be215f75a831",
+    "support": "N/A",
+    "correct_unknown": true,
+    "facts": [],
+    "notes": "Correct abstention: no retrieved Kotlin passage supports an answer about Debezium/PostgreSQL."
+  }
+}

@@ -1,0 +1,34 @@
+# Install with scripts/install-local-rag.py; placeholders are resolved there.
+[provider]
+name = "ollama"
+
+[ollama]
+endpoint = "http://127.0.0.1:11434"
+model = "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M"
+output_tokens = 1024
+summary_tokens = 256
+keep_alive = "10m"
+
+[daemon]
+socket_path = "/Users/keldzh/Develop/AiAdventChallenge/week5/data/task3-state/advent-agent/task3-batch4/agent.sock"
+session_dir = "/Users/keldzh/Develop/AiAdventChallenge/week5/data/task3-state/advent-agent/task3-batch4"
+log_path = "/Users/keldzh/Develop/AiAdventChallenge/week5/data/task3-state/advent-agent/task3-batch4/agentd.log"
+request_timeout = "10m"
+debug = false
+
+[agent]
+context_window_tokens = 16384
+compression_enabled = true
+context_strategy = "summary"
+recent_messages = 4
+summary_batch_messages = 2
+
+[client]
+autostart = true
+
+[rag]
+executable = "/Users/keldzh/Develop/AiAdventChallenge/week5/scripts/local-kotlin-index"
+database = "/Users/keldzh/Develop/AiAdventChallenge/week5/data/index.sqlite"
+
+[rag.scorer]
+batch_size = 4

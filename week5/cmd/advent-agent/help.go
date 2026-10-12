@@ -11,6 +11,7 @@ func writeCLIUsage(w io.Writer) {
   advent-agent resume [SESSION_ID] [OPTIONS]
   advent-agent delete SESSION_ID
   advent-agent profiles
+  advent-agent rag compare|score-bench [OPTIONS]
   advent-agent mcp COMMAND
   advent-agent schedule add|list|remove|run|reload ...
   advent-agent pipeline add|list|show|step|run|remove ...

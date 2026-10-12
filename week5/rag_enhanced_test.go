@@ -31,7 +31,7 @@ func (f *enhancedFake) Complete(ctx context.Context, r CompletionRequest) (Compl
 	switch r.Messages[0].Content {
 	case rewriteInstructions:
 		answer = `{"query":"rewritten Kotlin query"}`
-	case scoreInstructions:
+	case scoreInstructions, compactScoreInstructions, compactScoresInstructions:
 		if f.scoreOutput != "" {
 			answer = f.scoreOutput
 			break
@@ -46,7 +46,15 @@ func (f *enhancedFake) Complete(ctx context.Context, r CompletionRequest) (Compl
 		for i, c := range input.Candidates {
 			scores = append(scores, map[string]any{"id": c.ID, "score": i % 4})
 		}
-		data, _ := json.Marshal(map[string]any{"scores": scores})
+		var scoreValue any = scores
+		if r.Messages[0].Content == compactScoresInstructions {
+			values := []int{}
+			for i := range input.Candidates {
+				values = append(values, i%4)
+			}
+			scoreValue = values
+		}
+		data, _ := json.Marshal(map[string]any{"scores": scoreValue})
 		answer = string(data)
 	default:
 		if f.failAnswer {
@@ -182,7 +190,7 @@ func TestEnhancedComparisonResume(t *testing.T) {
 		switch r.Messages[0].Content {
 		case rewriteInstructions:
 			rewrite++
-		case scoreInstructions:
+		case scoreInstructions, compactScoreInstructions, compactScoresInstructions:
 			score++
 		}
 		data, _ := json.Marshal(r.Messages)

@@ -1,0 +1,50 @@
+{
+  "selection": "Two bounded answer spot checks: q01 supported, q23 unsupported. Not a full-suite comparison.",
+  "review_basis": "Expected facts recorded before generation from saved Task0 source snapshots. Full normalized source texts retained with line numbers; expected facts are never sent to the model.",
+  "questions": [
+    {
+      "id": "q01",
+      "query": "How can a function require an implicit service and how is that service resolved?",
+      "relevant": [
+        {
+          "document_id": "context-parameters",
+          "section": "Context parameters resolution"
+        }
+      ],
+      "expected_facts": [
+        {
+          "id": "f1",
+          "text": "Declare context(name: Service) on the function for an implicit dependency."
+        },
+        {
+          "id": "f2",
+          "text": "Resolution happens at the call site by matching context values by type."
+        },
+        {
+          "id": "f3",
+          "text": "Multiple compatible values at the same scope level cause ambiguity."
+        }
+      ],
+      "mistakes_to_watch": "Do not present old context receivers as the current named-parameter syntax; distinguish experimental explicit arguments.",
+      "source_review": {
+        "snapshot_sha256": "2321cd77936bdbc3b2753f2b1a1b09b678efbc319eb91f0065d8fe24c0162e06",
+        "lines": [
+          1,
+          165
+        ],
+        "excerpt": "reports/task1/sources/context-parameters.txt"
+      },
+      "selection_reason": "Current context-parameter syntax, scope resolution and ambiguity."
+    },
+    {
+      "id": "q23",
+      "query": "How do I configure a PostgreSQL replication slot for Debezium?",
+      "relevant": [],
+      "unanswerable": true,
+      "expected_facts": [],
+      "selection_reason": "Out-of-corpus control: irrelevant evidence rejection and honest attribution.",
+      "review_criteria": "Return unknown with clarification, no factual advice, no fabricated sources or quotes."
+    }
+  ],
+  "description": "Seven answerable questions and three unknown controls for mandatory grounding; expected facts never enter provider prompts."
+}

@@ -26,7 +26,7 @@ func ragFixture(t *testing.T, body string) RAGConfig {
 	if err := os.WriteFile(db, []byte("index"), 0600); err != nil {
 		t.Fatal(err)
 	}
-	return RAGConfig{exe, db}
+	return RAGConfig{Executable: exe, Database: db}
 }
 
 const fixtureEvidence = `[{"id":"c1","document_id":"doc","strategy":"semantic","text":"Reference fact αβ","title":"Guide","source":"https://example.org/guide","sections":["Section"],"line_start":3,"line_end":5,"availability":"unknown","score":0.9}]`

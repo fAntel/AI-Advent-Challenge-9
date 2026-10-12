@@ -168,18 +168,32 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 	if err := validateOllamaSettings(request.Settings); err != nil {
 		return CompletionResponse{}, err
 	}
-	request.Messages = withLocalCapabilities(request.Messages)
-	output := c.Config.OutputTokens
 	if request.Purpose == "" {
 		request.Purpose = completionPurpose(ctx)
 	}
+	if request.Purpose != "rag_score" || !compactScorer(request.Scorer) {
+		request.Messages = withLocalCapabilities(request.Messages)
+	}
+	output := c.Config.OutputTokens
 	if request.Purpose == "rag_score" || request.Purpose == "rag_rewrite" {
 		output = 256
 	}
 	if request.Purpose == "summary" {
 		output = c.Config.SummaryTokens
 	}
-	if err := checkLocalBudget(request.Messages, c.ContextWindow, output); err != nil {
+	contextWindow := c.ContextWindow
+	if request.Purpose == "rag_score" && request.Scorer != nil {
+		if err := request.Scorer.Validate(); err != nil {
+			return CompletionResponse{}, err
+		}
+		scoring := request.Scorer.Effective()
+		output = scoring.OutputTokens
+		if scoring.ContextWindowTokens > 0 {
+			contextWindow = scoring.ContextWindowTokens
+		}
+		request.Settings.Temperature = scoring.Temperature
+	}
+	if err := checkLocalBudget(request.Messages, contextWindow, output); err != nil {
 		return CompletionResponse{}, err
 	}
 	c.mu.Lock()
@@ -197,7 +211,7 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 	if err := c.inspect(ctx, request.Settings.Model); err != nil {
 		return CompletionResponse{}, err
 	}
-	options := map[string]any{"num_ctx": c.ContextWindow, "num_predict": output, "temperature": 1.0, "top_p": 0.95, "top_k": -1}
+	options := map[string]any{"num_ctx": contextWindow, "num_predict": output, "temperature": 1.0, "top_p": 0.95, "top_k": -1}
 	if request.Settings.Temperature != nil {
 		options["temperature"] = *request.Settings.Temperature
 	}
@@ -206,6 +220,13 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 		body["format"] = "json"
 		if request.Purpose == "rag_score" {
 			body["format"] = localScoreSchema
+			if request.Scorer != nil && request.Scorer.PromptVersion == "compact-v2" {
+				schema, err := orderedScoreSchema(request.Messages)
+				if err != nil {
+					return CompletionResponse{}, err
+				}
+				body["format"] = schema
+			}
 		}
 		if request.Settings.RAG && ctx.Value(ragInvariantEnvelopeKey) != true {
 			body["format"] = groundedLocalSchema(ctx)
@@ -215,11 +236,14 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 		Message struct {
 			Content string `json:"content"`
 		} `json:"message"`
-		Done       bool   `json:"done"`
-		DoneReason string `json:"done_reason"`
-		Error      string `json:"error"`
-		Prompt     int    `json:"prompt_eval_count"`
-		Generated  int    `json:"eval_count"`
+		Done           bool          `json:"done"`
+		DoneReason     string        `json:"done_reason"`
+		Error          string        `json:"error"`
+		Prompt         int           `json:"prompt_eval_count"`
+		Generated      int           `json:"eval_count"`
+		LoadDuration   time.Duration `json:"load_duration"`
+		PromptDuration time.Duration `json:"prompt_eval_duration"`
+		EvalDuration   time.Duration `json:"eval_duration"`
 	}
 	started := time.Now()
 	if err := c.post(ctx, "/api/chat", body, &raw); err != nil {
@@ -235,7 +259,7 @@ func (c *OllamaClient) Complete(ctx context.Context, request CompletionRequest) 
 		return CompletionResponse{}, errors.New("Ollama returned an empty answer")
 	}
 	usage := Usage{PromptTokens: raw.Prompt, CompletionTokens: raw.Generated, TotalTokens: raw.Prompt + raw.Generated}
-	call := CallMetrics{StartedAt: started.UTC(), Duration: time.Since(started), Usage: usage, FinishReason: raw.DoneReason}
+	call := CallMetrics{LoadDuration: raw.LoadDuration, PromptDuration: raw.PromptDuration, EvalDuration: raw.EvalDuration, StartedAt: started.UTC(), Duration: time.Since(started), Usage: usage, FinishReason: raw.DoneReason}
 	response := CompletionResponse{Answer: raw.Message.Content, Usage: usage, Metrics: Metrics{Requests: 1, Duration: call.Duration, Usage: usage}, Call: call}
 	if raw.DoneReason == "length" && (request.Settings.RAG || strings.HasPrefix(request.Purpose, "rag_")) {
 		return response, errors.New("local RAG response reached the output token limit")

@@ -11,6 +11,7 @@ type CompletionRequest struct {
 	Messages []Message
 	Settings Settings
 	Purpose  string
+	Scorer   *ScorerConfig
 }
 type CompletionResponse struct {
 	Answer      string

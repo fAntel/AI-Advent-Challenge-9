@@ -17,8 +17,10 @@ import (
 )
 
 type RAGConfig struct {
-	Executable string `toml:"executable"`
-	Database   string `toml:"database"`
+	Rerank     bool         `toml:"rerank"`
+	Scorer     ScorerConfig `toml:"scorer"`
+	Executable string       `toml:"executable"`
+	Database   string       `toml:"database"`
 }
 
 func (c RAGConfig) Paths() (string, string, error) {

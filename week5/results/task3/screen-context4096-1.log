@@ -1,0 +1,1 @@
+error: warmup failed: rag_score: model context window exceeded: conservative local input estimate 4143 exceeds budget 3840; shorten instructions, memory or the current message, or start a new session

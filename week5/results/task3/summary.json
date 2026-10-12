@@ -1,0 +1,77 @@
+{
+  "method": "one bounded pass, recorded controlled baseline",
+  "baseline": {
+    "relevant": 11,
+    "retained": 10,
+    "selected_relevant": 10,
+    "selected": 19,
+    "packed_relevant": 9,
+    "false_positive_controls": 0,
+    "errors": 0,
+    "prompt_tokens": 39954,
+    "output_tokens": 1209,
+    "calls": 40,
+    "prompt_seconds": 206.21027400000003,
+    "generation_seconds": 104.63834400000002,
+    "load_seconds": 0.8412674620000001,
+    "trials": 4,
+    "median_seconds": 84.5266413125,
+    "recall": 0.9090909090909091,
+    "precision": 0.5263157894736842,
+    "packed_recall": 0.8181818181818182,
+    "ndcg5": 0.9070068031330177,
+    "varying_pairs": 0
+  },
+  "finalist": {
+    "relevant": 11,
+    "retained": 11,
+    "selected_relevant": 11,
+    "selected": 24,
+    "packed_relevant": 9,
+    "false_positive_controls": 0,
+    "errors": 0,
+    "prompt_tokens": 23690,
+    "output_tokens": 283,
+    "calls": 20,
+    "prompt_seconds": 104.85467299899999,
+    "generation_seconds": 19.575348998999996,
+    "load_seconds": 0.113054707,
+    "trials": 4,
+    "median_seconds": 34.785102729,
+    "recall": 1.0,
+    "precision": 0.4583333333333333,
+    "packed_recall": 0.8181818181818182,
+    "ndcg5": 0.8521763300410997,
+    "varying_pairs": 0
+  },
+  "speedup": 2.4299667007172863,
+  "scoring_qualifies": true,
+  "adopt": false,
+  "reason": "Bounded scoring validation; full answer quality is not established.",
+  "answer_spot_checks": [
+    {
+      "arm": "historical baseline",
+      "question_id": "q01",
+      "status": "Failed: invalid RAG quote for chunk \"2dbf892f46e37b486442c3499d22535ad4217ce70468e4594e9f09707c102a31\": not an exact evidence fragment; retry the operation",
+      "review_bound": true
+    },
+    {
+      "arm": "historical baseline",
+      "question_id": "q23",
+      "status": "unknown",
+      "review_bound": true
+    },
+    {
+      "arm": "finalist",
+      "question_id": "q01",
+      "status": "Failed: Ollama unavailable or request interrupted; check ollama serve: Post \"http://127.0.0.1:11434/api/chat\": context deadline exceeded",
+      "review_bound": true
+    },
+    {
+      "arm": "finalist",
+      "question_id": "q23",
+      "status": "unknown",
+      "review_bound": true
+    }
+  ]
+}

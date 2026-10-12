@@ -1,0 +1,3 @@
+Saved trial 1/q01: Ollama unavailable or request interrupted; check ollama serve: Post "http://127.0.0.1:11434/api/chat": context deadline exceeded
+Saved trial 1/q23: unknown
+error: 1/2 trials failed; all results saved (rerun will not retry failures)

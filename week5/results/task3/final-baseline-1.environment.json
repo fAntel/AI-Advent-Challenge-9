@@ -1,0 +1,1306 @@
+{
+  "binary_sha256": "43eacd2a63345691a768cbc5ed460651bebe1dba062f4ffc9b06235ddf039abf",
+  "command": [
+    "/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent",
+    "--profile",
+    "task3-baseline",
+    "rag",
+    "score-bench",
+    "--input",
+    "/Users/keldzh/Develop/AiAdventChallenge/week5/results/task3/candidates.json",
+    "--runs",
+    "1",
+    "--output",
+    "/Users/keldzh/Develop/AiAdventChallenge/week5/results/task3/final-baseline-1.json"
+  ],
+  "version": {
+    "version": "0.40.1"
+  },
+  "tags": {
+    "models": [
+      {
+        "name": "embeddinggemma:300m",
+        "model": "embeddinggemma:300m",
+        "modified_at": "2026-10-12T09:46:01.955084289+03:00",
+        "size": 621875917,
+        "digest": "3a2d262bdb75dd103c532a4cf9595dc033fd47a2710a061f7a364c7cbb475c9c",
+        "details": {
+          "parent_model": "embeddinggemma:300m-bf16",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3"
+          ],
+          "parameter_size": "307.58M",
+          "quantization_level": "BF16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      },
+      {
+        "name": "embeddinggemma:300m",
+        "model": "embeddinggemma:300m",
+        "modified_at": "2026-10-12T09:46:01.955084289+03:00",
+        "size": 621875861,
+        "digest": "5265a4c1d1e7ef31b67da5be71b21030cf8f3f0ffab7b38614866c4e92a8c4b5",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma-embedding",
+          "families": [
+            "gemma-embedding"
+          ],
+          "parameter_size": "307.58M",
+          "quantization_level": "BF16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "llamacpp"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      },
+      {
+        "name": "llamacpp:5265a4c1d1e7ef31b67da5be71b21030cf8f3f0ffab7b38614866c4e92a8c4b5",
+        "model": "llamacpp:5265a4c1d1e7ef31b67da5be71b21030cf8f3f0ffab7b38614866c4e92a8c4b5",
+        "modified_at": "2026-10-12T09:46:01.950327594+03:00",
+        "size": 621875861,
+        "digest": "5265a4c1d1e7ef31b67da5be71b21030cf8f3f0ffab7b38614866c4e92a8c4b5",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma-embedding",
+          "families": [
+            "gemma-embedding"
+          ],
+          "parameter_size": "307.58M",
+          "quantization_level": "BF16",
+          "context_length": 2048,
+          "embedding_length": 768,
+          "runner": "llamacpp"
+        },
+        "capabilities": [
+          "embedding"
+        ]
+      },
+      {
+        "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+        "modified_at": "2026-10-10T00:31:38.230617042+03:00",
+        "size": 2600225381,
+        "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "spark2_5",
+          "families": [
+            "spark2_5"
+          ],
+          "parameter_size": "4.11B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 1048576,
+          "embedding_length": 2560,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "tools",
+          "thinking",
+          "completion"
+        ]
+      }
+    ]
+  },
+  "samples": [
+    {
+      "time": 1791804973.425947,
+      "ollama": {
+        "models": []
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2368.88M  free = 703.12M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   125243.\nPages active:                                  62534.\nPages inactive:                               184871.\nPages speculative:                              1982.\nPages throttled:                                   0.\nPages wired down:                              68516.\nPages purgeable:                                   2.\n\"Translation faults\":                      322745835.\nPages copy-on-write:                         4226235.\nPages zero filled:                          60561249.\nPages reactivated:                         157856755.\nPages purged:                                2659858.\nFile-backed pages:                            194533.\nAnonymous pages:                               54854.\nPages stored in compressor:                   344826.\nPages occupied by compressor:                  45344.\nDecompressions:                            149994482.\nCompressions:                              162675884.\nPageins:                                    19680311.\nPageouts:                                     177874.\nSwapins:                                    10652142.\nSwapouts:                                   14364687.",
+      "processes": "  837   4880 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  18144 /opt/homebrew/opt/ollama/bin/ollama\n14624   4064 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd"
+    },
+    {
+      "time": 1791804978.458396,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:18.46041+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1548.69M  free = 1523.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    55765.\nPages active:                                  63186.\nPages inactive:                                56857.\nPages speculative:                              5332.\nPages throttled:                                   0.\nPages wired down:                             265518.\nPages purgeable:                                  84.\n\"Translation faults\":                      322980735.\nPages copy-on-write:                         4227294.\nPages zero filled:                          60617233.\nPages reactivated:                         157856755.\nPages purged:                                2659858.\nFile-backed pages:                             44119.\nAnonymous pages:                               81256.\nPages stored in compressor:                   331543.\nPages occupied by compressor:                  41828.\nDecompressions:                            150007287.\nCompressions:                              162675884.\nPageins:                                    19686729.\nPageouts:                                     177874.\nSwapins:                                    10654569.\nSwapouts:                                   14364687.",
+      "processes": "  837   5248 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  44912 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  15920 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3125552 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791804983.509758,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:23.458017+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1548.69M  free = 1523.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    49968.\nPages active:                                  66297.\nPages inactive:                                59548.\nPages speculative:                              6017.\nPages throttled:                                   0.\nPages wired down:                             267178.\nPages purgeable:                                  87.\n\"Translation faults\":                      323000852.\nPages copy-on-write:                         4227776.\nPages zero filled:                          60620128.\nPages reactivated:                         157856755.\nPages purged:                                2659858.\nFile-backed pages:                             45173.\nAnonymous pages:                               86689.\nPages stored in compressor:                   324915.\nPages occupied by compressor:                  39406.\nDecompressions:                            150013835.\nCompressions:                              162675884.\nPageins:                                    19687520.\nPageouts:                                     177874.\nSwapins:                                    10654688.\nSwapouts:                                   14364687.",
+      "processes": "  837   5248 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46000 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18096 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3128992 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791804988.541504,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:23.458017+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1548.69M  free = 1523.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    41740.\nPages active:                                  70663.\nPages inactive:                                63746.\nPages speculative:                              6029.\nPages throttled:                                   0.\nPages wired down:                             267170.\nPages purgeable:                                  73.\n\"Translation faults\":                      323022311.\nPages copy-on-write:                         4228256.\nPages zero filled:                          60630434.\nPages reactivated:                         157856755.\nPages purged:                                2659858.\nFile-backed pages:                             45188.\nAnonymous pages:                               95250.\nPages stored in compressor:                   323697.\nPages occupied by compressor:                  39069.\nDecompressions:                            150015044.\nCompressions:                              162675884.\nPageins:                                    19687527.\nPageouts:                                     177874.\nSwapins:                                    10654732.\nSwapouts:                                   14364687.",
+      "processes": "  837   8448 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46048 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18096 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3259792 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791804993.5826712,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:30.381943+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1548.69M  free = 1523.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    32771.\nPages active:                                  76155.\nPages inactive:                                69511.\nPages speculative:                              6042.\nPages throttled:                                   0.\nPages wired down:                             265501.\nPages purgeable:                                  84.\n\"Translation faults\":                      323043375.\nPages copy-on-write:                         4228734.\nPages zero filled:                          60640111.\nPages reactivated:                         157856777.\nPages purged:                                2659858.\nFile-backed pages:                             45222.\nAnonymous pages:                              106486.\nPages stored in compressor:                   321657.\nPages occupied by compressor:                  38514.\nDecompressions:                            150017031.\nCompressions:                              162675884.\nPageins:                                    19687557.\nPageouts:                                     177874.\nSwapins:                                    10654891.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46064 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18224 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3380432 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791804998.61801,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:30.381943+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1548.69M  free = 1523.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    32068.\nPages active:                                  75835.\nPages inactive:                                68931.\nPages speculative:                              6218.\nPages throttled:                                   0.\nPages wired down:                             267113.\nPages purgeable:                                  87.\n\"Translation faults\":                      323055422.\nPages copy-on-write:                         4229213.\nPages zero filled:                          60642228.\nPages reactivated:                         157856777.\nPages purged:                                2659858.\nFile-backed pages:                             45465.\nAnonymous pages:                              105519.\nPages stored in compressor:                   320993.\nPages occupied by compressor:                  38291.\nDecompressions:                            150017694.\nCompressions:                              162675884.\nPageins:                                    19687726.\nPageouts:                                     177874.\nSwapins:                                    10654951.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46064 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18224 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3380416 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805003.64896,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:38.753804+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1548.69M  free = 1523.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    22230.\nPages active:                                  82784.\nPages inactive:                                74495.\nPages speculative:                              6264.\nPages throttled:                                   0.\nPages wired down:                             265510.\nPages purgeable:                                  81.\n\"Translation faults\":                      323077325.\nPages copy-on-write:                         4229696.\nPages zero filled:                          60652356.\nPages reactivated:                         157856777.\nPages purged:                                2659858.\nFile-backed pages:                             45512.\nAnonymous pages:                              118031.\nPages stored in compressor:                   318074.\nPages occupied by compressor:                  37149.\nDecompressions:                            150020583.\nCompressions:                              162675884.\nPageins:                                    19687737.\nPageouts:                                     177874.\nSwapins:                                    10655010.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46064 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18352 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3508064 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805008.678951,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:44.818999+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    12252.\nPages active:                                  86360.\nPages inactive:                                79210.\nPages speculative:                              6402.\nPages throttled:                                   0.\nPages wired down:                             267042.\nPages purgeable:                                 130.\n\"Translation faults\":                      323098035.\nPages copy-on-write:                         4230180.\nPages zero filled:                          60663187.\nPages reactivated:                         157856777.\nPages purged:                                2659858.\nFile-backed pages:                             45823.\nAnonymous pages:                              126149.\nPages stored in compressor:                   317051.\nPages occupied by compressor:                  37158.\nDecompressions:                            150021556.\nCompressions:                              162675884.\nPageins:                                    19688013.\nPageouts:                                     177874.\nSwapins:                                    10655489.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46064 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  19248 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3642848 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805013.7309399,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:51.049768+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4111.\nPages active:                                  92950.\nPages inactive:                                82679.\nPages speculative:                              6575.\nPages throttled:                                   0.\nPages wired down:                             265316.\nPages purgeable:                                 210.\n\"Translation faults\":                      323118749.\nPages copy-on-write:                         4230662.\nPages zero filled:                          60672848.\nPages reactivated:                         157856777.\nPages purged:                                2659858.\nFile-backed pages:                             46021.\nAnonymous pages:                              136183.\nPages stored in compressor:                   315980.\nPages occupied by compressor:                  36726.\nDecompressions:                            150022619.\nCompressions:                              162675884.\nPageins:                                    19688059.\nPageouts:                                     177874.\nSwapins:                                    10655541.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  46064 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  19488 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3755600 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805018.780107,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:57.195695+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3734.\nPages active:                                  75341.\nPages inactive:                                73483.\nPages speculative:                               905.\nPages throttled:                                   0.\nPages wired down:                             266905.\nPages purgeable:                                  64.\n\"Translation faults\":                      323157016.\nPages copy-on-write:                         4231733.\nPages zero filled:                          60685589.\nPages reactivated:                         157879706.\nPages purged:                                2659911.\nFile-backed pages:                             41113.\nAnonymous pages:                              108616.\nPages stored in compressor:                   346308.\nPages occupied by compressor:                  68040.\nDecompressions:                            150030074.\nCompressions:                              162713772.\nPageins:                                    19688918.\nPageouts:                                     177978.\nSwapins:                                    10655661.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  42016 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  17456 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3323776 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805023.831598,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:46:57.195695+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3649.\nPages active:                                  70147.\nPages inactive:                                68696.\nPages speculative:                               673.\nPages throttled:                                   0.\nPages wired down:                             267007.\nPages purgeable:                                 163.\n\"Translation faults\":                      323173051.\nPages copy-on-write:                         4232211.\nPages zero filled:                          60688173.\nPages reactivated:                         157883617.\nPages purged:                                2659945.\nFile-backed pages:                             40902.\nAnonymous pages:                               98614.\nPages stored in compressor:                   356462.\nPages occupied by compressor:                  78212.\nDecompressions:                            150033069.\nCompressions:                              162726966.\nPageins:                                    19689023.\nPageouts:                                     177993.\nSwapins:                                    10655816.\nSwapouts:                                   14364687.",
+      "processes": "  837   8592 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  41936 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  17200 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3176624 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805028.872159,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:05.031211+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4087.\nPages active:                                  68074.\nPages inactive:                                67056.\nPages speculative:                               203.\nPages throttled:                                   0.\nPages wired down:                             265270.\nPages purgeable:                                 219.\n\"Translation faults\":                      323200054.\nPages copy-on-write:                         4232689.\nPages zero filled:                          60698852.\nPages reactivated:                         157898893.\nPages purged:                                2659961.\nFile-backed pages:                             40310.\nAnonymous pages:                               95023.\nPages stored in compressor:                   368749.\nPages occupied by compressor:                  83743.\nDecompressions:                            150038763.\nCompressions:                              162744947.\nPageins:                                    19689118.\nPageouts:                                     177995.\nSwapins:                                    10655916.\nSwapouts:                                   14364687.",
+      "processes": "  837   8544 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  43952 /opt/homebrew/opt/ollama/bin/ollama\n14624   4064 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18192 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3276496 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805033.902954,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:11.983185+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3690.\nPages active:                                  63312.\nPages inactive:                                62046.\nPages speculative:                               288.\nPages throttled:                                   0.\nPages wired down:                             265252.\nPages purgeable:                                 108.\n\"Translation faults\":                      323229597.\nPages copy-on-write:                         4233165.\nPages zero filled:                          60708781.\nPages reactivated:                         157904501.\nPages purged:                                2660037.\nFile-backed pages:                             40300.\nAnonymous pages:                               85346.\nPages stored in compressor:                   385030.\nPages occupied by compressor:                  93780.\nDecompressions:                            150048089.\nCompressions:                              162770649.\nPageins:                                    19689189.\nPageouts:                                     178008.\nSwapins:                                    10655952.\nSwapouts:                                   14364687.",
+      "processes": "  837   4992 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  43088 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18384 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3319984 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805038.951221,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:11.983185+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1532.69M  free = 1539.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4074.\nPages active:                                  62656.\nPages inactive:                                61545.\nPages speculative:                               199.\nPages throttled:                                   0.\nPages wired down:                             265270.\nPages purgeable:                                  78.\n\"Translation faults\":                      323247976.\nPages copy-on-write:                         4233636.\nPages zero filled:                          60711009.\nPages reactivated:                         157904906.\nPages purged:                                2660076.\nFile-backed pages:                             40220.\nAnonymous pages:                               84180.\nPages stored in compressor:                   386242.\nPages occupied by compressor:                  94764.\nDecompressions:                            150053789.\nCompressions:                              162777591.\nPageins:                                    19689207.\nPageouts:                                     178012.\nSwapins:                                    10656020.\nSwapouts:                                   14364687.",
+      "processes": "  837   4992 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  43120 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18384 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3319952 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805043.9988601,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:19.384341+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1503.69M  free = 1568.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4018.\nPages active:                                  44006.\nPages inactive:                                40622.\nPages speculative:                              2396.\nPages throttled:                                   0.\nPages wired down:                             265288.\nPages purgeable:                                   2.\n\"Translation faults\":                      323325278.\nPages copy-on-write:                         4234581.\nPages zero filled:                          60730733.\nPages reactivated:                         157963695.\nPages purged:                                2660380.\nFile-backed pages:                             40641.\nAnonymous pages:                               46383.\nPages stored in compressor:                   435643.\nPages occupied by compressor:                 132097.\nDecompressions:                            150083948.\nCompressions:                              162858031.\nPageins:                                    19694337.\nPageouts:                                     178038.\nSwapins:                                    10658196.\nSwapouts:                                   14365391.",
+      "processes": "  837   4928 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  14880 /opt/homebrew/opt/ollama/bin/ollama\n14624   2848 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  10640 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 2966480 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805049.046433,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:26.772436+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1495.69M  free = 1576.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4138.\nPages active:                                  44427.\nPages inactive:                                41895.\nPages speculative:                              2015.\nPages throttled:                                   0.\nPages wired down:                             265628.\nPages purgeable:                                   2.\n\"Translation faults\":                      323399359.\nPages copy-on-write:                         4236371.\nPages zero filled:                          60746586.\nPages reactivated:                         157989640.\nPages purged:                                2660760.\nFile-backed pages:                             32983.\nAnonymous pages:                               55354.\nPages stored in compressor:                   433974.\nPages occupied by compressor:                 130374.\nDecompressions:                            150112500.\nCompressions:                              162886456.\nPageins:                                    19700899.\nPageouts:                                     178071.\nSwapins:                                    10658533.\nSwapouts:                                   14365391.",
+      "processes": "  837   3248 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  39456 /opt/homebrew/opt/ollama/bin/ollama\n14624   2864 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18304 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3174864 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805054.0983849,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:34.026982+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1620.50M  free = 1451.50M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3457.\nPages active:                                  46692.\nPages inactive:                                43506.\nPages speculative:                              2217.\nPages throttled:                                   0.\nPages wired down:                             265769.\nPages purgeable:                                   0.\n\"Translation faults\":                      323543370.\nPages copy-on-write:                         4237523.\nPages zero filled:                          60773446.\nPages reactivated:                         158039188.\nPages purged:                                2661545.\nFile-backed pages:                             36312.\nAnonymous pages:                               56103.\nPages stored in compressor:                   434948.\nPages occupied by compressor:                 126724.\nDecompressions:                            150169841.\nCompressions:                              162951363.\nPageins:                                    19714290.\nPageouts:                                     178088.\nSwapins:                                    10659397.\nSwapouts:                                   14373891.",
+      "processes": "  837   3856 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  38560 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16432 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3181552 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805059.1418319,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:37.064179+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1682.19M  free = 1389.81M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3597.\nPages active:                                  49398.\nPages inactive:                                43974.\nPages speculative:                              4438.\nPages throttled:                                   0.\nPages wired down:                             266100.\nPages purgeable:                                  26.\n\"Translation faults\":                      323680801.\nPages copy-on-write:                         4239442.\nPages zero filled:                          60802278.\nPages reactivated:                         158096285.\nPages purged:                                2664287.\nFile-backed pages:                             36678.\nAnonymous pages:                               61132.\nPages stored in compressor:                   433753.\nPages occupied by compressor:                 120904.\nDecompressions:                            150225792.\nCompressions:                              163016396.\nPageins:                                    19725747.\nPageouts:                                     178130.\nSwapins:                                    10660099.\nSwapouts:                                   14378863.",
+      "processes": "  837   3616 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  34688 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16352 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3196240 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805064.190891,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:42.301809+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1745.69M  free = 1326.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4132.\nPages active:                                  42677.\nPages inactive:                                38541.\nPages speculative:                              3358.\nPages throttled:                                   0.\nPages wired down:                             268812.\nPages purgeable:                                  18.\n\"Translation faults\":                      323770885.\nPages copy-on-write:                         4241364.\nPages zero filled:                          60820952.\nPages reactivated:                         158130301.\nPages purged:                                2664868.\nFile-backed pages:                             36456.\nAnonymous pages:                               48120.\nPages stored in compressor:                   454551.\nPages occupied by compressor:                 130944.\nDecompressions:                            150257112.\nCompressions:                              163070574.\nPageins:                                    19732761.\nPageouts:                                     178221.\nSwapins:                                    10660503.\nSwapouts:                                   14383439.",
+      "processes": "  837   3296 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  29568 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   8896 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3116112 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805069.256264,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:47.411279+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1793.75M  free = 1278.25M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3812.\nPages active:                                  46459.\nPages inactive:                                43117.\nPages speculative:                              2647.\nPages throttled:                                   0.\nPages wired down:                             267835.\nPages purgeable:                                   2.\n\"Translation faults\":                      323880780.\nPages copy-on-write:                         4242337.\nPages zero filled:                          60842603.\nPages reactivated:                         158184168.\nPages purged:                                2666674.\nFile-backed pages:                             35124.\nAnonymous pages:                               57099.\nPages stored in compressor:                   449615.\nPages occupied by compressor:                 124535.\nDecompressions:                            150301799.\nCompressions:                              163112830.\nPageins:                                    19742935.\nPageouts:                                     178282.\nSwapins:                                    10661532.\nSwapouts:                                   14387027.",
+      "processes": "  837   3280 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  37072 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16608 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3271520 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805074.3055239,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:52.683778+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1873.31M  free = 1198.69M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     9489.\nPages active:                                  43239.\nPages inactive:                                38924.\nPages speculative:                              3567.\nPages throttled:                                   0.\nPages wired down:                             266347.\nPages purgeable:                                   2.\n\"Translation faults\":                      323989041.\nPages copy-on-write:                         4243887.\nPages zero filled:                          60860635.\nPages reactivated:                         158232638.\nPages purged:                                2668093.\nFile-backed pages:                             33945.\nAnonymous pages:                               51785.\nPages stored in compressor:                   454374.\nPages occupied by compressor:                 126843.\nDecompressions:                            150346743.\nCompressions:                              163168571.\nPageins:                                    19750786.\nPageouts:                                     178415.\nSwapins:                                    10662596.\nSwapouts:                                   14393143.",
+      "processes": "  837   3360 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  38528 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18256 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3126048 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805079.354501,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:47:52.683778+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1849.31M  free = 1222.69M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4180.\nPages active:                                  46821.\nPages inactive:                                43528.\nPages speculative:                              2428.\nPages throttled:                                   0.\nPages wired down:                             266351.\nPages purgeable:                                   2.\n\"Translation faults\":                      324028025.\nPages copy-on-write:                         4244818.\nPages zero filled:                          60865119.\nPages reactivated:                         158241061.\nPages purged:                                2668194.\nFile-backed pages:                             33708.\nAnonymous pages:                               59069.\nPages stored in compressor:                   446153.\nPages occupied by compressor:                 125189.\nDecompressions:                            150360787.\nCompressions:                              163176304.\nPageins:                                    19755582.\nPageouts:                                     178432.\nSwapins:                                    10663694.\nSwapouts:                                   14393143.",
+      "processes": "  837   3264 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  31712 /opt/homebrew/opt/ollama/bin/ollama\n14624   8112 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   9840 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3093040 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805084.4100428,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:00.997161+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1878.62M  free = 1193.38M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4019.\nPages active:                                  43466.\nPages inactive:                                40858.\nPages speculative:                              1684.\nPages throttled:                                   0.\nPages wired down:                             266224.\nPages purgeable:                                   2.\n\"Translation faults\":                      324090778.\nPages copy-on-write:                         4245622.\nPages zero filled:                          60880334.\nPages reactivated:                         158261805.\nPages purged:                                2668647.\nFile-backed pages:                             32889.\nAnonymous pages:                               53119.\nPages stored in compressor:                   459004.\nPages occupied by compressor:                 132138.\nDecompressions:                            150383778.\nCompressions:                              163213446.\nPageins:                                    19758144.\nPageouts:                                     178438.\nSwapins:                                    10664166.\nSwapouts:                                   14395531.",
+      "processes": "  837   3248 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  34096 /opt/homebrew/opt/ollama/bin/ollama\n14624   4080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  15936 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3094112 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805089.456272,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:09.067421+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1927.12M  free = 1144.88M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4041.\nPages active:                                  43542.\nPages inactive:                                40321.\nPages speculative:                              2001.\nPages throttled:                                   0.\nPages wired down:                             266089.\nPages purgeable:                                   2.\n\"Translation faults\":                      324171003.\nPages copy-on-write:                         4246191.\nPages zero filled:                          60900477.\nPages reactivated:                         158291121.\nPages purged:                                2668807.\nFile-backed pages:                             32478.\nAnonymous pages:                               53386.\nPages stored in compressor:                   464145.\nPages occupied by compressor:                 132332.\nDecompressions:                            150418307.\nCompressions:                              163256482.\nPageins:                                    19761084.\nPageouts:                                     178442.\nSwapins:                                    10664771.\nSwapouts:                                   14399147.",
+      "processes": "  837   3248 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  35520 /opt/homebrew/opt/ollama/bin/ollama\n14624   4256 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18272 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3153328 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805094.49657,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:09.067421+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 1986.62M  free = 1085.38M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3802.\nPages active:                                  43068.\nPages inactive:                                38323.\nPages speculative:                              3886.\nPages throttled:                                   0.\nPages wired down:                             266854.\nPages purgeable:                                   2.\n\"Translation faults\":                      324218627.\nPages copy-on-write:                         4247234.\nPages zero filled:                          60906850.\nPages reactivated:                         158316426.\nPages purged:                                2669129.\nFile-backed pages:                             33998.\nAnonymous pages:                               51279.\nPages stored in compressor:                   465166.\nPages occupied by compressor:                 132524.\nDecompressions:                            150437863.\nCompressions:                              163279113.\nPageins:                                    19765035.\nPageouts:                                     178453.\nSwapins:                                    10666281.\nSwapouts:                                   14404491.",
+      "processes": "  837   3504 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  23728 /opt/homebrew/opt/ollama/bin/ollama\n14624   4096 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  14544 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3088880 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805099.560253,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:17.815027+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2034.75M  free = 1037.25M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3632.\nPages active:                                  43141.\nPages inactive:                                41615.\nPages speculative:                              1023.\nPages throttled:                                   0.\nPages wired down:                             267466.\nPages purgeable:                                  16.\n\"Translation faults\":                      324259514.\nPages copy-on-write:                         4247695.\nPages zero filled:                          60920768.\nPages reactivated:                         158331955.\nPages purged:                                2669196.\nFile-backed pages:                             30751.\nAnonymous pages:                               55028.\nPages stored in compressor:                   466304.\nPages occupied by compressor:                 131504.\nDecompressions:                            150453858.\nCompressions:                              163298480.\nPageins:                                    19765620.\nPageouts:                                     178461.\nSwapins:                                    10667945.\nSwapouts:                                   14409107.",
+      "processes": "  837   3488 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  40528 /opt/homebrew/opt/ollama/bin/ollama\n14624   4096 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  15984 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3166176 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805104.5929222,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:17.815027+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2075.06M  free = 996.94M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3995.\nPages active:                                  43805.\nPages inactive:                                42348.\nPages speculative:                               422.\nPages throttled:                                   0.\nPages wired down:                             265740.\nPages purgeable:                                   2.\n\"Translation faults\":                      324288025.\nPages copy-on-write:                         4248159.\nPages zero filled:                          60923992.\nPages reactivated:                         158344609.\nPages purged:                                2669260.\nFile-backed pages:                             30263.\nAnonymous pages:                               56312.\nPages stored in compressor:                   464988.\nPages occupied by compressor:                 132141.\nDecompressions:                            150465220.\nCompressions:                              163309943.\nPageins:                                    19765969.\nPageouts:                                     178477.\nSwapins:                                    10669121.\nSwapouts:                                   14412711.",
+      "processes": "  837   4144 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  31952 /opt/homebrew/opt/ollama/bin/ollama\n14624   4096 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  15984 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3097984 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805109.6423192,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:25.649561+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2270.50M  free = 801.50M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4671.\nPages active:                                  43548.\nPages inactive:                                40003.\nPages speculative:                              2303.\nPages throttled:                                   0.\nPages wired down:                             265686.\nPages purgeable:                                   2.\n\"Translation faults\":                      324356574.\nPages copy-on-write:                         4249379.\nPages zero filled:                          60942450.\nPages reactivated:                         158372888.\nPages purged:                                2670105.\nFile-backed pages:                             38276.\nAnonymous pages:                               47578.\nPages stored in compressor:                   482684.\nPages occupied by compressor:                 132190.\nDecompressions:                            150484511.\nCompressions:                              163348925.\nPageins:                                    19778865.\nPageouts:                                     178505.\nSwapins:                                    10669923.\nSwapouts:                                   14426243.",
+      "processes": "  837   8448 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  30384 /opt/homebrew/opt/ollama/bin/ollama\n14624   2864 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  17632 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3033664 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805114.682226,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:33.206587+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2376.38M  free = 695.62M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3748.\nPages active:                                  43238.\nPages inactive:                                39137.\nPages speculative:                              2980.\nPages throttled:                                   0.\nPages wired down:                             269857.\nPages purgeable:                                  10.\n\"Translation faults\":                      324461834.\nPages copy-on-write:                         4251573.\nPages zero filled:                          60971547.\nPages reactivated:                         158432339.\nPages purged:                                2671462.\nFile-backed pages:                             36076.\nAnonymous pages:                               49279.\nPages stored in compressor:                   486687.\nPages occupied by compressor:                 129479.\nDecompressions:                            150516687.\nCompressions:                              163390442.\nPageins:                                    19800414.\nPageouts:                                     178604.\nSwapins:                                    10672864.\nSwapouts:                                   14436603.",
+      "processes": "  837   3424 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  29216 /opt/homebrew/opt/ollama/bin/ollama\n14624   2848 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16240 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3072512 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805119.754737,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:33.206587+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2544.75M  free = 527.25M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3852.\nPages active:                                  42746.\nPages inactive:                                39460.\nPages speculative:                              2357.\nPages throttled:                                   0.\nPages wired down:                             269487.\nPages purgeable:                                   8.\n\"Translation faults\":                      324680496.\nPages copy-on-write:                         4256962.\nPages zero filled:                          61014404.\nPages reactivated:                         158550460.\nPages purged:                                2677470.\nFile-backed pages:                             41051.\nAnonymous pages:                               43512.\nPages stored in compressor:                   504192.\nPages occupied by compressor:                 130481.\nDecompressions:                            150575571.\nCompressions:                              163469460.\nPageins:                                    19842835.\nPageouts:                                     178837.\nSwapins:                                    10678626.\nSwapouts:                                   14451987.",
+      "processes": "  837   3280 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843   8944 /opt/homebrew/opt/ollama/bin/ollama\n14624   2864 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   4336 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 2926864 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805125.435075,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:45.143574+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2568.69M  free = 503.31M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4077.\nPages active:                                  45401.\nPages inactive:                                41328.\nPages speculative:                              3271.\nPages throttled:                                   0.\nPages wired down:                             271237.\nPages purgeable:                                   2.\n\"Translation faults\":                      324806462.\nPages copy-on-write:                         4259433.\nPages zero filled:                          61046963.\nPages reactivated:                         158603003.\nPages purged:                                2680065.\nFile-backed pages:                             34215.\nAnonymous pages:                               55785.\nPages stored in compressor:                   499978.\nPages occupied by compressor:                 123132.\nDecompressions:                            150618032.\nCompressions:                              163509627.\nPageins:                                    19852904.\nPageouts:                                     178960.\nSwapins:                                    10679702.\nSwapouts:                                   14455567.",
+      "processes": "  837   3136 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  40656 /opt/homebrew/opt/ollama/bin/ollama\n14624   2256 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18736 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3184096 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805130.4921222,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:45.143574+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2568.88M  free = 503.12M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3890.\nPages active:                                  43320.\nPages inactive:                                38699.\nPages speculative:                              3725.\nPages throttled:                                   0.\nPages wired down:                             271149.\nPages purgeable:                                   2.\n\"Translation faults\":                      324883679.\nPages copy-on-write:                         4260085.\nPages zero filled:                          61057822.\nPages reactivated:                         158627931.\nPages purged:                                2680805.\nFile-backed pages:                             33150.\nAnonymous pages:                               52594.\nPages stored in compressor:                   500008.\nPages occupied by compressor:                 127617.\nDecompressions:                            150647861.\nCompressions:                              163541881.\nPageins:                                    19859094.\nPageouts:                                     179033.\nSwapins:                                    10679916.\nSwapouts:                                   14455579.",
+      "processes": "  837   3168 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  14768 /opt/homebrew/opt/ollama/bin/ollama\n14624   2864 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   8688 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3027120 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805135.539495,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:53.912684+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2623.38M  free = 448.62M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3948.\nPages active:                                  42532.\nPages inactive:                                38227.\nPages speculative:                              3546.\nPages throttled:                                   0.\nPages wired down:                             269499.\nPages purgeable:                                   2.\n\"Translation faults\":                      324950461.\nPages copy-on-write:                         4260961.\nPages zero filled:                          61077330.\nPages reactivated:                         158649312.\nPages purged:                                2681305.\nFile-backed pages:                             32845.\nAnonymous pages:                               51460.\nPages stored in compressor:                   509396.\nPages occupied by compressor:                 130786.\nDecompressions:                            150666501.\nCompressions:                              163572407.\nPageins:                                    19862956.\nPageouts:                                     179140.\nSwapins:                                    10680087.\nSwapouts:                                   14459579.",
+      "processes": "  837   3184 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  31472 /opt/homebrew/opt/ollama/bin/ollama\n14624   2864 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16672 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3114432 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805140.574482,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:48:53.912684+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2708.19M  free = 363.81M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3709.\nPages active:                                  42692.\nPages inactive:                                38781.\nPages speculative:                              3293.\nPages throttled:                                   0.\nPages wired down:                             271206.\nPages purgeable:                                   2.\n\"Translation faults\":                      325041576.\nPages copy-on-write:                         4261538.\nPages zero filled:                          61093289.\nPages reactivated:                         158689482.\nPages purged:                                2681723.\nFile-backed pages:                             31969.\nAnonymous pages:                               52797.\nPages stored in compressor:                   508118.\nPages occupied by compressor:                 128774.\nDecompressions:                            150702936.\nCompressions:                              163609283.\nPageins:                                    19871065.\nPageouts:                                     179189.\nSwapins:                                    10681153.\nSwapouts:                                   14465519.",
+      "processes": "  837   3152 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  13696 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   8128 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 2973792 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805145.640905,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:49:03.546426+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2748.25M  free = 323.75M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4166.\nPages active:                                  41845.\nPages inactive:                                39672.\nPages speculative:                              1306.\nPages throttled:                                   0.\nPages wired down:                             269245.\nPages purgeable:                                   2.\n\"Translation faults\":                      325098174.\nPages copy-on-write:                         4262049.\nPages zero filled:                          61108819.\nPages reactivated:                         158708035.\nPages purged:                                2682325.\nFile-backed pages:                             30534.\nAnonymous pages:                               52289.\nPages stored in compressor:                   517516.\nPages occupied by compressor:                 132094.\nDecompressions:                            150721268.\nCompressions:                              163637487.\nPageins:                                    19872822.\nPageouts:                                     179191.\nSwapins:                                    10682569.\nSwapouts:                                   14469527.",
+      "processes": "  837   3168 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  35040 /opt/homebrew/opt/ollama/bin/ollama\n14624   2848 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  17040 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3106768 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805150.7025778,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:49:03.546426+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 3072.00M  used = 2812.75M  free = 259.25M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4751.\nPages active:                                  42247.\nPages inactive:                                37495.\nPages speculative:                              3989.\nPages throttled:                                   0.\nPages wired down:                             269261.\nPages purgeable:                                   3.\n\"Translation faults\":                      325171285.\nPages copy-on-write:                         4263548.\nPages zero filled:                          61119873.\nPages reactivated:                         158732629.\nPages purged:                                2682687.\nFile-backed pages:                             32763.\nAnonymous pages:                               50968.\nPages stored in compressor:                   519695.\nPages occupied by compressor:                 130662.\nDecompressions:                            150747141.\nCompressions:                              163666079.\nPageins:                                    19876647.\nPageouts:                                     179205.\nSwapins:                                    10683081.\nSwapouts:                                   14474259.",
+      "processes": "  837   3120 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  13456 /opt/homebrew/opt/ollama/bin/ollama\n14624   2832 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   7952 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 2993984 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805155.751557,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:49:14.492916+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 4096.00M  used = 2863.44M  free = 1232.56M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4239.\nPages active:                                  42222.\nPages inactive:                                40558.\nPages speculative:                               798.\nPages throttled:                                   0.\nPages wired down:                             270779.\nPages purgeable:                                   2.\n\"Translation faults\":                      325230098.\nPages copy-on-write:                         4264018.\nPages zero filled:                          61135860.\nPages reactivated:                         158750272.\nPages purged:                                2682856.\nFile-backed pages:                             29014.\nAnonymous pages:                               54564.\nPages stored in compressor:                   522346.\nPages occupied by compressor:                 129958.\nDecompressions:                            150770026.\nCompressions:                              163692578.\nPageins:                                    19877231.\nPageouts:                                     179233.\nSwapins:                                    10684556.\nSwapouts:                                   14479243.",
+      "processes": "  837   3328 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  35184 /opt/homebrew/opt/ollama/bin/ollama\n14624   3104 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16432 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3173456 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805160.80928,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:49:14.492916+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 4096.00M  used = 2928.75M  free = 1167.25M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4102.\nPages active:                                  43240.\nPages inactive:                                39182.\nPages speculative:                              3240.\nPages throttled:                                   0.\nPages wired down:                             269006.\nPages purgeable:                                  41.\n\"Translation faults\":                      325277408.\nPages copy-on-write:                         4264723.\nPages zero filled:                          61143824.\nPages reactivated:                         158759965.\nPages purged:                                2683025.\nFile-backed pages:                             32527.\nAnonymous pages:                               53135.\nPages stored in compressor:                   525978.\nPages occupied by compressor:                 129607.\nDecompressions:                            150781962.\nCompressions:                              163708242.\nPageins:                                    19880155.\nPageouts:                                     179244.\nSwapins:                                    10685483.\nSwapouts:                                   14483731.",
+      "processes": "  837   3440 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  31952 /opt/homebrew/opt/ollama/bin/ollama\n14624   3104 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  16416 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3095776 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805165.8424351,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:49:14.492916+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 4096.00M  used = 2923.31M  free = 1172.69M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3860.\nPages active:                                  43274.\nPages inactive:                                39211.\nPages speculative:                              3193.\nPages throttled:                                   0.\nPages wired down:                             268269.\nPages purgeable:                                   2.\n\"Translation faults\":                      325306476.\nPages copy-on-write:                         4265196.\nPages zero filled:                          61146739.\nPages reactivated:                         158763604.\nPages purged:                                2683106.\nFile-backed pages:                             32187.\nAnonymous pages:                               53491.\nPages stored in compressor:                   525394.\nPages occupied by compressor:                 130642.\nDecompressions:                            150792308.\nCompressions:                              163718110.\nPageins:                                    19881538.\nPageouts:                                     179246.\nSwapins:                                    10685736.\nSwapouts:                                   14483895.",
+      "processes": "  837   3376 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  15968 /opt/homebrew/opt/ollama/bin/ollama\n14624   3120 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796   8080 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3101632 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    },
+    {
+      "time": 1791805170.892531,
+      "ollama": {
+        "models": [
+          {
+            "name": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+            "size": 2805999860,
+            "digest": "49f49d0f084fddc10c8cf78465fe4f454814697bb5eae3b3cf661023126791ab",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "spark2_5",
+              "families": [
+                "spark2_5"
+              ],
+              "parameter_size": "4.11B",
+              "quantization_level": "unknown"
+            },
+            "expires_at": "2026-10-12T14:49:26.105379+03:00",
+            "size_vram": 2805999860,
+            "context_length": 16384,
+            "runner": "llamacpp"
+          }
+        ]
+      },
+      "swap": "vm.swapusage: total = 4096.00M  used = 3033.38M  free = 1062.62M  (encrypted)",
+      "vm": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     3981.\nPages active:                                  43235.\nPages inactive:                                41033.\nPages speculative:                              1144.\nPages throttled:                                   0.\nPages wired down:                             268009.\nPages purgeable:                                   3.\n\"Translation faults\":                      325355514.\nPages copy-on-write:                         4265662.\nPages zero filled:                          61160457.\nPages reactivated:                         158778939.\nPages purged:                                2683209.\nFile-backed pages:                             30750.\nAnonymous pages:                               54662.\nPages stored in compressor:                   532962.\nPages occupied by compressor:                 131101.\nDecompressions:                            150814769.\nCompressions:                              163748612.\nPageins:                                    19882535.\nPageouts:                                     179259.\nSwapins:                                    10686620.\nSwapouts:                                   14491451.",
+      "processes": "  837   3328 /Users/keldzh/Develop/AiAdventChallenge/week4/advent-agentd\n  843  31424 /opt/homebrew/opt/ollama/bin/ollama\n14624   2928 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agentd\n24796  18416 /Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent\n24797 3100368 /opt/homebrew/Cellar/ollama/0.40.3/libexec/lib/ollama/llama-server"
+    }
+  ],
+  "cache_policy": "unload model before configuration, then recorded warmup (scoring only)",
+  "reset": {
+    "model": "hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M",
+    "created_at": "2026-10-12T11:36:13.322957Z",
+    "response": "",
+    "done": true,
+    "done_reason": "unload"
+  }
+}

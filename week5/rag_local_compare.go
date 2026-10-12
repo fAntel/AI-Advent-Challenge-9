@@ -22,17 +22,19 @@ type RAGTrial struct {
 	Error       string            `json:"error,omitempty"`
 }
 type RepeatedRAGRun struct {
-	Version       string       `json:"version"`
-	SuiteSHA256   string       `json:"suite_sha256"`
-	IndexSHA256   string       `json:"index_sha256"`
-	Settings      Settings     `json:"settings"`
-	Ollama        OllamaConfig `json:"ollama"`
-	ContextWindow int          `json:"context_window"`
-	Passes        int          `json:"passes"`
-	Trials        []RAGTrial   `json:"trials"`
+	Scorer        *ScorerConfig `json:"scorer,omitempty"`
+	Version       string        `json:"version"`
+	SuiteSHA256   string        `json:"suite_sha256"`
+	IndexSHA256   string        `json:"index_sha256"`
+	Settings      Settings      `json:"settings"`
+	Ollama        OllamaConfig  `json:"ollama"`
+	ContextWindow int           `json:"context_window"`
+	Passes        int           `json:"passes"`
+	Trials        []RAGTrial    `json:"trials"`
 }
 
 func RunRepeatedRAG(ctx context.Context, provider Provider, cfg Config, settings Settings, suitePath, output string, passes int) error {
+	cfg = cfg.scoringConfig()
 	if passes < 1 || passes > 10 {
 		return fmt.Errorf("runs must be 1..10")
 	}
@@ -72,6 +74,10 @@ func RunRepeatedRAG(ctx context.Context, provider Provider, cfg Config, settings
 		return err
 	}
 	run := RepeatedRAGRun{Version: "local-grounded-v2", SuiteSHA256: fmt.Sprintf("%x", sha256.Sum256(data)), IndexSHA256: fp, Settings: s, Ollama: cfg.Ollama, ContextWindow: cfg.Agent.ContextWindowTokens, Passes: passes, Trials: []RAGTrial{}}
+	if !cfg.RAG.Scorer.IsDefault() {
+		effective := cfg.RAG.Scorer.Effective()
+		run.Scorer = &effective
+	}
 	if saved, e := os.ReadFile(output); e == nil {
 		var old RepeatedRAGRun
 		if err = json.Unmarshal(saved, &old); err != nil {

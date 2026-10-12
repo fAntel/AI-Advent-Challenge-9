@@ -1,0 +1,287 @@
+{
+  "records": [
+    {
+      "name": "baseline",
+      "scorer": {},
+      "metrics": {
+        "relevant": 11,
+        "retained": 10,
+        "selected_relevant": 10,
+        "selected": 19,
+        "packed_relevant": 9,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 39954,
+        "output_tokens": 1209,
+        "trials": 4,
+        "median_seconds": 84.5266413125,
+        "recall": 0.9090909090909091,
+        "precision": 0.5263157894736842,
+        "packed_recall": 0.8181818181818182,
+        "ndcg5": 0.9070068031330177,
+        "varying_pairs": 0
+      }
+    },
+    {
+      "name": "temperature0",
+      "scorer": {
+        "temperature": 0
+      },
+      "metrics": {
+        "relevant": 11,
+        "retained": 10,
+        "selected_relevant": 10,
+        "selected": 18,
+        "packed_relevant": 9,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 39954,
+        "output_tokens": 1080,
+        "trials": 4,
+        "median_seconds": 94.5613501455,
+        "recall": 0.9090909090909091,
+        "precision": 0.5555555555555556,
+        "packed_recall": 0.8181818181818182,
+        "ndcg5": 0.8915958968879493,
+        "varying_pairs": 0
+      }
+    },
+    {
+      "name": "compact",
+      "scorer": {
+        "prompt_version": "compact-v1"
+      },
+      "metrics": {
+        "errors": 1,
+        "reason": "Incomplete benchmark",
+        "median_seconds": null
+      }
+    },
+    {
+      "name": "batch4",
+      "scorer": {
+        "batch_size": 4
+      },
+      "metrics": {
+        "relevant": 11,
+        "retained": 11,
+        "selected_relevant": 11,
+        "selected": 13,
+        "packed_relevant": 10,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 34290,
+        "output_tokens": 1000,
+        "trials": 4,
+        "median_seconds": 108.7284992495,
+        "recall": 1.0,
+        "precision": 0.8461538461538461,
+        "packed_recall": 0.9090909090909091,
+        "ndcg5": 0.908796845072892,
+        "varying_pairs": 0
+      }
+    },
+    {
+      "name": "batch5",
+      "scorer": {
+        "batch_size": 5
+      },
+      "metrics": {
+        "relevant": 11,
+        "retained": 11,
+        "selected_relevant": 11,
+        "selected": 20,
+        "packed_relevant": 8,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 33158,
+        "output_tokens": 1017,
+        "trials": 4,
+        "median_seconds": 98.051153438,
+        "recall": 1.0,
+        "precision": 0.55,
+        "packed_recall": 0.7272727272727273,
+        "ndcg5": 0.8847483485946565,
+        "varying_pairs": 0
+      }
+    },
+    {
+      "name": "context4096",
+      "scorer": {
+        "context_window_tokens": 4096
+      },
+      "metrics": {
+        "errors": 1,
+        "reason": "Incomplete benchmark",
+        "median_seconds": null
+      }
+    },
+    {
+      "name": "context8192",
+      "scorer": {
+        "context_window_tokens": 8192
+      },
+      "metrics": {
+        "relevant": 11,
+        "retained": 10,
+        "selected_relevant": 10,
+        "selected": 20,
+        "packed_relevant": 9,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 39954,
+        "output_tokens": 1150,
+        "trials": 4,
+        "median_seconds": 123.952025813,
+        "recall": 0.9090909090909091,
+        "precision": 0.5,
+        "packed_recall": 0.8181818181818182,
+        "ndcg5": 0.901411888670829,
+        "varying_pairs": 0
+      }
+    },
+    {
+      "name": "output",
+      "scorer": {
+        "output_tokens": 96
+      },
+      "metrics": {
+        "relevant": 11,
+        "retained": 11,
+        "selected_relevant": 11,
+        "selected": 20,
+        "packed_relevant": 9,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 39954,
+        "output_tokens": 1192,
+        "trials": 4,
+        "median_seconds": 97.940706146,
+        "recall": 1.0,
+        "precision": 0.55,
+        "packed_recall": 0.8181818181818182,
+        "ndcg5": 0.907745572665303,
+        "varying_pairs": 0
+      }
+    },
+    {
+      "name": "ordered",
+      "scorer": {
+        "temperature": 0,
+        "prompt_version": "compact-v2",
+        "batch_size": 4,
+        "context_window_tokens": 8192,
+        "output_tokens": 64
+      },
+      "metrics": {
+        "relevant": 11,
+        "retained": 11,
+        "selected_relevant": 11,
+        "selected": 24,
+        "packed_relevant": 9,
+        "false_positive_controls": 0,
+        "errors": 0,
+        "prompt_tokens": 23690,
+        "output_tokens": 283,
+        "calls": 20,
+        "prompt_seconds": 136.64996100000002,
+        "generation_seconds": 22.593848,
+        "load_seconds": 0.12210704200000001,
+        "trials": 4,
+        "median_seconds": 42.232605479499995,
+        "recall": 1.0,
+        "precision": 0.4583333333333333,
+        "packed_recall": 0.8181818181818182,
+        "ndcg5": 0.8521763300410997,
+        "varying_pairs": 0
+      }
+    }
+  ],
+  "selected": {
+    "name": "ordered",
+    "scorer": {
+      "temperature": 0,
+      "prompt_version": "compact-v2",
+      "batch_size": 4,
+      "context_window_tokens": 8192,
+      "output_tokens": 64
+    },
+    "metrics": {
+      "relevant": 11,
+      "retained": 11,
+      "selected_relevant": 11,
+      "selected": 24,
+      "packed_relevant": 9,
+      "false_positive_controls": 0,
+      "errors": 0,
+      "prompt_tokens": 23690,
+      "output_tokens": 283,
+      "calls": 20,
+      "prompt_seconds": 136.64996100000002,
+      "generation_seconds": 22.593848,
+      "load_seconds": 0.12210704200000001,
+      "trials": 4,
+      "median_seconds": 42.232605479499995,
+      "recall": 1.0,
+      "precision": 0.4583333333333333,
+      "packed_recall": 0.8181818181818182,
+      "ndcg5": 0.8521763300410997,
+      "varying_pairs": 0
+    }
+  },
+  "baseline": {
+    "name": "baseline",
+    "scorer": {},
+    "metrics": {
+      "relevant": 11,
+      "retained": 10,
+      "selected_relevant": 10,
+      "selected": 19,
+      "packed_relevant": 9,
+      "false_positive_controls": 0,
+      "errors": 0,
+      "prompt_tokens": 39954,
+      "output_tokens": 1209,
+      "trials": 4,
+      "median_seconds": 84.5266413125,
+      "recall": 0.9090909090909091,
+      "precision": 0.5263157894736842,
+      "packed_recall": 0.8181818181818182,
+      "ndcg5": 0.9070068031330177,
+      "varying_pairs": 0
+    }
+  },
+  "finalist": {
+    "name": "ordered",
+    "scorer": {
+      "temperature": 0,
+      "prompt_version": "compact-v2",
+      "batch_size": 4,
+      "context_window_tokens": 8192,
+      "output_tokens": 64
+    },
+    "metrics": {
+      "relevant": 11,
+      "retained": 11,
+      "selected_relevant": 11,
+      "selected": 24,
+      "packed_relevant": 9,
+      "false_positive_controls": 0,
+      "errors": 0,
+      "prompt_tokens": 23690,
+      "output_tokens": 283,
+      "calls": 20,
+      "prompt_seconds": 136.64996100000002,
+      "generation_seconds": 22.593848,
+      "load_seconds": 0.12210704200000001,
+      "trials": 4,
+      "median_seconds": 42.232605479499995,
+      "recall": 1.0,
+      "precision": 0.4583333333333333,
+      "packed_recall": 0.8181818181818182,
+      "ndcg5": 0.8521763300410997,
+      "varying_pairs": 0
+    }
+  },
+  "additional_experiment": "Combined compact ordered output, temperature zero, batch four and 8192 context after individual variants did not improve latency."
+}

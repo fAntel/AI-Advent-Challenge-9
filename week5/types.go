@@ -53,12 +53,15 @@ type Metrics struct {
 // one HTTP API call. PromptTokens is the entire context sent for that call,
 // not just the user's latest message.
 type CallMetrics struct {
-	StartedAt    time.Time     `json:"started_at"`
-	Duration     time.Duration `json:"duration"`
-	Usage        Usage         `json:"usage"`
-	CostUSD      float64       `json:"cost_usd"`
-	FinishReason string        `json:"finish_reason,omitempty"`
-	Purpose      string        `json:"purpose,omitempty"`
+	LoadDuration   time.Duration `json:"load_duration,omitempty"`
+	PromptDuration time.Duration `json:"prompt_duration,omitempty"`
+	EvalDuration   time.Duration `json:"eval_duration,omitempty"`
+	StartedAt      time.Time     `json:"started_at"`
+	Duration       time.Duration `json:"duration"`
+	Usage          Usage         `json:"usage"`
+	CostUSD        float64       `json:"cost_usd"`
+	FinishReason   string        `json:"finish_reason,omitempty"`
+	Purpose        string        `json:"purpose,omitempty"`
 }
 
 type Operation struct {
