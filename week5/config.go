@@ -20,6 +20,7 @@ type Config struct {
 	Daemon    DaemonConfig    `toml:"daemon"`
 	Provider  ProviderConfig  `toml:"provider"`
 	Ollama    OllamaConfig    `toml:"ollama"`
+	LlamaCPP  LlamaCPPConfig  `toml:"llamacpp"`
 	DeepSeek  DeepSeekConfig  `toml:"deepseek"`
 	Agent     AgentConfig     `toml:"agent"`
 	Client    ClientConfig    `toml:"client"`
@@ -102,6 +103,7 @@ func DefaultConfig() Config {
 		Daemon:   DaemonConfig{SocketPath: socket, SessionDir: stateDir, RequestTimeout: Duration(5 * time.Minute), LeaseTimeout: Duration(30 * time.Second), EvictAfter: Duration(2 * time.Second), LogPath: filepath.Join(stateDir, "agentd.log"), LogMaxBytes: 10 << 20, LogBackups: 3},
 		Provider: ProviderConfig{Name: "deepseek"},
 		Ollama:   OllamaConfig{Endpoint: "http://127.0.0.1:11434", Model: LocalModel, OutputTokens: 1024, SummaryTokens: 256, KeepAlive: "10m"},
+		LlamaCPP: LlamaCPPConfig{Endpoint: "http://127.0.0.1:18080", Model: "private-smollm", OutputTokens: 64, MinInterval: Duration(11 * time.Second)},
 		DeepSeek: DeepSeekConfig{Endpoint: "https://api.deepseek.com/chat/completions", Model: FlashModel, Reasoning: "none"},
 		Agent:    AgentConfig{ContextWindowTokens: 1_000_000, CompressionEnabled: true, RecentMessages: 5, SummaryBatchMessages: 5, ContextStrategy: "summary"},
 		Client:   ClientConfig{PollInterval: Duration(250 * time.Millisecond), Autostart: true}, ConfigDir: configDir, StateDir: stateDir, Profile: DefaultProfile,
@@ -190,7 +192,7 @@ func (c Config) Validate() error {
 	if c.Daemon.SocketPath == "" || c.Daemon.SessionDir == "" {
 		return errors.New("socket_path and session_dir are required")
 	}
-	if c.Provider.Name != "deepseek" && c.Provider.Name != "ollama" {
+	if c.Provider.Name != "deepseek" && c.Provider.Name != "ollama" && c.Provider.Name != "llamacpp" {
 		return fmt.Errorf("unknown provider %q", c.Provider.Name)
 	}
 	if c.Daemon.RequestTimeout <= 0 || c.Daemon.LeaseTimeout <= 0 || c.Daemon.EvictAfter < 0 || c.Client.PollInterval <= 0 {
@@ -213,6 +215,11 @@ func (c Config) Validate() error {
 			return err
 		}
 	}
+	if c.Provider.Name == "llamacpp" {
+		if err := c.LlamaCPP.Validate(c.Agent.ContextWindowTokens); err != nil {
+			return err
+		}
+	}
 	return ValidateSettings(DefaultSettings(c))
 }
 func DefaultSettings(c Config) Settings {
@@ -224,17 +231,25 @@ func DefaultSettings(c Config) Settings {
 	if c.Provider.Name == "ollama" {
 		model, reasoning, temperature = c.Ollama.Model, "none", nil
 	}
+	if c.Provider.Name == "llamacpp" {
+		zero := 0.0
+		model, reasoning, temperature = c.LlamaCPP.Model, "none", &zero
+	}
 	return normalizeSettings(Settings{RAGRerank: c.RAG.Rerank, Provider: c.Provider.Name, Model: model, Reasoning: reasoning, Temperature: temperature, Approach: "none", Roles: []string{"Business analyst", "Engineer", "Critic"}, Compression: strategy == "summary", ContextStrategy: strategy})
 }
 func ValidateSettings(s Settings) error {
 	if err := validateRAG(s); err != nil {
 		return err
 	}
-	if s.Provider != "" && s.Provider != "deepseek" && s.Provider != "ollama" {
+	if s.Provider != "" && s.Provider != "deepseek" && s.Provider != "ollama" && s.Provider != "llamacpp" {
 		return fmt.Errorf("unknown provider %q", s.Provider)
 	}
 	if s.Provider == "ollama" {
 		if err := validateOllamaSettings(s); err != nil {
+			return err
+		}
+	} else if s.Provider == "llamacpp" {
+		if err := validateLlamaCPPSettings(s); err != nil {
 			return err
 		}
 	} else if err := ValidateDeepSeekSettings(s); err != nil {

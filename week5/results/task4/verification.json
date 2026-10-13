@@ -1,0 +1,1116 @@
+{
+  "started_at": "2026-10-13T15:12:42.551397+00:00",
+  "script_sha256": "96cec657d1f2da1851dbd693e7821c0419682d2861f111426a7651093475de7c",
+  "base_url": "http://127.0.0.1:18080",
+  "model": "private-smollm",
+  "requested_stability_requests": 10,
+  "status": "passed",
+  "requests": [
+    {
+      "name": "health_before",
+      "path": "/health",
+      "request": null,
+      "request_bytes": 0,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:12:42 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "15",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"status\":\"ok\"}",
+      "response": {
+        "status": "ok"
+      },
+      "elapsed_seconds": 0.109
+    },
+    {
+      "name": "models",
+      "path": "/v1/models",
+      "request": null,
+      "request_bytes": 0,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:12:42 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "679",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"models\":[{\"name\":\"private-smollm\",\"model\":\"private-smollm\",\"modified_at\":\"\",\"size\":\"\",\"digest\":\"\",\"type\":\"model\",\"description\":\"\",\"tags\":[\"\"],\"capabilities\":[\"completion\"],\"parameters\":\"\",\"details\":{\"parent_model\":\"\",\"format\":\"gguf\",\"family\":\"\",\"families\":[\"\"],\"parameter_size\":\"\",\"quantization_level\":\"\"}}],\"object\":\"list\",\"data\":[{\"id\":\"private-smollm\",\"aliases\":[\"private-smollm\"],\"tags\":[],\"object\":\"model\",\"architecture\":{\"input_modalities\":[\"text\"],\"output_modalities\":[\"text\"]},\"created\":1791904362,\"owned_by\":\"llamacpp\",\"meta\":{\"vocab_type\":2,\"n_vocab\":49152,\"n_ctx\":1024,\"n_ctx_train\":8192,\"n_embd\":960,\"n_params\":361821120,\"size\":268803840,\"ftype\":\"Q4_K - Medium\"}}]}",
+      "response": {
+        "models": [
+          {
+            "name": "private-smollm",
+            "model": "private-smollm",
+            "modified_at": "",
+            "size": "",
+            "digest": "",
+            "type": "model",
+            "description": "",
+            "tags": [
+              ""
+            ],
+            "capabilities": [
+              "completion"
+            ],
+            "parameters": "",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "",
+              "families": [
+                ""
+              ],
+              "parameter_size": "",
+              "quantization_level": ""
+            }
+          }
+        ],
+        "object": "list",
+        "data": [
+          {
+            "id": "private-smollm",
+            "aliases": [
+              "private-smollm"
+            ],
+            "tags": [],
+            "object": "model",
+            "architecture": {
+              "input_modalities": [
+                "text"
+              ],
+              "output_modalities": [
+                "text"
+              ]
+            },
+            "created": 1791904362,
+            "owned_by": "llamacpp",
+            "meta": {
+              "vocab_type": 2,
+              "n_vocab": 49152,
+              "n_ctx": 1024,
+              "n_ctx_train": 8192,
+              "n_embd": 960,
+              "n_params": 361821120,
+              "size": 268803840,
+              "ftype": "Q4_K - Medium"
+            }
+          }
+        ]
+      },
+      "elapsed_seconds": 0.136
+    },
+    {
+      "name": "chat_first",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "My name is Mira. Reply with a short greeting."
+          },
+          {
+            "role": "assistant",
+            "content": "Hello, Mira. How are you today?"
+          },
+          {
+            "role": "user",
+            "content": "What is my name? Reply with only my name."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 172,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:13:08 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "658",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Hello, Mira. How are you today?\"}}],\"created\":1791904388,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":10,\"prompt_tokens\":42,\"total_tokens\":52,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-0ZpW12JMG6GN4w0xuceSKABKsnKXDqQq\",\"timings\":{\"cache_n\":24,\"prompt_n\":18,\"prompt_ms\":9189.484,\"prompt_per_token_ms\":510.5268888888889,\"prompt_per_second\":1.9587606877600527,\"predicted_n\":10,\"predicted_ms\":4997.212,\"predicted_per_token_ms\":555.2457777777778,\"predicted_per_second\":1.801004239964204}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Hello, Mira. How are you today?"
+            }
+          }
+        ],
+        "created": 1791904388,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 10,
+          "prompt_tokens": 42,
+          "total_tokens": 52,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-0ZpW12JMG6GN4w0xuceSKABKsnKXDqQq",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 18,
+          "prompt_ms": 9189.484,
+          "prompt_per_token_ms": 510.5268888888889,
+          "prompt_per_second": 1.9587606877600527,
+          "predicted_n": 10,
+          "predicted_ms": 4997.212,
+          "predicted_per_token_ms": 555.2457777777778,
+          "predicted_per_second": 1.801004239964204
+        }
+      },
+      "elapsed_seconds": 14.325
+    },
+    {
+      "name": "chat_followup",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "My name is Mira. Reply with a short greeting."
+          },
+          {
+            "role": "assistant",
+            "content": "Hello, Mira. How are you today?"
+          },
+          {
+            "role": "user",
+            "content": "What is my name? Reply with only my name."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 315,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:13:33 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "636",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Your name is Mira.\"}}],\"created\":1791904413,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":6,\"prompt_tokens\":74,\"total_tokens\":80,\"prompt_tokens_details\":{\"cached_tokens\":51}},\"id\":\"chatcmpl-zBwwbD0a7NPdcYnN4qTTN83XesM4kev9\",\"timings\":{\"cache_n\":51,\"prompt_n\":23,\"prompt_ms\":10946.25,\"prompt_per_token_ms\":475.92391304347825,\"prompt_per_second\":2.1011762018956266,\"predicted_n\":6,\"predicted_ms\":2879.201,\"predicted_per_token_ms\":575.8402,\"predicted_per_second\":1.7365928950427567}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Your name is Mira."
+            }
+          }
+        ],
+        "created": 1791904413,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 74,
+          "total_tokens": 80,
+          "prompt_tokens_details": {
+            "cached_tokens": 51
+          }
+        },
+        "id": "chatcmpl-zBwwbD0a7NPdcYnN4qTTN83XesM4kev9",
+        "timings": {
+          "cache_n": 51,
+          "prompt_n": 23,
+          "prompt_ms": 10946.25,
+          "prompt_per_token_ms": 475.92391304347825,
+          "prompt_per_second": 2.1011762018956266,
+          "predicted_n": 6,
+          "predicted_ms": 2879.201,
+          "predicted_per_token_ms": 575.8402,
+          "predicted_per_second": 1.7365928950427567
+        }
+      },
+      "elapsed_seconds": 14.015
+    },
+    {
+      "name": "stability_01",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reply with exactly one word: ready."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 162,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:13:52 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "620",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Ready\"}}],\"created\":1791904432,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":39,\"total_tokens\":41,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-YOuliTNYF2qUsnKsMFOW6KXhsdES4MZ8\",\"timings\":{\"cache_n\":24,\"prompt_n\":15,\"prompt_ms\":7366.319,\"prompt_per_token_ms\":491.08793333333335,\"prompt_per_second\":2.036295197099121,\"predicted_n\":2,\"predicted_ms\":433.927,\"predicted_per_token_ms\":433.927,\"predicted_per_second\":2.3045350946126884}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Ready"
+            }
+          }
+        ],
+        "created": 1791904432,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 39,
+          "total_tokens": 41,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-YOuliTNYF2qUsnKsMFOW6KXhsdES4MZ8",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 15,
+          "prompt_ms": 7366.319,
+          "prompt_per_token_ms": 491.08793333333335,
+          "prompt_per_second": 2.036295197099121,
+          "predicted_n": 2,
+          "predicted_ms": 433.927,
+          "predicted_per_token_ms": 433.927,
+          "predicted_per_second": 2.3045350946126884
+        }
+      },
+      "elapsed_seconds": 7.938
+    },
+    {
+      "name": "stability_02",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is 2 plus 3? Answer with one number."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 168,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:14:16 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "635",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"2 + 3 = 5\"}}],\"created\":1791904456,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":8,\"prompt_tokens\":43,\"total_tokens\":51,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-yBPws0IdQ88EzUCiIXkodQIv54361THz\",\"timings\":{\"cache_n\":24,\"prompt_n\":19,\"prompt_ms\":9761.081,\"prompt_per_token_ms\":513.7411052631579,\"prompt_per_second\":1.9465057200119535,\"predicted_n\":8,\"predicted_ms\":3884.039,\"predicted_per_token_ms\":554.8627142857143,\"predicted_per_second\":1.8022476087392532}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "2 + 3 = 5"
+            }
+          }
+        ],
+        "created": 1791904456,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 43,
+          "total_tokens": 51,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-yBPws0IdQ88EzUCiIXkodQIv54361THz",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 19,
+          "prompt_ms": 9761.081,
+          "prompt_per_token_ms": 513.7411052631579,
+          "prompt_per_second": 1.9465057200119535,
+          "predicted_n": 8,
+          "predicted_ms": 3884.039,
+          "predicted_per_token_ms": 554.8627142857143,
+          "predicted_per_second": 1.8022476087392532
+        }
+      },
+      "elapsed_seconds": 13.776
+    },
+    {
+      "name": "stability_03",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name one primary color. Answer with one word."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 172,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:14:39 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "642",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Primary colors: Red, Blue, Yellow\"}}],\"created\":1791904479,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":9,\"prompt_tokens\":40,\"total_tokens\":49,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-JFEqiJAkcQxyiewvbewDiso8WkG7sPyS\",\"timings\":{\"cache_n\":24,\"prompt_n\":16,\"prompt_ms\":7942.202,\"prompt_per_token_ms\":496.387625,\"prompt_per_second\":2.0145546537345687,\"predicted_n\":9,\"predicted_ms\":3601.768,\"predicted_per_token_ms\":450.221,\"predicted_per_second\":2.2211313999124873}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Primary colors: Red, Blue, Yellow"
+            }
+          }
+        ],
+        "created": 1791904479,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 9,
+          "prompt_tokens": 40,
+          "total_tokens": 49,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-JFEqiJAkcQxyiewvbewDiso8WkG7sPyS",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 16,
+          "prompt_ms": 7942.202,
+          "prompt_per_token_ms": 496.387625,
+          "prompt_per_second": 2.0145546537345687,
+          "predicted_n": 9,
+          "predicted_ms": 3601.768,
+          "predicted_per_token_ms": 450.221,
+          "predicted_per_second": 2.2211313999124873
+        }
+      },
+      "elapsed_seconds": 11.682
+    },
+    {
+      "name": "stability_04",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the opposite of hot? Answer with one word."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 177,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:14:59 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "619",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Cold\"}}],\"created\":1791904499,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":42,\"total_tokens\":44,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-udNcEeyjGVWqcd8vc9TX0mWUsU6mOFdO\",\"timings\":{\"cache_n\":24,\"prompt_n\":18,\"prompt_ms\":8652.547,\"prompt_per_token_ms\":480.6970555555556,\"prompt_per_second\":2.0803123057291684,\"predicted_n\":2,\"predicted_ms\":537.268,\"predicted_per_token_ms\":537.268,\"predicted_per_second\":1.8612684917024649}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Cold"
+            }
+          }
+        ],
+        "created": 1791904499,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 42,
+          "total_tokens": 44,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-udNcEeyjGVWqcd8vc9TX0mWUsU6mOFdO",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 18,
+          "prompt_ms": 8652.547,
+          "prompt_per_token_ms": 480.6970555555556,
+          "prompt_per_second": 2.0803123057291684,
+          "predicted_n": 2,
+          "predicted_ms": 537.268,
+          "predicted_per_token_ms": 537.268,
+          "predicted_per_second": 1.8612684917024649
+        }
+      },
+      "elapsed_seconds": 9.297
+    },
+    {
+      "name": "stability_05",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name one animal. Answer with one word."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 165,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:15:18 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "621",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Animal\"}}],\"created\":1791904518,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":39,\"total_tokens\":41,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-GjVUlTjdtnbck1CEZvHZOSHXCiw8NFkV\",\"timings\":{\"cache_n\":24,\"prompt_n\":15,\"prompt_ms\":7244.208,\"prompt_per_token_ms\":482.94719999999995,\"prompt_per_second\":2.070619728202172,\"predicted_n\":2,\"predicted_ms\":631.007,\"predicted_per_token_ms\":631.007,\"predicted_per_second\":1.5847684732499008}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Animal"
+            }
+          }
+        ],
+        "created": 1791904518,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 39,
+          "total_tokens": 41,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-GjVUlTjdtnbck1CEZvHZOSHXCiw8NFkV",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 15,
+          "prompt_ms": 7244.208,
+          "prompt_per_token_ms": 482.94719999999995,
+          "prompt_per_second": 2.070619728202172,
+          "predicted_n": 2,
+          "predicted_ms": 631.007,
+          "predicted_per_token_ms": 631.007,
+          "predicted_per_second": 1.5847684732499008
+        }
+      },
+      "elapsed_seconds": 7.971
+    },
+    {
+      "name": "stability_06",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reply with exactly one word: ready."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 162,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:15:37 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "619",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Ready\"}}],\"created\":1791904537,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":39,\"total_tokens\":41,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-Bt9Aq0fhw9H17G9Pk9rQWexa7b3qbabq\",\"timings\":{\"cache_n\":24,\"prompt_n\":15,\"prompt_ms\":6780.212,\"prompt_per_token_ms\":452.01413333333335,\"prompt_per_second\":2.212320204736961,\"predicted_n\":2,\"predicted_ms\":574.634,\"predicted_per_token_ms\":574.634,\"predicted_per_second\":1.740238134186282}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Ready"
+            }
+          }
+        ],
+        "created": 1791904537,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 39,
+          "total_tokens": 41,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-Bt9Aq0fhw9H17G9Pk9rQWexa7b3qbabq",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 15,
+          "prompt_ms": 6780.212,
+          "prompt_per_token_ms": 452.01413333333335,
+          "prompt_per_second": 2.212320204736961,
+          "predicted_n": 2,
+          "predicted_ms": 574.634,
+          "predicted_per_token_ms": 574.634,
+          "predicted_per_second": 1.740238134186282
+        }
+      },
+      "elapsed_seconds": 7.458
+    },
+    {
+      "name": "stability_07",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is 2 plus 3? Answer with one number."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 168,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:16:01 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "635",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"2 + 3 = 5\"}}],\"created\":1791904561,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":8,\"prompt_tokens\":43,\"total_tokens\":51,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-jB3Q1qoLgOBRzaZJvfyjCkuqTuJugHes\",\"timings\":{\"cache_n\":24,\"prompt_n\":19,\"prompt_ms\":9341.751,\"prompt_per_token_ms\":491.6711052631579,\"prompt_per_second\":2.0338799439205775,\"predicted_n\":8,\"predicted_ms\":3847.099,\"predicted_per_token_ms\":549.5855714285715,\"predicted_per_second\":1.8195528630794267}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "2 + 3 = 5"
+            }
+          }
+        ],
+        "created": 1791904561,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 43,
+          "total_tokens": 51,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-jB3Q1qoLgOBRzaZJvfyjCkuqTuJugHes",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 19,
+          "prompt_ms": 9341.751,
+          "prompt_per_token_ms": 491.6711052631579,
+          "prompt_per_second": 2.0338799439205775,
+          "predicted_n": 8,
+          "predicted_ms": 3847.099,
+          "predicted_per_token_ms": 549.5855714285715,
+          "predicted_per_second": 1.8195528630794267
+        }
+      },
+      "elapsed_seconds": 13.282
+    },
+    {
+      "name": "stability_08",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name one primary color. Answer with one word."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 172,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:16:25 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "645",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Primary colors: Red, Blue, Yellow\"}}],\"created\":1791904585,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":9,\"prompt_tokens\":40,\"total_tokens\":49,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-0y4kruebWxyRXQ47kAffYua3uNe8puWn\",\"timings\":{\"cache_n\":24,\"prompt_n\":16,\"prompt_ms\":8377.723,\"prompt_per_token_ms\":523.6076875,\"prompt_per_second\":1.9098268109365755,\"predicted_n\":9,\"predicted_ms\":4481.614,\"predicted_per_token_ms\":560.20175,\"predicted_per_second\":1.7850711819447191}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Primary colors: Red, Blue, Yellow"
+            }
+          }
+        ],
+        "created": 1791904585,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 9,
+          "prompt_tokens": 40,
+          "total_tokens": 49,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-0y4kruebWxyRXQ47kAffYua3uNe8puWn",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 16,
+          "prompt_ms": 8377.723,
+          "prompt_per_token_ms": 523.6076875,
+          "prompt_per_second": 1.9098268109365755,
+          "predicted_n": 9,
+          "predicted_ms": 4481.614,
+          "predicted_per_token_ms": 560.20175,
+          "predicted_per_second": 1.7850711819447191
+        }
+      },
+      "elapsed_seconds": 12.951
+    },
+    {
+      "name": "stability_09",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the opposite of hot? Answer with one word."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 177,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:16:46 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "617",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Cold\"}}],\"created\":1791904606,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":42,\"total_tokens\":44,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-sKrAfgiElDu2KfzMqtWaj7mzYDUNjRSb\",\"timings\":{\"cache_n\":24,\"prompt_n\":18,\"prompt_ms\":8977.856,\"prompt_per_token_ms\":498.7697777777778,\"prompt_per_second\":2.0049330263261074,\"predicted_n\":2,\"predicted_ms\":423.88,\"predicted_per_token_ms\":423.88,\"predicted_per_second\":2.3591582523355665}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Cold"
+            }
+          }
+        ],
+        "created": 1791904606,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 42,
+          "total_tokens": 44,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-sKrAfgiElDu2KfzMqtWaj7mzYDUNjRSb",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 18,
+          "prompt_ms": 8977.856,
+          "prompt_per_token_ms": 498.7697777777778,
+          "prompt_per_second": 2.0049330263261074,
+          "predicted_n": 2,
+          "predicted_ms": 423.88,
+          "predicted_per_token_ms": 423.88,
+          "predicted_per_second": 2.3591582523355665
+        }
+      },
+      "elapsed_seconds": 9.499
+    },
+    {
+      "name": "stability_10",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name one animal. Answer with one word."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 165,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:17:10 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "619",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Animal\"}}],\"created\":1791904630,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":39,\"total_tokens\":41,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-dRcNOpafRVei9zxlyPxUQMa5VknaB4jQ\",\"timings\":{\"cache_n\":24,\"prompt_n\":15,\"prompt_ms\":6231.416,\"prompt_per_token_ms\":415.4277333333333,\"prompt_per_second\":2.407157538511311,\"predicted_n\":2,\"predicted_ms\":521.813,\"predicted_per_token_ms\":521.813,\"predicted_per_second\":1.916395337026866}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Animal"
+            }
+          }
+        ],
+        "created": 1791904630,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 39,
+          "total_tokens": 41,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-dRcNOpafRVei9zxlyPxUQMa5VknaB4jQ",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 15,
+          "prompt_ms": 6231.416,
+          "prompt_per_token_ms": 415.4277333333333,
+          "prompt_per_second": 2.407157538511311,
+          "predicted_n": 2,
+          "predicted_ms": 521.813,
+          "predicted_per_token_ms": 521.813,
+          "predicted_per_second": 1.916395337026866
+        }
+      },
+      "elapsed_seconds": 13.503
+    },
+    {
+      "name": "oversized_context",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello "
+          }
+        ],
+        "max_tokens": 8,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 12126,
+      "status": 400,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:17:21 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "195",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"error\":{\"code\":400,\"message\":\"request (2031 tokens) exceeds the available context size (1024 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":2031,\"n_ctx\":1024}}",
+      "response": {
+        "error": {
+          "code": 400,
+          "message": "request (2031 tokens) exceeds the available context size (1024 tokens), try increasing it",
+          "type": "exceed_context_size_error",
+          "n_prompt_tokens": 2031,
+          "n_ctx": 1024
+        }
+      },
+      "elapsed_seconds": 0.252
+    },
+    {
+      "name": "rate_first",
+      "path": "/v1/chat/completions",
+      "request": null,
+      "request_bytes": 1,
+      "raw_request": "{",
+      "status": 400,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:17:33 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "220",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"error\":{\"code\":400,\"message\":\"[json.exception.parse_error.101] parse error at line 1, column 2: syntax error while parsing object key - unexpected end of input; expected string literal\",\"type\":\"invalid_request_error\"}}",
+      "response": {
+        "error": {
+          "code": 400,
+          "message": "[json.exception.parse_error.101] parse error at line 1, column 2: syntax error while parsing object key - unexpected end of input; expected string literal",
+          "type": "invalid_request_error"
+        }
+      },
+      "elapsed_seconds": 0.112
+    },
+    {
+      "name": "rate_second",
+      "path": "/v1/chat/completions",
+      "request": null,
+      "request_bytes": 1,
+      "raw_request": "{",
+      "status": 429,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:17:33 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "58",
+        "Connection": "close",
+        "Retry-After": "10"
+      },
+      "response_text": "{\"error\":{\"message\":\"Rate limit exceeded or server busy\"}}",
+      "response": {
+        "error": {
+          "message": "Rate limit exceeded or server busy"
+        }
+      },
+      "elapsed_seconds": 0.134
+    },
+    {
+      "name": "oversized_body",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        ],
+        "max_tokens": 8,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 17126,
+      "status": 413,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:17:45 GMT",
+        "Content-Type": "text/html",
+        "Content-Length": "176",
+        "Connection": "close"
+      },
+      "response_text": "<html>\r\n<head><title>413 Request Entity Too Large</title></head>\r\n<body>\r\n<center><h1>413 Request Entity Too Large</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n",
+      "response": null,
+      "elapsed_seconds": 1.044
+    },
+    {
+      "name": "recovery",
+      "path": "/v1/chat/completions",
+      "request": {
+        "model": "private-smollm",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reply with one word: ready."
+          }
+        ],
+        "max_tokens": 32,
+        "temperature": 0,
+        "stream": false
+      },
+      "request_bytes": 154,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:18:04 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "619",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Ready\"}}],\"created\":1791904684,\"model\":\"private-smollm\",\"system_fingerprint\":\"b1-a17e94d\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":2,\"prompt_tokens\":38,\"total_tokens\":40,\"prompt_tokens_details\":{\"cached_tokens\":24}},\"id\":\"chatcmpl-VvttznwjNTDFlcdojdBcNbCOZgg6QXBo\",\"timings\":{\"cache_n\":24,\"prompt_n\":14,\"prompt_ms\":7154.338,\"prompt_per_token_ms\":511.02414285714286,\"prompt_per_second\":1.956854708290271,\"predicted_n\":2,\"predicted_ms\":546.543,\"predicted_per_token_ms\":546.543,\"predicted_per_second\":1.829682202498248}}",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Ready"
+            }
+          }
+        ],
+        "created": 1791904684,
+        "model": "private-smollm",
+        "system_fingerprint": "b1-a17e94d",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 38,
+          "total_tokens": 40,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "id": "chatcmpl-VvttznwjNTDFlcdojdBcNbCOZgg6QXBo",
+        "timings": {
+          "cache_n": 24,
+          "prompt_n": 14,
+          "prompt_ms": 7154.338,
+          "prompt_per_token_ms": 511.02414285714286,
+          "prompt_per_second": 1.956854708290271,
+          "predicted_n": 2,
+          "predicted_ms": 546.543,
+          "predicted_per_token_ms": 546.543,
+          "predicted_per_second": 1.829682202498248
+        }
+      },
+      "elapsed_seconds": 8.614
+    },
+    {
+      "name": "health_after",
+      "path": "/health",
+      "request": null,
+      "request_bytes": 0,
+      "status": 200,
+      "headers": {
+        "Server": "nginx",
+        "Date": "Tue, 13 Oct 2026 15:18:04 GMT",
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": "15",
+        "Connection": "close",
+        "Access-Control-Allow-Origin": ""
+      },
+      "response_text": "{\"status\":\"ok\"}",
+      "response": {
+        "status": "ok"
+      },
+      "elapsed_seconds": 0.151
+    }
+  ],
+  "checks": {
+    "health_before": true,
+    "model_available": true,
+    "chat_first_completed": true,
+    "chat_followup_completed": true,
+    "chat_remembers_name": true,
+    "sequential_requests_completed": true,
+    "oversized_context_rejected": true,
+    "rate_limit": true,
+    "oversized_body_rejected": true,
+    "chat_after_rejections": true,
+    "health_after": true
+  },
+  "notes": [
+    "No retries or cloud fallback.",
+    "11-second pauses before normal chat calls respect the shared rate limit.",
+    "Client sends conversation history; server-side session storage is not tested.",
+    "This short sequential test is not a load test or an uptime guarantee.",
+    "No server memory or restart measurements are available through this API."
+  ],
+  "stability": {
+    "attempted": 10,
+    "completed": 10,
+    "median_seconds": 10.5905,
+    "max_seconds": 13.776
+  },
+  "finished_at": "2026-10-13T15:18:04.943330+00:00"
+}

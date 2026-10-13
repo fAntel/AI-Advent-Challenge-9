@@ -177,7 +177,7 @@ func (a *Agent) Create(req CreateSessionRequest) (*Session, error) {
 	if err := a.validateProvider(settings); err != nil {
 		return nil, err
 	}
-	if a.local != nil && !req.Chat {
+	if (a.local != nil || a.defaults.Provider == "llamacpp") && !req.Chat {
 		return nil, errors.New("local task lifecycle is not supported in Task1; use --chat")
 	}
 	id := randomID()
@@ -244,7 +244,7 @@ func (a *Agent) loadLocked(id string) (*runtimeSession, error) {
 	if err := a.validateProvider(s.Settings); err != nil {
 		return nil, err
 	}
-	if a.local != nil && !s.Chat {
+	if (a.local != nil || a.defaults.Provider == "llamacpp") && !s.Chat {
 		return nil, errors.New("local task lifecycle is not supported in Task1")
 	}
 	if s.RootSessionID == "" {
@@ -1103,7 +1103,7 @@ func contextRequestMessagesWithInvariantFeedback(s *Session, invariants map[stri
 		history = lastMessages(history, s.RecentMessages)
 	}
 	parts := []string{}
-	if s.Settings.Provider == "ollama" && s.Operation != nil && s.Operation.TextOnlyRetry {
+	if (s.Settings.Provider == "ollama" || s.Settings.Provider == "llamacpp") && s.Operation != nil && s.Operation.TextOnlyRetry {
 		parts = append(parts, "The previous response was rejected for unsupported tool-call syntax. Correct it: respond with text only. If the question requires live information you cannot verify offline, explain that limitation instead of attempting a tool call.")
 	}
 	for _, source := range s.Instructions {

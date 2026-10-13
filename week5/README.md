@@ -634,3 +634,151 @@ In the recorded run, q01 finished scoring but answer generation hit the
 speed target passed, but end-to-end answer quality and speed remain unproven.
 The baseline remains the default unless both speed and reviewed answer-quality
 gates pass; `install-fast-rag.py` refuses an unqualified result.
+
+## Task4 — Private LLM service on a 1 GB VPS
+
+SmolLM2-360M-Instruct Q4_K_M runs on a single-core Ubuntu 24.04.4 x86_64 VPS
+using a CPU-compatible llama.cpp build. Nginx exposes its chat API on loopback
+with rate and concurrency limits. An SSH tunnel provides authenticated,
+encrypted access from the Mac; inference takes place entirely on the VPS.
+See the [deployment record and service files](deploy/private-llm/README.md)
+for the build, model checksum, topology, resource snapshots and limitations.
+
+After `make test` and `make build`, keep the SSH tunnel open and run:
+
+```sh
+python3 /Users/keldzh/Develop/AiAdventChallenge/week5/scripts/verify-private-llm.py
+```
+
+The standard-library Python script uses `http://127.0.0.1:18080`, without proxy
+environment variables, redirects, retries or cloud fallback. It checks health
+and model discovery, sends a two-turn conversation with history, makes ten short
+sequential chat requests, tests oversized context, rate limiting and body size,
+then checks recovery. Eleven-second pauses respect the gateway's shared limit;
+avoid other chat requests during the capture. Allow several minutes on this CPU.
+
+Responses, HTTP statuses, request bodies and timings are checkpointed to
+`results/task4/verification.json`. Existing captures are never overwritten;
+use `--output results/task4/another-run.json` for another run. Nonempty answers
+must finish with `stop`; truncation is not counted as a successful completion.
+The context test must return a specific context error, not just any HTTP 400.
+The body-size and rate tests require 413 and 429 respectively. The script exits
+unsuccessfully if a check fails and retains partial results after interruption.
+
+The deployed context is 1,024 tokens; gateway limits are six chat starts/minute
+without bursts, one active chat request and a 16 KiB body. No browser UI is
+exposed; the chat API takes a `messages` history. Resource accounting and service
+restart counts require separate VPS commands in the deployment record. This
+short test does not establish long-term uptime or general answer quality.
+
+### Task4 observed verification
+
+The [live capture](results/task4/verification.json) passed all eleven checks
+through the Mac's SSH tunnel. `make test` (Python, Go and Go race tests) and
+`make build` passed before the capture. The HTTP client was the Python script
+above; the inference artifact was `/usr/local/bin/llama-server` on the VPS,
+build 1, source revision `a17e94d229fc7fed1567a799baebd11b771fe5af`.
+
+| Check | Observed result |
+| --- | --- |
+| Network model availability | HTTP 200; `private-smollm`, 361.8M parameters, Q4_K_M, context 1024 |
+| Two-turn conversation | Completed greeting and correct recall of the name Mira |
+| Sequential stability | 10/10 nonempty answers completed with `stop`, without retries |
+| Short-request latency | Median 10.59 s; maximum 13.78 s, excluding intentional pacing pauses |
+| Context restriction | HTTP 400 identifying 2,031 input tokens versus the 1,024-token context |
+| Rate restriction | Consecutive malformed requests returned 400 then 429 |
+| Request-body restriction | HTTP 413 for a body exceeding 16 KiB |
+| Recovery | Normal chat returned 200 with `stop`; final health check passed |
+
+The [user-reported VPS snapshot](results/task4/vps-reported.json) during the run
+showed 333.9 MiB process RSS, an active service and zero restarts. This was not
+a continuous memory measurement. These stability counts measure completed API
+responses, not correctness: the model returned “Animal” when asked to name an
+animal and sometimes ignored formatting instructions such as “only my name” or
+“one number.” Complex reasoning and broader factual reliability were not evaluated.
+
+The private service satisfies the task's network API, conversation, repeated
+request and basic restriction checks on the existing 1 GB VPS. Concurrent-load,
+hard output-cap override, reboot and long-duration uptime tests were not run.
+Video recording/upload, if required for submission, remain with the user.
+
+### Task4 chat in advent-agent
+
+The `llamacpp` provider connects to the private server's OpenAI-compatible HTTP
+API through the SSH tunnel. It uses `/v1/models` and `/v1/chat/completions`, no
+cloud credentials, no redirects or automatic retries, and no provider fallback.
+Ollama and DeepSeek profiles retain their existing behavior.
+
+After `make test` and `make build`, keep the tunnel to VPS port 8080 open and run
+from `week5/`:
+
+```sh
+./scripts/vps-chat.sh
+```
+
+This installs the `vps` profile in `data/task4-config`, uses isolated state in
+`data/task4-state`, and starts the rebuilt
+`/Users/keldzh/Develop/AiAdventChallenge/week5/advent-agent` with its sibling
+`advent-agentd`. The launcher enters a dedicated `advent-agent-vps-chat-UID`
+directory under the OS temporary directory, outside the Git repository, to avoid
+loading its large instruction file into a 1,024-token conversation. Session
+history remains in the workspace state directory across launches and restarts.
+No home-directory profile or existing daemon is replaced. The config template is
+[config.vps.example.toml](config.vps.example.toml).
+
+For a recording, type these lines individually and wait for each answer:
+
+```text
+/model
+My name is Mira. Reply with a short greeting.
+What is my name? Reply with only my name.
+/stats
+/exit
+```
+
+The model should identify itself as `private-smollm` in `/model`; that command
+displays the configured model rather than asking the model to identify itself.
+The follow-up demonstrates history; stats show provider-reported tokens and
+finish reason. Answers appear when generation completes, without token streaming.
+To resume, use the session ID printed by the CLI:
+
+```sh
+./scripts/vps-chat.sh resume SESSION_ID
+```
+
+The adapter serializes generations and spaces starts at least eleven seconds
+apart within one daemon. Other clients or a daemon restart can still encounter
+the gateway's shared rate limit; HTTP 429 is shown with advice to wait and use
+`/retry`. The default reply limit is 64 tokens. The client conservatively budgets
+UTF-8 bytes plus message overhead, including a short capability prompt and the
+output reserve, so it can reject history before the server's actual token limit.
+Instructions and history are never silently truncated. Start a new chat when
+the context fills. RAG, automatic summaries, alternate history strategies and
+task lifecycle mode are explicitly unsupported for this small private profile;
+ordinary chat and session resume are supported. `/model NAME` can select another
+model advertised by the same server; availability is checked before generation.
+
+The repeatable CLI capture additionally stops only the VPS profile's daemon,
+resumes its session after automatic restart, and verifies name recall:
+
+```sh
+python3 scripts/demo-vps-agent.py
+```
+
+It saves CLI output, session snapshots and binary hashes to
+`results/task4/agent-demo.json`, refuses to overwrite a capture, and does not pass
+`DEEPSEEK_API_KEY` to child processes. Use `--output PATH` for another recording.
+For the service portion of the video, show `/v1/models` through the tunnel,
+the VPS's loopback listeners and service status, then the saved stability and
+restriction results or a new `verify-private-llm.py --output PATH` run.
+
+The [final agent capture](results/task4/agent-demo-final.json) passed: the first
+answer greeted Mira, and the resumed session answered “Your name is Mira.”
+after the isolated daemon was stopped and automatically restarted. Both calls
+finished with `stop`, using 50/12 and 84/6 input/output tokens respectively.
+The final session retained provider `llamacpp`, model `private-smollm` and all
+four conversation messages. The full test suite (including race checks) and
+rebuild passed before this capture. The initial failed capture is retained in
+[agent-demo.json](results/task4/agent-demo.json): a working directory inside the
+repository still resolved to the Git root and loaded its large instructions;
+the launcher now uses the external temporary directory described above.

@@ -1,0 +1,28 @@
+[provider]
+name = "llamacpp"
+
+[llamacpp]
+endpoint = "http://127.0.0.1:18080"
+model = "private-smollm"
+output_tokens = 64
+min_interval = "11s"
+
+[daemon]
+socket_path = "~/.local/state/advent-agent/vps/agent.sock"
+session_dir = "~/.local/state/advent-agent/vps"
+log_path = "~/.local/state/advent-agent/vps/agentd.log"
+request_timeout = "3m"
+debug = false
+
+[agent]
+context_window_tokens = 1024
+compression_enabled = false
+context_strategy = "full"
+recent_messages = 4
+summary_batch_messages = 2
+
+[rag]
+rerank = false
+
+[client]
+autostart = true

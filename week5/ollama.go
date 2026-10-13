@@ -104,6 +104,11 @@ type OllamaClient struct {
 
 func NewConfiguredProvider(cfg Config, httpClient *http.Client, logger *DebugLogger, key string) (Provider, error) {
 	switch cfg.Provider.Name {
+	case "llamacpp":
+		if err := cfg.LlamaCPP.Validate(cfg.Agent.ContextWindowTokens); err != nil {
+			return nil, err
+		}
+		return &LlamaCPPClient{HTTP: httpClient, Config: cfg.LlamaCPP, ContextWindow: cfg.Agent.ContextWindowTokens, gate: make(chan struct{}, 1)}, nil
 	case "ollama":
 		if err := cfg.Ollama.Validate(cfg.Agent.ContextWindowTokens); err != nil {
 			return nil, err

@@ -301,3 +301,12 @@ func (c *APIClient) RequireLocal() error {
 	}
 	return nil
 }
+
+func (c *APIClient) RequireLlamaCPP() error {
+	var caps map[string]bool
+	_, err := c.do("GET", "/v1/capabilities", "", nil, &caps)
+	if err != nil || !caps["provider_llamacpp"] {
+		return errors.New("daemon does not support llama.cpp; rebuild week5 and restart the isolated vps daemon")
+	}
+	return nil
+}

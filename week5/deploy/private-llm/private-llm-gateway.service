@@ -1,0 +1,16 @@
+[Unit]
+Description=Private LLM rate-limiting gateway
+After=network.target private-llm.service
+Wants=private-llm.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/sbin/nginx -t -c /etc/private-llm-gateway.conf
+ExecStart=/usr/sbin/nginx -c /etc/private-llm-gateway.conf -g "daemon off;"
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGQUIT
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

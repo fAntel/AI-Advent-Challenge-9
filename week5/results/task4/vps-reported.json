@@ -1,0 +1,32 @@
+{
+  "source": "User-pasted VPS command output during setup and the live verification run; not collected over the HTTP API",
+  "os": "Ubuntu 24.04.4 LTS",
+  "kernel": "6.8.0-107-generic",
+  "architecture": "x86_64",
+  "vcpus": 1,
+  "cpu_model": "QEMU Virtual CPU version 2.5+",
+  "ram_total_mib_rounded": 961,
+  "swap_total_mib_rounded": 461,
+  "llama_cpp_version": "0.6.0-dev",
+  "llama_cpp_build": 1,
+  "llama_cpp_commit": "a17e94d229fc7fed1567a799baebd11b771fe5af",
+  "compiler": "GNU 13.3.0 for Linux x86_64",
+  "installed_executable": "/usr/local/bin/llama-server",
+  "during_verification": {
+    "pid": 1618880,
+    "rss_kib": 341876,
+    "vsz_kib": 936776,
+    "ps_lifetime_cpu_percent": 7.4,
+    "process_elapsed": "29:51",
+    "service_active_state": "active",
+    "service_restarts": 0,
+    "cgroup_memory_current_bytes": 120827904,
+    "cgroup_memory_peak_bytes": 121098240
+  },
+  "limitations": [
+    "One snapshot during verification; not a sampled peak RSS or a post-run restart count.",
+    "RSS and cgroup memory account for shared and file-backed pages differently.",
+    "VSZ is virtual address space, not physical RAM consumption.",
+    "No reboot or forced-crash recovery test was performed."
+  ]
+}

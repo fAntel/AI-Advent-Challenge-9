@@ -1,0 +1,33 @@
+[Unit]
+Description=Private SmolLM2 HTTP service
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+DynamicUser=yes
+WorkingDirectory=/opt/private-llm/models
+ExecStart=/usr/local/bin/llama-server \
+    --model /opt/private-llm/models/smollm2-360m-q4_k_m.gguf \
+    --alias private-smollm \
+    --host 127.0.0.1 \
+    --port 8081 \
+    --threads 1 \
+    --threads-batch 1 \
+    --parallel 1 \
+    --ctx-size 1024 \
+    --batch-size 64 \
+    --ubatch-size 64 \
+    --n-predict 128 \
+    --cache-ram 0 \
+    --no-context-shift
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target

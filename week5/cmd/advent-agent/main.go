@@ -1010,6 +1010,8 @@ func printSessionStats(w io.Writer, s *agent.Session) {
 	fmt.Fprintf(w, "  whole dialog: calls=%d, cumulative input=%d, model output=%d, total=%d\n", t.Requests, t.Usage.PromptTokens, t.Usage.CompletionTokens, t.Usage.TotalTokens)
 	if s.Settings.Provider == "ollama" {
 		fmt.Fprintln(w, "  local generation API charges: $0 USD (hardware costs excluded)")
+	} else if s.Settings.Provider == "llamacpp" {
+		fmt.Fprintln(w, "  private server generation API charges: $0 USD (VPS costs excluded)")
 	} else {
 		fmt.Fprintf(w, "  estimated dialog cost: $%.8f USD\n", t.CostUSD)
 	}
@@ -1082,6 +1084,9 @@ func ensureDaemon(api *agent.APIClient, cfg agent.Config) error {
 	}
 	if cfg.Provider.Name == "ollama" {
 		return api.RequireLocal()
+	}
+	if cfg.Provider.Name == "llamacpp" {
+		return api.RequireLlamaCPP()
 	}
 	return nil
 }

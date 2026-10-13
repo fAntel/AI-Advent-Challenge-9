@@ -27,6 +27,11 @@ func TestLocalStartupSkipsCloudCredentials(t *testing.T) {
 	if called || key != "" {
 		t.Fatal("local daemon accessed cloud credentials")
 	}
+	cfg.Provider.Name = "llamacpp"
+	key = providerKey(cfg, func() (string, error) { called = true; return "cloud-secret", nil })
+	if called || key != "" {
+		t.Fatal("private daemon accessed cloud credentials")
+	}
 	cfg.Provider.Name = "deepseek"
 	if providerKey(cfg, func() (string, error) { return "cloud-secret", nil }) != "cloud-secret" {
 		t.Fatal("cloud credentials changed")
