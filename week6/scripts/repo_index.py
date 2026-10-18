@@ -18,7 +18,8 @@ import tempfile
 import urllib.request
 from urllib.parse import urlparse
 
-VERSION = 1
+VERSION = 2
+CORPUS_SNAPSHOT = None
 EXCLUDED = {'.git', '.venv', 'node_modules', '__pycache__', 'data'}
 
 
@@ -27,8 +28,13 @@ def digest(value):
 
 
 def corpus(root):
+    if CORPUS_SNAPSHOT is not None:
+        return CORPUS_SNAPSHOT
     root = Path(root).resolve()
-    listing = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z', '--cached', '--others', '--exclude-standard'])
+    try:
+        listing = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        listing = b'\0'.join(os.fsencode(str(p.relative_to(root))) for p in root.rglob('*.md'))
     docs = []
     for name in sorted(set(os.fsdecode(p) for p in listing.split(b'\0') if p)):
         path = root / name
@@ -36,7 +42,28 @@ def corpus(root):
             continue
         if not path.is_file() or not path.resolve().is_relative_to(root):
             continue
-        text = path.read_bytes().decode('utf-8')
+        # Resolve internal links, then open every resolved component without following
+        # links again. A concurrent link replacement cannot bypass the boundary.
+        resolved = path.resolve().relative_to(root)
+        if any(p.lower() == '.git' for p in resolved.parts):
+            continue
+        fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            for part in resolved.parts[:-1]:
+                child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+                os.close(fd)
+                fd = child
+            leaf = os.open(resolved.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
+            with os.fdopen(leaf, 'rb') as stream:
+                import stat
+                if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                    continue
+                data = stream.read(256 * 1024 + 1)
+                if len(data) > 256 * 1024:
+                    raise ValueError('Markdown file exceeds 256 KiB')
+                text = data.decode('utf-8')
+        finally:
+            os.close(fd)
         docs.append({'path': name, 'text': text, 'hash': digest(text)})
     return docs
 
@@ -189,7 +216,9 @@ def search(root, database, embedder, query, limit=20):
 
 
 def main():
+    global CORPUS_SNAPSHOT
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--corpus-stdin', action='store_true')
     p.add_argument('--root', required=True)
     p.add_argument('--database', required=True)
     p.add_argument('--ollama', default='http://127.0.0.1:11434')
@@ -197,6 +226,8 @@ def main():
     p.add_argument('command', choices=['index', 'status', 'search'])
     p.add_argument('query', nargs='?', default='')
     a = p.parse_args()
+    if a.corpus_stdin:
+        CORPUS_SNAPSHOT = json.load(sys.stdin)
     Path(a.database).parent.mkdir(parents=True, exist_ok=True)
     if a.command == 'status':
         result = status(a.root, a.database)

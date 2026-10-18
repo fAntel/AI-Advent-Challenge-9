@@ -32,6 +32,9 @@ func repo(t *testing.T) string {
 	if e != nil {
 		t.Fatal(e)
 	}
+	if err := os.WriteFile(filepath.Join(r, "README.md"), []byte("A project."), 0644); err != nil {
+		t.Fatal(err)
+	}
 	return r
 }
 func TestGitHelper(t *testing.T) {
@@ -126,6 +129,12 @@ func fakeEngine(t *testing.T) *Engine {
 	e.Index = func(context.Context, Config, string, string, string) ([]byte, error) {
 		return []byte(`[{"id":"doc","source":"README.md","line_start":1,"line_end":1,"text":"A project."}]`), nil
 	}
+	e.ToolComplete = func(_ context.Context, m []ToolMessage, _ bool) (ToolMessage, Call, error) {
+		if len(m) == 2 {
+			return ToolMessage{Role: "assistant", ToolCalls: []ToolCall{testCall("git", "git_branch", map[string]any{}), testCall("rag", "rag_search", map[string]any{"query": "project"})}}, Call{}, nil
+		}
+		return ToolMessage{Role: "assistant", Content: "Finished."}, Call{}, nil
+	}
 	e.Complete = func(_ context.Context, purpose string, m []Message) (string, Call, error) {
 		call := Call{Purpose: purpose}
 		switch purpose {
@@ -134,7 +143,7 @@ func fakeEngine(t *testing.T) *Engine {
 		case "summary":
 			return "User asked about the project.", call, nil
 		default:
-			return `{"status":"answered","answer":"A project [1].","quotes":[{"chunk_id":"doc","text":"A project."}],"clarification":""}`, call, nil
+			return testFinal(m), call, nil
 		}
 	}
 	return e
@@ -163,7 +172,7 @@ func TestSessionRecovery(t *testing.T) {
 	if _, err = e.Ask(context.Background(), s.ID, "skip", false); err == nil {
 		t.Fatal("pending not guarded")
 	}
-	// A fresh engine loads disk state and obtains new live context on retry.
+	// A final-answer failure retries reporting from saved evidence, without tools.
 	fresh := fakeEngine(t)
 	fresh.Config = e.Config
 	fresh.Complete = original
@@ -174,8 +183,8 @@ func TestSessionRecovery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s.Operations[2].Git.Branch != "changed" || len(s.Messages) != 4 {
-		t.Fatal("retry did not refresh")
+	if s.Operations[2].Git.Branch != "main" || len(s.Operations[2].Tools) != 0 || len(s.Messages) != 4 {
+		t.Fatal("answer-only retry reran tools or lost history")
 	}
 	for i := 0; i < 5; i++ {
 		s, err = fresh.Ask(context.Background(), s.ID, "More?", false)
@@ -202,8 +211,7 @@ func TestGitFailureAndUnknown(t *testing.T) {
 	}
 	e.Index = func(context.Context, Config, string, string, string) ([]byte, error) { return []byte("[]"), nil }
 	e.Complete = func(context.Context, string, []Message) (string, Call, error) {
-		t.Fatal("unexpected generation")
-		return "", Call{}, nil
+		return `{"status":"unknown","answer":"","quotes":[],"clarification":"No supporting sources."}`, Call{}, nil
 	}
 	s, err = e.Ask(context.Background(), s.ID, "unsupported", false)
 	if err != nil || s.Operations[1].Answer.Status != "unknown" {
@@ -295,19 +303,28 @@ func TestInterruptedDiscardAndSummaryFailure(t *testing.T) {
 		t.Fatal("state isolation failed")
 	}
 }
-func TestStaleIndexBlocksGeneration(t *testing.T) {
+func TestStaleIndexFallsBack(t *testing.T) {
 	e := fakeEngine(t)
 	e.Index = func(context.Context, Config, string, string, string) ([]byte, error) {
 		return nil, fmt.Errorf("stale; reindex")
 	}
-	e.Complete = func(context.Context, string, []Message) (string, Call, error) {
-		t.Fatal("generation despite stale index")
-		return "", Call{}, nil
+	e.ToolComplete = func(_ context.Context, m []ToolMessage, _ bool) (ToolMessage, Call, error) {
+		switch len(m) {
+		case 2:
+			return ToolMessage{Role: "assistant", ToolCalls: []ToolCall{testCall("rag", "rag_search", map[string]any{"query": "project"})}}, Call{}, nil
+		case 4:
+			if !strings.Contains(m[3].Content, "stale") {
+				t.Fatal("missing tool error")
+			}
+			return ToolMessage{Role: "assistant", ToolCalls: []ToolCall{testCall("read", "read_file", map[string]any{"path": "README.md"})}}, Call{}, nil
+		default:
+			return ToolMessage{Role: "assistant", Content: "A project."}, Call{}, nil
+		}
 	}
 	s, _ := e.Create(repo(t))
 	s, err := e.Ask(context.Background(), s.ID, "question", false)
-	if err == nil || len(s.Messages) != 0 || s.Operations[0].Error == "" {
-		t.Fatal("stale index not saved as failure")
+	if err != nil || s.Operations[0].Answer == nil || len(s.Operations[0].Tools) != 2 {
+		t.Fatalf("fallback: %+v %v", s, err)
 	}
 }
 func TestDaemonRestart(t *testing.T) {

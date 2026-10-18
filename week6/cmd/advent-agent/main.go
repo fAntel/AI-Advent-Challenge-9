@@ -19,17 +19,20 @@ import (
 )
 
 const help = `Repository assistant
-  /help QUESTION   Ask about this project (same as plain text)
+  /help QUESTION   Give a project goal (same as plain text)
   /help            Show these commands
-  /retry           Retry a failed/interrupted question with fresh evidence
-  /discard         Discard a failed/interrupted question
+  /retry           Retry failed work; answer failures retry reporting only
+  /discard         Abandon an operation; saved edits remain
   /summary         Show conversation summary
   /stats           Show provider usage for this session
   /exit            Leave chat; the daemon remains running
 Examples:
   /help How are weeks and tasks organized?
   /help What format should a commit message use?
-  Which branch am I on?`
+  Which branch am I on?
+  Find every use of the Widget API.
+  Update the README to match the current implementation.
+Edits save directly inside the session project; .git and daemon state are protected.`
 
 func main() {
 	if err := run(); err != nil {
@@ -39,8 +42,8 @@ func main() {
 }
 func run() error {
 	path := flag.String("config", "", "TOML configuration path")
-	project := flag.String("project", ".", "project directory (any repository subdirectory)")
-	prompt := flag.String("p", "", "one-shot project question")
+	project := flag.String("project", ".", "session project directory (defaults to working directory)")
+	prompt := flag.String("p", "", "one-shot project goal")
 	_ = flag.Bool("chat", false, "interactive chat (default)")
 	flag.Usage = func() {
 		fmt.Fprintln(flag.CommandLine.Output(), "Usage: advent-agent [flags] [resume ID | rag index | rag status]\nFlags precede subcommands.")
@@ -107,6 +110,11 @@ func run() error {
 		next, e := call(ctx, c, action, agent.Request{ID: s.ID, Question: question})
 		if next != nil {
 			s = next
+		}
+		if next != nil && len(s.Operations) > 0 && action != "discard" {
+			for _, change := range s.Operations[len(s.Operations)-1].Changes {
+				fmt.Printf("\nChange %s: %s\n%s", change.Status, change.Path, change.Diff)
+			}
 		}
 		if e != nil {
 			return e
@@ -194,6 +202,9 @@ func ensure(ctx context.Context, c agent.Config, path string) error {
 	cancel()
 	if err == nil {
 		return nil
+	}
+	if strings.Contains(err.Error(), "incompatible daemon") {
+		return fmt.Errorf("incompatible daemon; stop it with advent-agentd stop before restarting")
 	}
 	if err = os.MkdirAll(c.State, 0700); err != nil {
 		return err

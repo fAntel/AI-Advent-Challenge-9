@@ -83,5 +83,25 @@ class IndexTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 r.normalize(v)
 
+    def test_subdirectory_plain_directory_and_git_alias(self):
+        docs = r.corpus(self.root / 'week6')
+        self.assertEqual([d['path'] for d in docs], ['docs/commit.md'])
+        (self.root / '.git/secret.md').write_text('metadata')
+        (self.root / 'alias.md').symlink_to('.git/secret.md')
+        self.assertNotIn('alias.md', [d['path'] for d in r.corpus(self.root)])
+        with tempfile.TemporaryDirectory() as directory:
+            plain = Path(directory)
+            (plain / 'README.md').write_text('plain')
+            self.assertEqual(r.corpus(plain)[0]['text'], 'plain')
+
+    def test_corpus_snapshot_stdin(self):
+        r.build(self.root, self.db, Fake())
+        snapshot = r.corpus(self.root)
+        completed = subprocess.run([
+            'python3', '-I', str(Path(r.__file__)), '--corpus-stdin',
+            '--root', str(self.root), '--database', str(self.db), 'status'
+        ], input=json.dumps(snapshot), text=True, capture_output=True, check=True)
+        self.assertFalse(json.loads(completed.stdout)['stale'])
+
 if __name__ == '__main__':
     unittest.main()

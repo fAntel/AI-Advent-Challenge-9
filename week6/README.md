@@ -1,5 +1,71 @@
 # Week6 — Developer's assistant
 
+## Task3 — Assistant that works with project files
+
+Task3 is implemented before Task2. Give a goal in chat or with `-p`: DeepSeek
+chooses file discovery, literal search, reading, writing, optional Markdown RAG,
+and live Git branch tools. Requested edits save directly; the CLI shows recorded
+unified diffs and a source-grounded answer. File work needs no Ollama or index.
+
+The project is the CLI's working directory, or the exact directory selected with
+`--project`. It is saved with the session and enforced by the daemon on every
+file operation. It is **not** expanded to the Git repository root. Resuming keeps
+the saved boundary. Ordinary directories without Git also work.
+
+Reads and writes stay inside that directory. Internal symlinks are supported;
+escaping links, `.git` metadata (including aliases), and daemon state are blocked.
+The active indexer and Git helper cannot be overwritten by file tools. Writes
+require a current file hash or a nonexistent destination, use atomic replacement,
+and do not modify external hard-linked files. New files require an existing parent
+directory. There is no shell, command execution, deletion, or automatic rollback.
+
+Tools handle UTF-8 text up to 256 KiB per file. Discovery visits at most 20,000
+entries; list/search pages contain at most 100 rows and approximately 32 KiB of
+text. Reads return at most 500 lines and 32 KiB. An operation has at most 30 agent
+turns, 60 tool calls, 240,000 bytes of conversation context, and the configured
+timeout. Large or incomplete results are reported explicitly.
+
+After `make test` and `make build`, use the rebuilt
+`/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent`:
+
+```sh
+./advent-agent -p 'Find every use of the ProjectRoot API and explain its callers.'
+./advent-agent --project /absolute/path/to/project -p 'Update the README to match the current implementation.'
+```
+
+The second command saves real edits. Invalid final answers get up to two correction
+attempts against the same evidence, with no tool calls. If reporting still fails,
+`/retry` retries only the final answer from saved evidence. Failures during tool
+work instead reexamine current files and prior write outcomes. `/discard` abandons
+the operation without undoing
+saved edits. Multi-file changes are not a transaction. Diffs remain available
+in the session even if the final provider call fails. Stop an older daemon before
+using the new protocol. Task0 sessions remain readable but cannot gain editing
+permissions; create a new scoped session.
+
+Two scenarios use a three-file catalog fixture: find API definitions/callers and
+update its stale README from source. Offline tests script provider responses;
+the live capture uses DeepSeek to choose the tools itself. After testing/building:
+
+```sh
+python3 scripts/demo_files.py --output results/another-files-demo.json
+```
+
+The script uses the exact rebuilt binaries above and their siblings, an isolated
+daemon, and disposable fixture copies. It records prompts, tool calls, usage,
+before/after files, and diffs; checks source and boundary sentinels; and refuses
+to overwrite an existing report. No Ollama service is needed for these scenarios.
+
+Verified on October 18, 2026: `make test` (including Go race tests) and
+`make build` passed. The [live Task3 capture](results/task3-demo-final.json)
+passed both scenarios and all seven acceptance checks, with 9 provider calls and
+16,942 provider-reported tokens. DeepSeek read all three files, saved the corrected
+README, and preserved source files plus the Git/outside-project sentinels.
+The [initial attempt](results/task3-demo.json) records a sandboxed daemon-startup
+failure before any model call; the successful capture used an isolated daemon
+with local-socket and network access. This is a small behavioral demonstration,
+not a broad model-quality evaluation.
+
 ## Task1 — Human PR review inside the agent harness
 
 The shared [review-bitbucket-pr skill](skills/review-bitbucket-pr/SKILL.md)
@@ -28,20 +94,21 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover \
 
 ## Task0 — Repository documentation assistant
 
-Task0 turns `advent-agent` into a documentation assistant for the entire AI Advent
-Challenge repository. Plain questions and `/help QUESTION` use repository RAG
-plus the current Git branch fetched through MCP. Answers show source paths,
+Task0 introduced repository documentation retrieval. Task3 retains it as an
+optional tool in the combined assistant, alongside live file tools and Git
+context fetched through MCP. Answers show source paths,
 line references, and exact supporting quotes, or explain missing evidence.
 
 The CLI and daemon remain; generation uses DeepSeek only. Local Ollama is used
 only for embeddings. Earlier weeks are preserved. Task lifecycle, explicit memory
-commands, conversation branching, model tools, scheduling/pipelines, HomeBox,
+commands, conversation branching, scheduling/pipelines, HomeBox,
 local/VPS generation, and benchmark commands are absent from this version.
 The daemon provides a base for a later scheduled-review task.
 
 ## Build and test
 
-Requires Go 1.27+, Python 3.9+, Git, and Ollama with `embeddinggemma:300m`.
+Requires Go 1.27+, Python 3.9+, and Git on macOS or Linux. Optional RAG also
+requires Ollama with `embeddinggemma:300m`.
 The Python indexer needs no third-party packages. From `week6/`:
 
 ```sh
@@ -56,7 +123,7 @@ the indexer is `week6/scripts/repo_index.py`. Binaries and state are ignored by 
 
 ## Setup and usage
 
-Start your installed Ollama service and install the embedding model if needed:
+For optional RAG, start your installed Ollama service and install the embedding model:
 
 ```sh
 ollama serve
@@ -66,7 +133,7 @@ ollama pull embeddinggemma:300m
 
 Set `DEEPSEEK_API_KEY` in the environment before daemon startup, or reuse the
 existing macOS Keychain entry (`advent-agent.deepseek`, account `api`). Generation
-sends questions, selected documentation, and conversation context to DeepSeek.
+sends questions, selected file contents, tool results, and conversation context to DeepSeek.
 Embedding generation stays on the configured loopback Ollama endpoint.
 
 After tests and build pass, these commands use the freshly rebuilt
@@ -83,7 +150,7 @@ Inside chat:
 ```text
 /help
 /help How are weeks and tasks organized in this repository?
-/help How can I register and inspect MCP servers in Week3?
+Find every use of ProjectRoot in this project.
 /help What format should a commit message use?
 Which branch am I on?
 What is this project's undocumented production SLA?
@@ -98,10 +165,9 @@ interrupted operation; `/discard` abandons it. `/summary` shows conversation
 context. Ctrl-C cancels the current request and exits the CLI. Stop this daemon
 with `./advent-agentd stop`.
 
-The repository root is resolved from the working directory, so every week's
-files belong to the same project. Override it with `--project PATH`. Global flags
-precede subcommands: `./advent-agent --project .. rag index`. Resuming uses the
-session's saved project root.
+Global flags precede subcommands. To explicitly include the whole challenge
+repository, use `./advent-agent --project ..` and
+`./advent-agent --project .. rag index`. Resuming uses the session's saved directory.
 
 ## Configuration and refresh
 
@@ -112,20 +178,21 @@ in [config.example.toml](config.example.toml). Filesystem overrides must be
 absolute. Stop the daemon before changing its configuration or credentials;
 use separate `state` directories for independent configurations.
 
-All tracked and non-ignored Markdown is included across all weeks: READMEs,
+Within the selected directory, tracked and non-ignored Markdown includes READMEs,
 AGENTS.md, docs, reports, and results. Runtime directories and escaping symlinks
 are excluded. Re-run `rag index` after Markdown changes; the assistant detects
 stale indexes. Indexing may take several minutes on the first run and reuses
-cached embeddings later. Git branch context is fetched anew on every question
-and does not require reindexing. A missing/stale index is an error, even for a
-branch question; an empty document match still permits a live branch answer.
+cached embeddings later. Git branch context is fetched when the model calls its tool and does not require
+reindexing. Missing/stale indexes produce a RAG tool error; the assistant can
+continue using live files. Markdown edits do not automatically rebuild indexes.
+For directories without Git, discovery includes non-runtime Markdown files.
 
 The [commit convention](docs/commit-conventions.md) is derived from all 30 existing
 commit messages. [Architecture and data](docs/architecture.md) describes the API,
 session schema, retrieval pipeline, and failure behavior. These documents are
 part of the index themselves.
 
-## Verification
+## Task0 historical verification
 
 Validated on October 18, 2026. Python tests, Go tests, Go race tests, and
 `make build` passed. The live corpus contained 29 documents and 727 chunks
@@ -161,5 +228,5 @@ before starting the rebuilt artifact, and checks another stop/restart during the
 run. It leaves the restarted daemon available for chat. It does not start Ollama.
 The final documentation refresh is indexed separately after recording results.
 Citation validation establishes source provenance, not semantic correctness.
-No generated commands are executed and no repository changes can be made through
-the assistant. Video recording and upload remain with the user.
+This capture predates Task3 file editing. No generated shell commands are executed.
+Video recording and upload remain with the user.

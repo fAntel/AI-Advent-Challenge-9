@@ -26,7 +26,7 @@ type Response struct {
 
 func Handler(e *Engine, stop context.CancelFunc) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "week6-v1") })
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "week6-v2") })
 	mux.HandleFunc("POST /stop", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "stopping"); go stop() })
 	for _, action := range []string{"create", "get", "ask", "retry", "discard"} {
 		mux.HandleFunc("POST /"+action, func(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +43,11 @@ func Handler(e *Engine, stop context.CancelFunc) http.Handler {
 			var err error
 			switch action {
 			case "create":
-				s, err = e.Create(req.Project)
+				if !filepath.IsAbs(req.Project) {
+					err = fmt.Errorf("project must be absolute")
+				} else {
+					s, err = e.Create(req.Project)
+				}
 			case "get":
 				s, err = e.Get(req.ID)
 			case "ask":
@@ -118,7 +122,7 @@ func Health(ctx context.Context, c Config) error {
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
-	if err == nil && string(b) != "week6-v1" {
+	if err == nil && string(b) != "week6-v2" {
 		err = fmt.Errorf("incompatible daemon")
 	}
 	return err

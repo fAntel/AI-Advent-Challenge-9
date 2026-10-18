@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -55,9 +54,25 @@ func ProjectRoot(path string) (string, error) {
 	if path == "" {
 		path = "."
 	}
-	out, err := exec.Command("git", "-C", path, "rev-parse", "--show-toplevel").Output()
+	abs, err := filepath.Abs(path)
 	if err != nil {
-		return "", fmt.Errorf("project must be inside a Git repository: %w", err)
+		return "", err
 	}
-	return filepath.EvalSymlinks(strings.TrimSpace(string(out)))
+	root, err := filepath.EvalSymlinks(abs)
+	if err != nil {
+		return "", err
+	}
+	info, err := os.Stat(root)
+	if err != nil {
+		return "", err
+	}
+	if !info.IsDir() {
+		return "", fmt.Errorf("project must be a directory")
+	}
+	for _, part := range strings.Split(root, string(filepath.Separator)) {
+		if strings.EqualFold(part, ".git") {
+			return "", fmt.Errorf("project cannot be Git metadata")
+		}
+	}
+	return root, nil
 }

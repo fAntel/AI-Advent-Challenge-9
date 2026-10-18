@@ -1,0 +1,78 @@
+{
+  "raw": "{\"status\":\"answered\",\"answer\":\"The catalog lookup API is `Lookup`, defined once and called twice. The definition is at `testdata/task3/catalog.go:4`: `func Lookup(id int) string {` [3]. Its doc comment at line 3 reads `// Lookup returns a product name. Unknown IDs return \\\"unknown\\\".`, and the body returns `\\\"Answer\\\"` when `id == 42` and `\\\"unknown\\\"` otherwise [3]. The two call sites are both in `testdata/task3/service.go`: line 3 `func Featured() string { return Lookup(42) }` and line 4 `func Missing() string { return Lookup(-1) }` [4]. Both files declare `package catalog` [3][4]. A literal search for `Lookup(` across `*.go` files returned only one other hit, `files_test.go:263`, where `Lookup(42)` appears inside a test fixture's Markdown string rather than as a Go call [9]. Note that `testdata/task3/README.md:3` claims \\\"Lookup returns an empty string for unknown IDs\\\" and line 4 claims \\\"The service has no lookup callers\\\" [5]; both statements contradict the source, which returns `\\\"unknown\\\"` [3] and has two callers [4].\",\"quotes\":[{\"chunk_id\":\"e3\",\"text\":\"func Lookup(id int) string {\"},{\"chunk_id\":\"e3\",\"text\":\"// Lookup returns a product name. Unknown IDs return \\\"unknown\\\".\"},{\"chunk_id\":\"e3\",\"text\":\"if id == 42 { return \\\"Answer\\\" }\"},{\"chunk_id\":\"e4\",\"text\":\"func Featured() string { return Lookup(42) }\"},{\"chunk_id\":\"e4\",\"text\":\"func Missing() string { return Lookup(-1) }\"},{\"chunk_id\":\"e5\",\"text\":\"Lookup returns an empty string for unknown IDs.\"},{\"chunk_id\":\"e5\",\"text\":\"The service has no lookup callers.\"},{\"chunk_id\":\"e9\",\"text\":\"files_test.go:263:\\tnewDocs := \\\"# Catalog\\\\n\\\\nLookup(42) returns Answer. Unknown IDs return unknown.\\\\nFeatured calls Lookup(42); Missing calls Lookup(-1).\\\\n\\\"\"}],\"clarification\":\"\"}",
+  "evidence": [
+    {
+      "id": "e1",
+      "number": 1,
+      "text": ""
+    },
+    {
+      "id": "e2",
+      "number": 2,
+      "text": ""
+    },
+    {
+      "number": 3,
+      "id": "e3",
+      "source": "testdata/task3/catalog.go",
+      "title": "",
+      "sections": null,
+      "week": "",
+      "line_start": 1,
+      "line_end": 7,
+      "text": "package catalog\n\n// Lookup returns a product name. Unknown IDs return \"unknown\".\nfunc Lookup(id int) string {\n if id == 42 { return \"Answer\" }\n return \"unknown\"\n}\n",
+      "similarity": 0
+    },
+    {
+      "number": 4,
+      "id": "e4",
+      "source": "testdata/task3/service.go",
+      "title": "",
+      "sections": null,
+      "week": "",
+      "line_start": 1,
+      "line_end": 4,
+      "text": "package catalog\n\nfunc Featured() string { return Lookup(42) }\nfunc Missing() string { return Lookup(-1) }\n",
+      "similarity": 0
+    },
+    {
+      "number": 5,
+      "id": "e5",
+      "source": "testdata/task3/README.md",
+      "title": "",
+      "sections": null,
+      "week": "",
+      "line_start": 1,
+      "line_end": 4,
+      "text": "# Catalog\n\nLookup returns an empty string for unknown IDs.\nThe service has no lookup callers.\n",
+      "similarity": 0
+    },
+    {
+      "id": "e6",
+      "number": 6,
+      "text": ""
+    },
+    {
+      "id": "e7",
+      "number": 7,
+      "text": ""
+    },
+    {
+      "id": "e8",
+      "number": 8,
+      "text": ""
+    },
+    {
+      "number": 9,
+      "id": "e9",
+      "source": "tool://search_files",
+      "title": "",
+      "sections": null,
+      "week": "",
+      "line_start": 0,
+      "line_end": 0,
+      "text": "{\"has_more\":false,\"next_offset\":1,\"results\":[\"files_test.go:263:\\tnewDocs := \\\"# Catalog\\\\n\\\\nLookup(42) returns Answer. Unknown IDs return unknown.\\\\nFeatured calls Lookup(42); Missing calls Lookup(-1).\\\\n\\\"\"],\"skipped_unreadable_or_nontext_files\":0}",
+      "similarity": 0
+    }
+  ]
+}
