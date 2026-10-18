@@ -1,0 +1,397 @@
+{
+  "at": "2026-10-18T13:32:43.405254+00:00",
+  "artifacts": {
+    "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent": "5b899b9928372e94f7c596add312fbf65af72529ff79a7d3e066ea127091fbb5",
+    "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agentd": "06e3c2b8d99f1e539435da9958a56600ecc4fb14a02223b477db26ef1e1c14d2",
+    "/Users/keldzh/Develop/AiAdventChallenge/week6/git-mcp": "b0fd2e69199c6ae5bd406693485197bf873be5c745e342710f7af9e01265d904"
+  },
+  "steps": [
+    {
+      "name": "index status",
+      "command": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent",
+        "rag",
+        "status"
+      ],
+      "returncode": 0,
+      "stdout": "{\"version\": 1, \"root\": \"/Users/keldzh/Develop/AiAdventChallenge\", \"fingerprint\": \"02ed7801e3c9d8ed9634557285aabafa2535ef1b81f53d80dc81b86b995874b8\", \"embedding\": {\"model\": \"embeddinggemma:300m\", \"digest\": \"5265a4c1d1e7ef31b67da5be71b21030cf8f3f0ffab7b38614866c4e92a8c4b5\", \"format\": 1}, \"documents\": 29, \"chunks\": 727, \"stale\": false}\n\n",
+      "stderr": ""
+    },
+    {
+      "name": "bare help",
+      "command": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent"
+      ],
+      "returncode": 0,
+      "stdout": "Session: 2185b5abf8ee0fb4d45f0174f3f682dc\nProject: /Users/keldzh/Develop/AiAdventChallenge\nType /help for commands. Ctrl-C cancels the current request and exits.\nyou> Repository assistant\n  /help QUESTION   Ask about this project (same as plain text)\n  /help            Show these commands\n  /retry           Retry a failed/interrupted question with fresh evidence\n  /discard         Discard a failed/interrupted question\n  /summary         Show conversation summary\n  /stats           Show provider usage for this session\n  /exit            Leave chat; the daemon remains running\nExamples:\n  /help How are weeks and tasks organized?\n  /help What format should a commit message use?\n  Which branch am I on?\nyou> ",
+      "stderr": ""
+    },
+    {
+      "name": "structure",
+      "command": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent",
+        "-p",
+        "/help How are weeks and tasks organized in this repository?",
+        "resume",
+        "2185b5abf8ee0fb4d45f0174f3f682dc"
+      ],
+      "returncode": 0,
+      "stdout": "Session: 2185b5abf8ee0fb4d45f0174f3f682dc\nProject: /Users/keldzh/Develop/AiAdventChallenge\nWeeks are organized as top-level directories named `weekN/`, while individual days and tasks are represented by commits rather than separate task directories or branches [1][2][3]. The root README gives an example: the `Week0 Task0` commit represents the first day of the first week [3]. The Week6 architecture document similarly states that each week's learning work is stored in a `weekN/` directory and that tasks are represented by commits, not task folders or branches [1]. It also notes that earlier weeks remain separate historical implementations, so a feature described in a Week3 or Week5 report is not automatically part of Week6 [1].\n\n[1] week6/docs/architecture.md:3-14\n> AI Advent Challenge #9 stores each week's learning work in a `weekN/` directory.\n> Tasks are represented by commits, not task folders or branches.\n\n[1] week6/docs/architecture.md:3-14\n> Earlier weeks remain separate historical implementations. A feature described\n> in a Week3 or Week5 report is not automatically part of Week6.\n\n[2] AGENTS.md:3-8\n> Each top-level `weekN/` directory contains that week's work, while individual days and tasks are represented by commits rather than separate task directories or branches.\n\n[3] README.md:1-15\n> Each week of the course has its own directory. Individual days/tasks are\n> presented as commits rather than separate folders or branches. For example,\n> the `Week0 Task0` commit represents the first day of the first week.\n",
+      "stderr": ""
+    },
+    {
+      "name": "earlier week",
+      "command": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent",
+        "-p",
+        "/help How did Week3 Task0 add MCP support?",
+        "resume",
+        "2185b5abf8ee0fb4d45f0174f3f682dc"
+      ],
+      "returncode": 0,
+      "stdout": "Session: 2185b5abf8ee0fb4d45f0174f3f682dc\nProject: /Users/keldzh/Develop/AiAdventChallenge\nI don't know based on the available sources.\n\nThe supplied evidence does not describe how Week3 Task0 added MCP support. The available Week3 README sections cover the MCP catalog and tools (e.g., `mcp add`, `mcp list`, `mcp tools`, `mcp call`) and the HomeBox MCP server configuration, but they do not identify a 'Task0' commit or explain the implementation steps by which MCP support was added. Documentation of the Week3 Task0 commit or its changes is needed.\n",
+      "stderr": ""
+    },
+    {
+      "name": "commit convention",
+      "command": [
+        "/Users/keldzh/Develop/AiAdventChallenge/week6/advent-agent",
+        "-p",
+        "/help What commit message format should I use for Week6 Task0?",
+        "resume",
+        "2185b5abf8ee0fb4d45f0174f3f682dc"
+      ],
+      "returncode": 1,
+      "stdout": "Session: 2185b5abf8ee0fb4d45f0174f3f682dc\nProject: /Users/keldzh/Develop/AiAdventChallenge\n",
+      "stderr": "error: invalid citation [3]\n"
+    }
+  ],
+  "session": "2185b5abf8ee0fb4d45f0174f3f682dc",
+  "operations": [
+    {
+      "question": "How are weeks and tasks organized in this repository?",
+      "at": "2026-10-18T13:32:43.725276Z",
+      "evidence": [
+        {
+          "id": "1231451a98323d369b5ea91457cca4c5985f58c3f04fb98dff95c565a522b4a5",
+          "source": "week6/docs/architecture.md",
+          "title": "week6/docs/architecture.md",
+          "sections": [
+            "Week6 architecture and data",
+            "Repository context"
+          ],
+          "week": "week6",
+          "line_start": 3,
+          "line_end": 14,
+          "text": "## Repository context\n\nAI Advent Challenge #9 stores each week's learning work in a `weekN/` directory.\nTasks are represented by commits, not task folders or branches. Week0 starts\nwith a DeepSeek CLI; Week1 adds a persistent daemon and context management;\nWeek2 adds memory and task state; Week3 adds MCP and automation; Week4 adds RAG;\nWeek5 explores local models and a private VPS model. Week6 reduces that history\nto a documentation assistant for this entire repository.\n\nEarlier weeks remain separate historical implementations. A feature described\nin a Week3 or Week5 report is not automatically part of Week6.\n\n",
+          "similarity": 0.626635621769417
+        },
+        {
+          "id": "a549bb37afddf9bfed053468f64ac5f5787ce375aa17bedfa2f41a7f36981030",
+          "source": "AGENTS.md",
+          "title": "AGENTS.md",
+          "sections": [
+            "Repository guidance",
+            "Project context"
+          ],
+          "week": "root",
+          "line_start": 3,
+          "line_end": 8,
+          "text": "## Project context\n\n- This repository contains homework and learning results for AI Advent Challenge #9. Each top-level `weekN/` directory contains that week's work, while individual days and tasks are represented by commits rather than separate task directories or branches.\n- When working anywhere inside a top-level directory whose name matches `weekN` (for example, `week0/`), first read both the repository-root `README.md` and that week's `README.md`. Use them to establish the project purpose, build and usage commands, and current documented behavior before inspecting only the implementation files relevant to the task.\n- Treat source code and tests as authoritative when they disagree with documentation, and update stale documentation as part of the task when it is in scope.\n\n",
+          "similarity": 0.513246231298032
+        },
+        {
+          "id": "9fe2dd9d5246aa798fb8f3bc7370a65c7427ff59dfe96a985efe335ecd9d0dbd",
+          "source": "README.md",
+          "title": "README.md",
+          "sections": [
+            "AI Advent Challenge #9"
+          ],
+          "week": "root",
+          "line_start": 1,
+          "line_end": 15,
+          "text": "# AI Advent Challenge #9\n\nThis repository contains my homework and learning results from the **AI Advent Challenge #9** course. It is intended for sharing completed work with tutors.\n\nEach week of the course has its own directory. Individual days/tasks are\npresented as commits rather than separate folders or branches. For example,\nthe `Week0 Task0` commit represents the first day of the first week.\n\nWeek directories include:\n\n- `week0/`\n- `week1/` — a persistent DeepSeek agent daemon and chat CLI\n- and so on\n\nMany assignments include a video demonstration. These videos are collected in the [AI Advent Challenge #9 playlist](https://www.youtube.com/playlist?list=PLY0ndpx99mvs).\n",
+          "similarity": 0.48550078490666665
+        },
+        {
+          "id": "9a3271d4e74855364add8bbc2d6b906a44977ac0ab8a5acd3f57648d05e057bc",
+          "source": "week6/docs/commit-conventions.md",
+          "title": "week6/docs/commit-conventions.md",
+          "sections": [
+            "Commit message conventions"
+          ],
+          "week": "week6",
+          "line_start": 1,
+          "line_end": 7,
+          "text": "# Commit message conventions\n\nDerived from all 30 commits reachable through local Git refs before Week6 Task0.\nThis describes observed practice, not a validator or a requirement to copy long\nmessages. The repository root README establishes that tasks are commits, while\nweeks are directories.\n\n",
+          "similarity": 0.5499031976447575
+        },
+        {
+          "id": "git:2026-10-18T13:32:43.725276Z",
+          "source": "mcp://git/git_branch @ 2026-10-18T13:32:43.782156Z",
+          "title": "Live Git context",
+          "sections": null,
+          "week": "",
+          "line_start": 0,
+          "line_end": 0,
+          "text": "{\"root\":\"/Users/keldzh/Develop/AiAdventChallenge\",\"branch\":\"main\",\"commit\":\"336c736fadd59d44650638d4be3eb0a450247f63\",\"detached\":false,\"unborn\":false,\"at\":\"2026-10-18T13:32:43.782156Z\"}",
+          "similarity": 0
+        }
+      ],
+      "git": {
+        "root": "/Users/keldzh/Develop/AiAdventChallenge",
+        "branch": "main",
+        "commit": "336c736fadd59d44650638d4be3eb0a450247f63",
+        "detached": false,
+        "unborn": false,
+        "at": "2026-10-18T13:32:43.782156Z"
+      },
+      "raw": "{\"status\":\"answered\",\"answer\":\"Weeks are organized as top-level directories named `weekN/`, while individual days and tasks are represented by commits rather than separate task directories or branches [1][2][3]. The root README gives an example: the `Week0 Task0` commit represents the first day of the first week [3]. The Week6 architecture document similarly states that each week's learning work is stored in a `weekN/` directory and that tasks are represented by commits, not task folders or branches [1]. It also notes that earlier weeks remain separate historical implementations, so a feature described in a Week3 or Week5 report is not automatically part of Week6 [1].\",\"quotes\":[{\"chunk_id\":\"1231451a98323d369b5ea91457cca4c5985f58c3f04fb98dff95c565a522b4a5\",\"text\":\"AI Advent Challenge #9 stores each week's learning work in a `weekN/` directory.\\nTasks are represented by commits, not task folders or branches.\"},{\"chunk_id\":\"1231451a98323d369b5ea91457cca4c5985f58c3f04fb98dff95c565a522b4a5\",\"text\":\"Earlier weeks remain separate historical implementations. A feature described\\nin a Week3 or Week5 report is not automatically part of Week6.\"},{\"chunk_id\":\"a549bb37afddf9bfed053468f64ac5f5787ce375aa17bedfa2f41a7f36981030\",\"text\":\"Each top-level `weekN/` directory contains that week's work, while individual days and tasks are represented by commits rather than separate task directories or branches.\"},{\"chunk_id\":\"9fe2dd9d5246aa798fb8f3bc7370a65c7427ff59dfe96a985efe335ecd9d0dbd\",\"text\":\"Each week of the course has its own directory. Individual days/tasks are\\npresented as commits rather than separate folders or branches. For example,\\nthe `Week0 Task0` commit represents the first day of the first week.\"}],\"clarification\":\"\"}",
+      "answer": {
+        "status": "answered",
+        "answer": "Weeks are organized as top-level directories named `weekN/`, while individual days and tasks are represented by commits rather than separate task directories or branches [1][2][3]. The root README gives an example: the `Week0 Task0` commit represents the first day of the first week [3]. The Week6 architecture document similarly states that each week's learning work is stored in a `weekN/` directory and that tasks are represented by commits, not task folders or branches [1]. It also notes that earlier weeks remain separate historical implementations, so a feature described in a Week3 or Week5 report is not automatically part of Week6 [1].",
+        "quotes": [
+          {
+            "chunk_id": "1231451a98323d369b5ea91457cca4c5985f58c3f04fb98dff95c565a522b4a5",
+            "text": "AI Advent Challenge #9 stores each week's learning work in a `weekN/` directory.\nTasks are represented by commits, not task folders or branches."
+          },
+          {
+            "chunk_id": "1231451a98323d369b5ea91457cca4c5985f58c3f04fb98dff95c565a522b4a5",
+            "text": "Earlier weeks remain separate historical implementations. A feature described\nin a Week3 or Week5 report is not automatically part of Week6."
+          },
+          {
+            "chunk_id": "a549bb37afddf9bfed053468f64ac5f5787ce375aa17bedfa2f41a7f36981030",
+            "text": "Each top-level `weekN/` directory contains that week's work, while individual days and tasks are represented by commits rather than separate task directories or branches."
+          },
+          {
+            "chunk_id": "9fe2dd9d5246aa798fb8f3bc7370a65c7427ff59dfe96a985efe335ecd9d0dbd",
+            "text": "Each week of the course has its own directory. Individual days/tasks are\npresented as commits rather than separate folders or branches. For example,\nthe `Week0 Task0` commit represents the first day of the first week."
+          }
+        ],
+        "clarification": ""
+      },
+      "calls": [
+        {
+          "purpose": "relevance",
+          "usage": {
+            "prompt_tokens": 7100,
+            "completion_tokens": 885,
+            "total_tokens": 7985
+          },
+          "duration": 3773061667,
+          "finish": "stop"
+        },
+        {
+          "purpose": "answer",
+          "usage": {
+            "prompt_tokens": 1346,
+            "completion_tokens": 471,
+            "total_tokens": 1817
+          },
+          "duration": 2426977292,
+          "finish": "stop"
+        }
+      ]
+    },
+    {
+      "question": "How did Week3 Task0 add MCP support?",
+      "at": "2026-10-18T13:32:50.398197Z",
+      "evidence": [
+        {
+          "id": "4e265d68378d676e2d20eb6f14ffdb355c15b7b72a93a1f58119013397e7ff11",
+          "source": "week3/README.md",
+          "title": "week3/README.md",
+          "sections": [
+            "advent-agent — Week 3",
+            "HomeBox MCP server (HomeBox 0.26.2)"
+          ],
+          "week": "week3",
+          "line_start": 105,
+          "line_end": 148,
+          "text": "## HomeBox MCP server (HomeBox 0.26.2)\n\n`homebox-mcp` connects to HomeBox's authenticated HTTPS API. Create a private\nJSON config outside the repository, for example:\n\n```sh\nmkdir -p ~/.config/advent-agent\ncat > ~/.config/advent-agent/homebox-mcp.json <<'JSON'\n{\n  \"url\": \"https://homebox.example.com\",\n  \"apiKey\": \"YOUR_HOMEBOX_PERSONAL_API_KEY\"\n}\nJSON\nchmod 600 ~/.config/advent-agent/homebox-mcp.json\n```\n\nThe URL is the HomeBox base URL, without `/api`. `caFile` may be added for a\nprivate certificate authority. The config path, rather than the key, is stored\nin the MCP catalog. The server rejects a config readable by other users.\n\nAfter `make test && make build`, register and inspect the rebuilt artifacts:\n\n```sh\n./advent-agent mcp add homebox --description \"HomeBox inventory\" -- ./homebox-mcp --config ~/.config/advent-agent/homebox-mcp.json\n./advent-agent mcp tools --refresh homebox\n./advent-agent -p \"Find the Desk lamp in HomeBox and tell me its entity ID\"\n```\n\nIn interactive chat (`./advent-agent --chat`), ask: `Find the Desk lamp in HomeBox and tell me its entity ID.` The\nmodel can discover `search_entities`, `get_entity`, `list_entity_types`,\n`list_tags`, `create_entity`, and `update_entity`. Search supports `query`,\n`page`, `pageSize`, `tags`, and `parentIds`. Create accepts a name and optional\ndescription, type ID, parent ID, quantity, and tag IDs. Update patches the type,\nparent, quantity, or tag IDs; supply an empty `tagIds` array to clear tags.\nRead tools run automatically. Create and update trigger the harness's approval\nprompt before an API request is sent.\n\nFor a reproducible HTTPS mock, start this in another terminal from `week3/`:\n\n```sh\ngo run ./testdata/homebox-mock --config /private/tmp/homebox-demo.json\n```\n\nThen use the same `mcp add`, `mcp tools`, and chat commands above with\n",
+          "similarity": 0.48644952169706135
+        },
+        {
+          "id": "c54644bb73fe07501fba07c8231921cc473b576f16dec5e78377c64aa90e349c",
+          "source": "week3/README.md",
+          "title": "week3/README.md",
+          "sections": [
+            "advent-agent — Week 3",
+            "MCP catalog and tools"
+          ],
+          "week": "week3",
+          "line_start": 74,
+          "line_end": 104,
+          "text": "## MCP catalog and tools\n\n```sh\n./advent-agent mcp add everything --description \"Official MCP client test server\" -- npx -y @modelcontextprotocol/server-everything\n./advent-agent mcp list\n./advent-agent mcp tools --refresh everything\n./advent-agent mcp remove everything\n```\n\nDefinitions and cached tool metadata are stored globally under the daemon\nstate directory in `mcp-catalog.json`, with private file permissions. `add`\nresolves path-like server executables against the CLI's current directory, so\nthe daemon can launch them even when it runs from another directory. `add`\ndoes not launch the server. First discovery or invocation starts a long-lived\nstdio connection; removal and shutdown close it. `mcp tools` follows every\nserver page and prints the total tool count after the inventory. Positive MCP TTLs allow cached discovery until expiry, while zero\nor missing TTLs require a new discovery. Refresh errors are shown and leave the\nlast snapshot on disk. This task supports stdio commands only.\n\nRun a registered tool directly, without a model or a pipeline, to inspect its\nresult in the terminal:\n\n```sh\n./advent-agent mcp call homebox list_tags\n./advent-agent mcp call homebox search_entities --args '{\"tags\":[\"TAG_ID\"],\"pageSize\":100}'\n```\n\nThe explicit `mcp call` command authorizes that call, including write-capable\ntools. The CLI validates arguments against the tool schema and prints text\nresults as readable JSON when possible.\n\n",
+          "similarity": 0.4732521374697353
+        },
+        {
+          "id": "6c283d2bedf96498d787224fe3043cb9928028bbbdb93110eb9babfe9442aa2b",
+          "source": "week3/README.md",
+          "title": "week3/README.md",
+          "sections": [
+            "advent-agent — Week 3",
+            "HomeBox MCP server (HomeBox 0.26.2)"
+          ],
+          "week": "week3",
+          "line_start": 149,
+          "line_end": 178,
+          "text": "`--config /private/tmp/homebox-demo.json`. The mock returns a Desk lamp\n(`item-1`, quantity 1), LED bulb (`item-2`, quantity 0), and Floor lamp\n(`item-3`, quantity 4). Stop the mock with Ctrl-C. The end-to-end Go test also verifies\nthe harness discovers the tool, calls the stdio server, and uses `Desk lamp`\nfrom the API result in its answer.\n\nThe model sees server names and local descriptions at each answer request.\nIt can call three fixed functions: `list_mcp_tools` (20 matches per page),\n`describe_mcp_tool` (one full schema), and `call_mcp_tool`. Descriptions,\nschemas, annotations, and results from servers are untrusted data. A tool\nexplicitly marked read-only and not destructive is invoked automatically; write-capable or ambiguous\ntools pause for `Execute? [y/N]`. Denial is returned to the model. Piped or\notherwise non-interactive input denies automatically. A pending approval\nsurvives daemon restart. The loop permits at most twelve model rounds and\nthirty-two internal calls, then requests a final answer with tools disabled.\n\nInteractive sessions print numbered MCP events in tool order. They show the\nchosen server, tool, and status, without tool arguments or results. The current\noperation keeps these events after completion; a new request starts a new\nsequence.\n\nInteractive terminal labels use cyan `You:`, magenta `Agent:`, and yellow\napproval prompts. Redirected output, `TERM=dumb`, and any defined `NO_COLOR`\ndisable ANSI colors.\n\nFor Xcode's `xcrun mcpbridge`, open a project in Xcode and enable **Allow\nexternal agents to use Xcode tools** under Xcode Settings → Intelligence.\nIf the bridge cannot initialize, `mcp tools` includes its bounded stderr\ndiagnostic. MCP connection and discovery pages time out after 30 seconds.\n\n",
+          "similarity": 0.4477135953339357
+        },
+        {
+          "id": "git:2026-10-18T13:32:50.398197Z",
+          "source": "mcp://git/git_branch @ 2026-10-18T13:32:50.478685Z",
+          "title": "Live Git context",
+          "sections": null,
+          "week": "",
+          "line_start": 0,
+          "line_end": 0,
+          "text": "{\"root\":\"/Users/keldzh/Develop/AiAdventChallenge\",\"branch\":\"main\",\"commit\":\"336c736fadd59d44650638d4be3eb0a450247f63\",\"detached\":false,\"unborn\":false,\"at\":\"2026-10-18T13:32:50.478685Z\"}",
+          "similarity": 0
+        }
+      ],
+      "git": {
+        "root": "/Users/keldzh/Develop/AiAdventChallenge",
+        "branch": "main",
+        "commit": "336c736fadd59d44650638d4be3eb0a450247f63",
+        "detached": false,
+        "unborn": false,
+        "at": "2026-10-18T13:32:50.478685Z"
+      },
+      "raw": "{\"status\":\"unknown\",\"answer\":\"\",\"quotes\":[],\"clarification\":\"The supplied evidence does not describe how Week3 Task0 added MCP support. The available Week3 README sections cover the MCP catalog and tools (e.g., `mcp add`, `mcp list`, `mcp tools`, `mcp call`) and the HomeBox MCP server configuration, but they do not identify a 'Task0' commit or explain the implementation steps by which MCP support was added. Documentation of the Week3 Task0 commit or its changes is needed.\"}",
+      "answer": {
+        "status": "unknown",
+        "answer": "",
+        "quotes": [],
+        "clarification": "The supplied evidence does not describe how Week3 Task0 added MCP support. The available Week3 README sections cover the MCP catalog and tools (e.g., `mcp add`, `mcp list`, `mcp tools`, `mcp call`) and the HomeBox MCP server configuration, but they do not identify a 'Task0' commit or explain the implementation steps by which MCP support was added. Documentation of the Week3 Task0 commit or its changes is needed."
+      },
+      "calls": [
+        {
+          "purpose": "relevance",
+          "usage": {
+            "prompt_tokens": 9199,
+            "completion_tokens": 870,
+            "total_tokens": 10069
+          },
+          "duration": 3836560000,
+          "finish": "stop"
+        },
+        {
+          "purpose": "answer",
+          "usage": {
+            "prompt_tokens": 2468,
+            "completion_tokens": 118,
+            "total_tokens": 2586
+          },
+          "duration": 1408856542,
+          "finish": "stop"
+        }
+      ]
+    },
+    {
+      "question": "What commit message format should I use for Week6 Task0?",
+      "at": "2026-10-18T13:32:56.090952Z",
+      "evidence": [
+        {
+          "id": "74ad7148c2fa8cb620452f6708efd91ce3f6b3e1dd37b98f33eddccb306704a4",
+          "source": "week6/docs/commit-conventions.md",
+          "title": "week6/docs/commit-conventions.md",
+          "sections": [
+            "Commit message conventions",
+            "Subject"
+          ],
+          "week": "week6",
+          "line_start": 8,
+          "line_end": 25,
+          "text": "## Subject\n\nTask commits use `WeekN TaskM: <imperative description>`, for example:\n\n```text\nWeek5 Task1: integrate local Ollama generation into advent-agent\nWeek4 Task0: index Kotlin documentation with local embeddings\nWeek3 Task0: add MCP discovery and execution\n```\n\nUse the week and task being implemented, then a concise English imperative\nsuch as add, integrate, optimize, or deploy. Subjects do not end with a period.\nDo not switch to Conventional Commits prefixes such as `feat:`: they are not\nthe format observed here.\n\nThese examples come from commits `28037d7`, `ad81d2b`, and `ffd0369`,\nrespectively. The history reviewed spans `50cccb4` through `336c736`.\n\n",
+          "similarity": 0.7228730193083983
+        },
+        {
+          "id": "9a3271d4e74855364add8bbc2d6b906a44977ac0ab8a5acd3f57648d05e057bc",
+          "source": "week6/docs/commit-conventions.md",
+          "title": "week6/docs/commit-conventions.md",
+          "sections": [
+            "Commit message conventions"
+          ],
+          "week": "week6",
+          "line_start": 1,
+          "line_end": 7,
+          "text": "# Commit message conventions\n\nDerived from all 30 commits reachable through local Git refs before Week6 Task0.\nThis describes observed practice, not a validator or a requirement to copy long\nmessages. The repository root README establishes that tasks are commits, while\nweeks are directories.\n\n",
+          "similarity": 0.7365655977928824
+        },
+        {
+          "id": "269a58ce0bc8a7c3befad0c8b0251ce8196b337111976eec0e627abe185c0a3f",
+          "source": "week6/docs/commit-conventions.md",
+          "title": "week6/docs/commit-conventions.md",
+          "sections": [
+            "Commit message conventions",
+            "Exceptions and task numbering"
+          ],
+          "week": "week6",
+          "line_start": 36,
+          "line_end": 44,
+          "text": "## Exceptions and task numbering\n\n`Initial commit` and `add README.md` are setup commits without week/task prefixes.\nTwo separate commits use `Week4 Task3`: one adds reranking/filtering and another\nrequires quotes and refusal with weak context. Do not infer one commit per task,\nconsecutive task numbers, or a prohibition on follow-up commits.\n\nThis document records the convention. The assistant can explain or suggest a\nmessage, but Task0 has no ability to create commits or modify Git state.\n",
+          "similarity": 0.6852783209844809
+        },
+        {
+          "id": "7f0302b86361f364fd2c8770ef3523c14b2d9a162f8508103dd14eef2374fa1b",
+          "source": "week6/docs/commit-conventions.md",
+          "title": "week6/docs/commit-conventions.md",
+          "sections": [
+            "Commit message conventions",
+            "Optional body"
+          ],
+          "week": "week6",
+          "line_start": 26,
+          "line_end": 35,
+          "text": "## Optional body\n\nMany commits put a blank line after the subject, followed by prose paragraphs.\nLater messages generally describe the implementation and resulting behavior,\nthen validation or measured results and limitations. Mention tests/builds that\nactually passed and distinguish observed results from claims not verified.\nThere are no mandatory section labels, fixed paragraph count, or line-length\nrule established by this history. Earlier commits sometimes have short bodies\nor no body at all, notably `Week1 Task2: add persistent token accounting`.\n\n",
+          "similarity": 0.6294259981962224
+        },
+        {
+          "id": "git:2026-10-18T13:32:56.090952Z",
+          "source": "mcp://git/git_branch @ 2026-10-18T13:32:56.167887Z",
+          "title": "Live Git context",
+          "sections": null,
+          "week": "",
+          "line_start": 0,
+          "line_end": 0,
+          "text": "{\"root\":\"/Users/keldzh/Develop/AiAdventChallenge\",\"branch\":\"main\",\"commit\":\"336c736fadd59d44650638d4be3eb0a450247f63\",\"detached\":false,\"unborn\":false,\"at\":\"2026-10-18T13:32:56.167887Z\"}",
+          "similarity": 0
+        }
+      ],
+      "git": {
+        "root": "/Users/keldzh/Develop/AiAdventChallenge",
+        "branch": "main",
+        "commit": "336c736fadd59d44650638d4be3eb0a450247f63",
+        "detached": false,
+        "unborn": false,
+        "at": "2026-10-18T13:32:56.167887Z"
+      },
+      "raw": "{\"status\":\"answered\",\"answer\":\"Use the subject format `WeekN TaskM: <imperative description>`, so for Week6 Task0 that would be `Week6 Task0: <imperative description>` [1]. The description should be a concise English imperative such as add, integrate, optimize, or deploy, and the subject should not end with a period [1]. Do not use Conventional Commits prefixes like `feat:` [1]. Optionally, you may add a blank line after the subject followed by prose paragraphs describing the implementation and resulting behavior, then validation or measured results and limitations; there are no mandatory section labels, fixed paragraph count, or line-length rule [2]. Note that the convention is observed practice, not a validator or a requirement to copy long messages [3].\",\"quotes\":[{\"chunk_id\":\"74ad7148c2fa8cb620452f6708efd91ce3f6b3e1dd37b98f33eddccb306704a4\",\"text\":\"Task commits use `WeekN TaskM: <imperative description>`, for example:\"},{\"chunk_id\":\"74ad7148c2fa8cb620452f6708efd91ce3f6b3e1dd37b98f33eddccb306704a4\",\"text\":\"Use the week and task being implemented, then a concise English imperative\\nsuch as add, integrate, optimize, or deploy. Subjects do not end with a period.\\nDo not switch to Conventional Commits prefixes such as `feat:`: they are not\\nthe format observed here.\"},{\"chunk_id\":\"7f0302b86361f364fd2c8770ef3523c14b2d9a162f8508103dd14eef2374fa1b\",\"text\":\"Many commits put a blank line after the subject, followed by prose paragraphs.\\nLater messages generally describe the implementation and resulting behavior,\\nthen validation or measured results and limitations.\"},{\"chunk_id\":\"7f0302b86361f364fd2c8770ef3523c14b2d9a162f8508103dd14eef2374fa1b\",\"text\":\"There are no mandatory section labels, fixed paragraph count, or line-length\\nrule established by this history.\"},{\"chunk_id\":\"9a3271d4e74855364add8bbc2d6b906a44977ac0ab8a5acd3f57648d05e057bc\",\"text\":\"This describes observed practice, not a validator or a requirement to copy long\\nmessages.\"}],\"clarification\":\"\"}",
+      "error": "invalid citation [3]",
+      "calls": [
+        {
+          "purpose": "relevance",
+          "usage": {
+            "prompt_tokens": 8335,
+            "completion_tokens": 882,
+            "total_tokens": 9217
+          },
+          "duration": 3548843125,
+          "finish": "stop"
+        },
+        {
+          "purpose": "answer",
+          "usage": {
+            "prompt_tokens": 1841,
+            "completion_tokens": 553,
+            "total_tokens": 2394
+          },
+          "duration": 2242581291,
+          "finish": "stop"
+        }
+      ]
+    }
+  ]
+}

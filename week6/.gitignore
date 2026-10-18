@@ -1,0 +1,7 @@
+/advent-agent
+/advent-agentd
+/git-mcp
+/data/
+/.venv/
+__pycache__/
+*.pyc

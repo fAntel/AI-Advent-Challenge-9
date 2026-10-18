@@ -1,0 +1,10 @@
+# All filesystem overrides must be absolute. Defaults resolve beside the binaries.
+# state = "/absolute/path/week6/data/state"
+# indexer = "/absolute/path/week6/scripts/repo_index.py"
+# git_mcp = "/absolute/path/week6/git-mcp"
+python = "python3"
+endpoint = "https://api.deepseek.com/chat/completions"
+model = "deepseek-v4-flash"
+ollama = "http://127.0.0.1:11434"
+embedding_model = "embeddinggemma:300m"
+timeout_seconds = 300

@@ -1,0 +1,14 @@
+.PHONY: build test
+build:
+	go build -buildmode=exe -o advent-agent ./cmd/advent-agent
+	go build -buildmode=exe -o advent-agentd ./cmd/advent-agentd
+	go build -buildmode=exe -o git-mcp ./cmd/git-mcp
+	./advent-agent --help >/dev/null
+	./advent-agentd --help >/dev/null
+	./git-mcp --help >/dev/null
+	python3 scripts/repo_index.py --help >/dev/null
+
+test:
+	python3 -m unittest discover -s scripts -p 'test_*.py'
+	go test ./...
+	go test -race ./...
