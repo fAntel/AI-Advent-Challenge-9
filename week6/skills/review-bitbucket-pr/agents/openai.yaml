@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Bitbucket PR"
+  short_description: "Review, comment, decline, approve, and merge Bitbucket PRs"
+  default_prompt: "Use $review-bitbucket-pr to review a Bitbucket Cloud pull request in revdiff and stop before comments, decline, approval, or merge-and-pull unless I explicitly authorize that exact mutation."

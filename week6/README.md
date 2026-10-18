@@ -1,5 +1,33 @@
 # Week6 — Developer's assistant
 
+## Task1 — Human PR review inside the agent harness
+
+The shared [review-bitbucket-pr skill](skills/review-bitbucket-pr/SKILL.md)
+lets me list Bitbucket Cloud PRs, read diffs in revdiff inside agterm, annotate
+them, and publish comments or approve/decline a PR without leaving the harness.
+It also supports an explicitly authorized merge and local destination update.
+I still perform the review and make the decisions myself while review
+documentation is being established; automated PR review is a later task.
+
+The [setup guide](skills/review-bitbucket-pr/SETUP.md) covers dependencies,
+installation, and credentials. This public copy uses generic workspace and
+repository fixtures. Credentials are supplied through the environment; private
+review artifacts and the original recording are not included.
+
+The skill is shared under `skills/`, rather than installed into this project's
+active skills. Copy `skills/review-bitbucket-pr` into the target clone's
+`.agents/skills/` directory to install it there. Comment publication, approval,
+decline, and merge each retain the skill's explicit human confirmation steps.
+
+Run its 19 offline tests from `week6/`:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover \
+  -s skills/review-bitbucket-pr/scripts -p 'test_bitbucket_pr.py'
+```
+
+## Task0 — Repository documentation assistant
+
 Task0 turns `advent-agent` into a documentation assistant for the entire AI Advent
 Challenge repository. Plain questions and `/help QUESTION` use repository RAG
 plus the current Git branch fetched through MCP. Answers show source paths,

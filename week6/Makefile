@@ -10,5 +10,6 @@ build:
 
 test:
 	python3 -m unittest discover -s scripts -p 'test_*.py'
+	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s skills/review-bitbucket-pr/scripts -p 'test_*.py'
 	go test ./...
 	go test -race ./...
