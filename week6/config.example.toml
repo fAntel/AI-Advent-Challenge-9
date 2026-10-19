@@ -8,3 +8,11 @@ model = "deepseek-v4-flash"
 ollama = "http://127.0.0.1:11434"
 embedding_model = "embeddinggemma:300m"
 timeout_seconds = 300
+# Bundled data MCP is auto-detected. Override with an absolute path, or disable
+# with data_mcp = "". Enables real account writes
+# only in advent-agent, never in support-bot. Restart the daemon after changing it.
+# data_mcp = "/absolute/path/healbe-data-mcp.app/Contents/MacOS/healbe-data-mcp"
+
+# Private JSON {"login": "...", "password": "..."}, mode 0600.
+# Defaults to healbe-credentials.json inside state. Never commit credentials.
+# data_mcp_credentials = "/absolute/private/path/healbe-credentials.json"

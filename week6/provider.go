@@ -64,6 +64,9 @@ func providerRequest(ctx context.Context, c Config, purpose string, messages []T
 	var definitions []map[string]any
 	if withTools {
 		definitions = toolDefinitions()
+		if d, ok := ctx.Value(dataMCPKey{}).(*dataConnection); ok {
+			definitions = append(definitions, d.definitions...)
+		}
 	}
 	return providerRequestTools(ctx, c, purpose, messages, definitions)
 }

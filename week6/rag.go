@@ -257,5 +257,10 @@ func Render(a Answer, evidence []Evidence) string {
 			}
 		}
 	}
+	for _, e := range evidence {
+		if e.Source == "chart://weights" {
+			b.WriteString("\n\n```text\n" + e.Text + "```\n")
+		}
+	}
 	return b.String()
 }

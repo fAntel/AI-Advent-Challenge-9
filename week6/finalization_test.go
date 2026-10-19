@@ -132,3 +132,27 @@ func TestFinalAnswerRepairLimitsAndFailure(t *testing.T) {
 		})
 	}
 }
+
+func TestMarkdownQuoteWrappingRestoredExactly(t *testing.T) {
+	text := "Supplying credentials through chat sends them to the model and stores\nthe user message in session history."
+	evidence := []Evidence{{Number: 1, ID: "e1", Source: "guide.md", Text: text}}
+	a := Answer{Status: "answered", Answer: "Credentials enter history [1].", Quotes: []Quote{{ID: "e1", Text: strings.ReplaceAll(text, "\n", " ")}}}
+	raw, _ := json.Marshal(a)
+	if _, err := ValidateAnswer(string(raw), evidence); err == nil {
+		t.Fatal("fixture must fail exact matching")
+	}
+	fixed := restoreMarkdownQuoteWrapping(string(raw), evidence)
+	validated, err := ValidateAnswer(fixed, evidence)
+	if err != nil || validated.Quotes[0].Text != text {
+		t.Fatalf("%v %+v", err, validated)
+	}
+	a.Quotes[0].Text = strings.ReplaceAll(a.Quotes[0].Text, "stores", "deletes")
+	bad, _ := json.Marshal(a)
+	if _, err := ValidateAnswer(restoreMarkdownQuoteWrapping(string(bad), evidence), evidence); err == nil {
+		t.Fatal("paraphrase accepted")
+	}
+	evidence[0].Source = "code.go"
+	if restoreMarkdownQuoteWrapping(string(raw), evidence) != string(raw) {
+		t.Fatal("code whitespace changed")
+	}
+}

@@ -21,7 +21,7 @@ func supportTools() []map[string]any {
 	out := []map[string]any{}
 	for _, d := range toolDefinitions() {
 		f := d["function"].(map[string]any)
-		if f["name"] == "write_file" {
+		if f["name"] == "write_file" || f["name"] == "list_available_tools" || f["name"] == "plan_daily_timestamps" || f["name"] == "render_weight_chart" {
 			continue
 		}
 		p := f["parameters"].(map[string]any)
@@ -134,6 +134,9 @@ func (i *SupportInvestigator) execute(ctx context.Context, ch SupportChannel, ro
 	// OpenProjectFS has one state boundary, so reject a second overlapping state
 	// explicitly through its protected paths below.
 	fs.extraReadBlocked = append(fs.extraReadBlocked, i.Config.Agent.State)
+	if i.Config.Agent.DataMCPCredentials != "" {
+		fs.extraReadBlocked = append(fs.extraReadBlocked, i.Config.Agent.DataMCPCredentials)
+	}
 	fs.readOnly = true
 	before := len(op.Evidence)
 	result, e := i.Engine.executeTool(ctx, fs, &Session{Root: path}, op, tc, func() error { return nil })

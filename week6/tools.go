@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type ToolRecord struct {
@@ -27,6 +28,9 @@ func toolDefinitions() []map[string]any {
 	str := map[string]string{"type": "string"}
 	integer := map[string]string{"type": "integer"}
 	boolean := map[string]string{"type": "boolean"}
+	add("plan_daily_timestamps", "Compute exact UTC dates and Unix seconds for today and days_prior previous days (inclusive). MUST use before generating date-based weight records; never calculate Unix timestamps mentally. time_utc defaults to 10:00:00; select another time if existing records collide.", map[string]any{"days_prior": integer, "time_utc": str}, "days_prior")
+	add("render_weight_chart", "Render an exact ASCII chart from downloaded weight evidence. Supply evidence_ids and record_ids to select only the intended records. Download all required pages first. The harness appends the chart to the final answer; do not redraw it yourself.", map[string]any{"evidence_ids": map[string]any{"type": "array", "items": str}, "record_ids": map[string]any{"type": "array", "items": integer}}, "evidence_ids", "record_ids")
+	add("list_available_tools", "Inspect this operation's actual runtime tool inventory and MCP status. Use this for questions about connected/available tools; source files and documentation cannot establish runtime connections.", map[string]any{})
 	add("list_files", "Discover project files. Optional glob matches project-relative paths (Go filepath.Match); offset paginates. Hidden Git metadata and runtime directories are excluded.", map[string]any{"glob": str, "offset": integer})
 	add("search_files", "Search literal text in project text files; results include paths and line numbers. Optional glob and offset.", map[string]any{"query": str, "glob": str, "offset": integer}, "query")
 	add("read_file", "Read UTF-8 text (at most 256 KiB), returning source lines and full-file hash. start_line defaults to 1. count defaults to 200 (maximum 500).", map[string]any{"path": str, "start_line": integer, "count": integer}, "path")
@@ -54,7 +58,53 @@ func (e *Engine) executeTool(ctx context.Context, fs *ProjectFS, s *Session, op 
 		ev := appendEvidence(op, Evidence{Source: source, Text: text, Start: start, End: end})
 		return toolJSON(ev)
 	}
+	if strings.HasPrefix(tc.Function.Name, "healbe_") {
+		body, err := callDataMCP(ctx, tc.Function.Name, object)
+		if err != nil {
+			return "", err
+		}
+		return evidence("mcp://healbe/"+tc.Function.Name, body, 0, 0)
+	}
 	switch tc.Function.Name {
+	case "plan_daily_timestamps":
+		var a struct {
+			Days *int   `json:"days_prior"`
+			Time string `json:"time_utc"`
+		}
+		if err := decodeStrict(tc.Function.Arguments, &a); err != nil {
+			return "", err
+		}
+		if a.Days == nil {
+			return "", fmt.Errorf("days_prior required")
+		}
+		if a.Time == "" {
+			a.Time = "10:00:00"
+		}
+		rows, err := dailyTimestamps(time.Now(), *a.Days, a.Time)
+		if err != nil {
+			return "", err
+		}
+		body, _ := toolJSON(rows)
+		return evidence("runtime://daily-timestamps", body, 0, 0)
+	case "render_weight_chart":
+		var a struct {
+			EvidenceIDs []string `json:"evidence_ids"`
+			RecordIDs   []int64  `json:"record_ids"`
+		}
+		if err := decodeStrict(tc.Function.Arguments, &a); err != nil {
+			return "", err
+		}
+		chart, err := weightChart(op.Evidence, a.EvidenceIDs, a.RecordIDs)
+		if err != nil {
+			return "", err
+		}
+		return evidence("chart://weights", chart, 0, 0)
+
+	case "list_available_tools":
+		if err := decodeStrict(tc.Function.Arguments, &struct{}{}); err != nil {
+			return "", err
+		}
+		return evidence("runtime://tools", runtimeToolInventory(ctx, e.Config), 0, 0)
 	case "list_files", "search_files":
 		var args struct {
 			Query  string `json:"query"`

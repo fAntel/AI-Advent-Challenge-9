@@ -46,7 +46,7 @@ func run() error {
 	prompt := flag.String("p", "", "one-shot project goal")
 	_ = flag.Bool("chat", false, "interactive chat (default)")
 	flag.Usage = func() {
-		fmt.Fprintln(flag.CommandLine.Output(), "Usage: advent-agent [flags] [resume ID | rag index | rag status]\nFlags precede subcommands.")
+		fmt.Fprintln(flag.CommandLine.Output(), "Usage: advent-agent [flags] [resume ID | rag index | rag status | mcp list]\nFlags precede subcommands.")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -57,6 +57,17 @@ func run() error {
 	ctx, done := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer done()
 	args := flag.Args()
+	if len(args) > 0 && args[0] == "mcp" {
+		if len(args) != 2 || args[1] != "list" {
+			return fmt.Errorf("usage: advent-agent mcp list")
+		}
+		inventory, err := agent.InspectTools(ctx, c)
+		if err != nil {
+			return err
+		}
+		fmt.Print(inventory)
+		return nil
+	}
 	if len(args) > 0 && args[0] == "rag" {
 		if len(args) != 2 || (args[1] != "index" && args[1] != "status") {
 			return fmt.Errorf("usage: advent-agent rag index|status")
@@ -73,7 +84,7 @@ func run() error {
 		return nil
 	}
 	if len(args) > 0 && (len(args) != 2 || args[0] != "resume") {
-		return fmt.Errorf("usage: advent-agent [flags] [resume ID | rag index | rag status]")
+		return fmt.Errorf("usage: advent-agent [flags] [resume ID | rag index | rag status | mcp list]")
 	}
 	if err = ensure(ctx, c, *path); err != nil {
 		return err

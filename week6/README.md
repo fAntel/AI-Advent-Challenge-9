@@ -1,5 +1,63 @@
 # Week6 — Developer's assistant
 
+## Task4 — Synthetic data through the real server library
+
+`data-mcp` is a standalone Kotlin/JVM stdio MCP server using the latest published
+`com.healbe:server-api-jvm:1.6.0` (verified October 19, 2026). Its 25 tools expose
+DataService downloads/uploads and weight read/add/batch/update operations.
+DeepSeek in `advent-agent` generates the scenario and values; the MCP server
+authenticates internally with `InMemoryAccessProvider` and calls the library.
+The macOS app bundle includes Java. No RAG, registration, firmware, or weight-goal
+tools are included. The read-only support bot cannot use the data tools.
+
+See [build, connection and video instructions](data-mcp/README.md). From Week6,
+run `make build-data`, `make test`, and `make build`. Private dependency access
+uses existing global Gradle properties. The exact MCP artifact is
+`/Users/keldzh/Develop/AiAdventChallenge/week6/data-mcp/build/package/healbe-data-mcp.app/Contents/MacOS/healbe-data-mcp`;
+the harness artifacts are `week6/advent-agent` and `week6/advent-agentd`.
+
+The plain CLI automatically detects the bundled data MCP when present.
+After rebuilding, stop the old daemon with `./advent-agentd stop`; the next
+request starts the new one. Inspect tools directly with `./advent-agent mcp list`
+(no model or account credentials required), or ask in chat to inspect the actual
+operation's connections. Set `data_mcp = ""` in a custom configuration to disable
+automatic discovery. Normal CLI use loads privately configured credentials from
+`data/state/healbe-credentials.json` when present; it never reads the SDK test
+sources itself. This local file is configured on this workstation, Git-ignored,
+mode 0600, and excluded from agent file access.
+
+After successful tests/builds, launch the video-ready interactive session:
+
+```sh
+python3 scripts/demo_data.py --chat
+```
+
+The helper privately loads the account from the SDK tests, starts an isolated
+daemon, and prints a ready-to-paste prompt. Passwords need not appear in chat or
+the recording. Explicit credential arguments remain supported, but credentials
+typed in chat reach the model and remain in user-message history.
+
+The [live Task4 capture](results/task4-data-demo.json) passed: DeepSeek generated
+30 daily weight/body-composition records, the server accepted all 30, and an
+independent MCP download matched every timestamp, weight and muscle-mass value.
+It used 5 tools, 7 provider calls, and 148,535 provider-reported tokens. This was
+a real HEALBE test-account upload using the bundled runtime, not a mock capture.
+The mobile-app display and video recording remain manual checks. The generated
+records remain in the account.
+
+For weight generation, the harness supplies exact UTC dates/timestamps with
+`plan_daily_timestamps`. `render_weight_chart` reads selected record IDs from
+MCP download evidence and appends an exact ASCII chart; the model does not draw
+it. Tool failures become evidence, and Markdown quotes with only line-wrapping
+differences are restored to their exact source span before strict validation.
+
+Offline validation includes JVM input/schema tests, real JVM/SDK/stdio calls
+against a local HTTP fixture, Go MCP integration, and the full Go race suite.
+Uploads are real mutations: matching DataService identities may be overwritten;
+`resync` is fixed false. Weight batches report partial outcomes and do not retry.
+The library can accept a weighing while body-composition enrichment fails, so
+the demo verifies downloaded fields rather than relying on upload receipts alone.
+
 ## Task2 — Read-only support investigation bot
 
 `support-bot` runs locally and polls configured Mattermost channels every 15

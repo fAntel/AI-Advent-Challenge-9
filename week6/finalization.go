@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 )
 
 type AnswerAttempt struct {
-	Raw    string   `json:"raw"`
-	Error  string   `json:"error,omitempty"`
-	Issues []string `json:"issues,omitempty"`
+	Raw          string   `json:"raw"`
+	ValidatedRaw string   `json:"validated_raw,omitempty"`
+	Error        string   `json:"error,omitempty"`
+	Issues       []string `json:"issues,omitempty"`
 }
 
 func needsFinalization(op Operation) bool {
@@ -61,7 +64,20 @@ func (e *Engine) finalizeAnswer(ctx context.Context, op *Operation, draft string
 			}
 			return Answer{}, err
 		}
-		answer, err := ValidateAnswer(raw, op.Evidence)
+		validated := restoreMarkdownQuoteWrapping(raw, op.Evidence)
+		if validated != raw {
+			record.ValidatedRaw = validated
+			op.Raw = validated
+		}
+		answer, err := ValidateAnswer(validated, op.Evidence)
+		if err == nil && strings.Contains(answer.Answer, "```") {
+			for _, ev := range op.Evidence {
+				if ev.Source == "chart://weights" {
+					err = &AnswerValidationError{Issues: []string{"Do not reproduce the chart or include code fences; the harness appends the exact chart automatically."}}
+					break
+				}
+			}
+		}
 		validationErr = err
 		if err != nil {
 			record.Error = err.Error()
@@ -82,6 +98,52 @@ func (e *Engine) finalizeAnswer(ctx context.Context, op *Operation, draft string
 		messages = append(messages, Message{"assistant", raw}, Message{"user", string(feedback)})
 	}
 	return Answer{}, fmt.Errorf("final answer validation failed after 3 attempts: %w; saved changes remain; /retry retries only the final answer", validationErr)
+}
+
+// Recover only Markdown line wrapping, then run the unchanged exact-substring
+// validator. Preserve the original provider answer in AnswerAttempt.Raw.
+func restoreMarkdownQuoteWrapping(raw string, evidence []Evidence) string {
+	var answer Answer
+	if decodeStrict(raw, &answer) != nil {
+		return raw
+	}
+	var fields map[string]json.RawMessage
+	if json.Unmarshal([]byte(raw), &fields) != nil {
+		return raw
+	}
+	for _, key := range []string{"status", "answer", "quotes", "clarification"} {
+		if v, ok := fields[key]; !ok || string(v) == "null" {
+			return raw
+		}
+	}
+	changed := false
+	for i, q := range answer.Quotes {
+		for _, e := range evidence {
+			if e.ID != q.ID || !strings.HasSuffix(strings.ToLower(e.Source), ".md") || strings.Contains(e.Text, q.Text) {
+				continue
+			}
+			words := strings.Fields(q.Text)
+			if len(words) < 2 {
+				continue
+			}
+			for j := range words {
+				words[j] = regexp.QuoteMeta(words[j])
+			}
+			match := regexp.MustCompile(strings.Join(words, `[\t\r\n ]+`)).FindString(e.Text)
+			if match != "" {
+				answer.Quotes[i].Text = match
+				changed = true
+			}
+		}
+	}
+	if !changed {
+		return raw
+	}
+	b, err := json.Marshal(answer)
+	if err != nil {
+		return raw
+	}
+	return string(b)
 }
 
 func validationIssues(err error) []string {

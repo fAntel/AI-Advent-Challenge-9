@@ -216,7 +216,7 @@ func TestToolProviderWire(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body map[string]any
 		json.NewDecoder(r.Body).Decode(&body)
-		if len(body["tools"].([]any)) != 6 {
+		if len(body["tools"].([]any)) != 9 {
 			t.Error("tool definitions missing")
 		}
 		messages := body["messages"].([]any)

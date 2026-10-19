@@ -1,4 +1,12 @@
-.PHONY: build test
+.DEFAULT_GOAL := build
+.PHONY: build test build-data test-data
+build-data:
+	cd data-mcp && ./gradlew test installDist packageApp --console=plain
+
+test-data:
+	cd data-mcp && ./gradlew test installDist --console=plain
+	python3 -m unittest discover -s scripts -p 'test_data_mcp.py'
+
 build:
 	go build -buildmode=exe -o advent-agent ./cmd/advent-agent
 	go build -buildmode=exe -o advent-agentd ./cmd/advent-agentd
