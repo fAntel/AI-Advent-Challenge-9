@@ -11,6 +11,7 @@ import (
 )
 
 type Config struct {
+	readBlocked    []string
 	State          string `toml:"state"`
 	Endpoint       string `toml:"endpoint"`
 	Model          string `toml:"model"`

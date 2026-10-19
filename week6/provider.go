@@ -61,6 +61,15 @@ func ToolProvider(c Config) ToolCompleteFunc {
 	}
 }
 func providerRequest(ctx context.Context, c Config, purpose string, messages []ToolMessage, withTools bool) (ToolMessage, Call, error) {
+	var definitions []map[string]any
+	if withTools {
+		definitions = toolDefinitions()
+	}
+	return providerRequestTools(ctx, c, purpose, messages, definitions)
+}
+
+func providerRequestTools(ctx context.Context, c Config, purpose string, messages []ToolMessage, definitions []map[string]any) (ToolMessage, Call, error) {
+	withTools := len(definitions) > 0
 	call := Call{Purpose: purpose}
 	empty := ToolMessage{}
 	key := os.Getenv("DEEPSEEK_API_KEY")
@@ -72,7 +81,7 @@ func providerRequest(ctx context.Context, c Config, purpose string, messages []T
 	}
 	payload := map[string]any{"model": c.Model, "messages": messages, "thinking": map[string]string{"type": "disabled"}, "stream": false, "max_tokens": 8192, "temperature": 0}
 	if withTools {
-		payload["tools"] = toolDefinitions()
+		payload["tools"] = definitions
 		payload["tool_choice"] = "auto"
 	} else if purpose != "summary" {
 		payload["response_format"] = map[string]string{"type": "json_object"}

@@ -52,7 +52,7 @@ func FetchBranch(ctx context.Context, c Config, root string) (GitSnapshot, error
 	defer cancel()
 	cmd := exec.Command(c.GitMCP, "--project", root)
 	for _, v := range os.Environ() {
-		if !strings.HasPrefix(v, "DEEPSEEK_API_KEY=") {
+		if !strings.HasPrefix(v, "DEEPSEEK_API_KEY=") && !strings.HasPrefix(v, "MATTERMOST_TOKEN=") {
 			cmd.Env = append(cmd.Env, v)
 		}
 	}

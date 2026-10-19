@@ -1,5 +1,102 @@
 # Week6 — Developer's assistant
 
+## Task2 — Read-only support investigation bot
+
+`support-bot` runs locally and polls configured Mattermost channels every 15
+seconds. New human root messages receive threaded analyses; follow-ups require
+`@bot-username`. First launch starts with new messages; restarts catch up from
+saved cursors. Each channel maps to named codebase roots. The read-only
+`mattermost-mcp` stdio adapter supplies thread context. Only the service posts.
+
+DeepSeek reads/searches code, uses Task0 Markdown RAG and Git context, and searches
+human-confirmed cases. The support runner excludes write tools, rejects forged
+mutation calls, and has no shell. Existing developer CLI editing is unchanged.
+Responses distinguish documented expectations, code-supported explanations or
+suspected bugs, and insufficient evidence. Code alone cannot establish intended
+behavior. Workarounds need supporting evidence and are never claimed as tested.
+Missing versions, logs, and reproduction details are requested explicitly.
+Answers include source paths, line references and exact quotes. Citation
+validation establishes provenance, not semantic correctness.
+
+A configured reviewer's ✅ (`white_check_mark`) reaction confirms a specific
+human or bot answer. Removing it, deleting the answer, or editing the answer or
+problem invalidates confirmation; edited content needs a new reaction. Confirmed
+cases use a separate SQLite embedding index scoped to channel/project mappings.
+They guide a fresh investigation, not verbatim cache replay. Confirmations are
+rechecked before retrieval. Missing RAG or embeddings permit live-file fallback.
+
+Use [support.example.toml](support.example.toml) for a real server, with a genuine
+bot account token in `MATTERMOST_TOKEN`, channel membership, and reviewer IDs.
+DeepSeek credentials/model and local Ollama embeddings use the existing setup.
+Selected thread content and code are sent to DeepSeek. Attachments are not read.
+Read-only enforcement is an application capability boundary, not an OS sandbox.
+
+After `make test` and `make build`, use the exact rebuilt artifact
+`/Users/keldzh/Develop/AiAdventChallenge/week6/support-bot`:
+
+```sh
+./support-bot --config /absolute/path/support.toml
+```
+
+### Demo without installing Mattermost
+
+The Python standard-library simulator replaces only Mattermost's REST transport.
+The Go service, real stdio MCP connection, DeepSeek, source boundaries, and RAG
+are unchanged. Its browser UI is labeled **simulated**; this demonstrates the
+workflow, not compatibility with a particular Mattermost deployment.
+
+After tests/build, start Ollama if needed and run:
+
+```sh
+python3 scripts/mattermost_simulator.py
+```
+
+Open <http://127.0.0.1:8765>. In another terminal, capture documentation lookup,
+a code-backed workaround, insufficient evidence, confirmation and similar-case
+reuse, ordinary reply suppression, and confirmation revocation:
+
+```sh
+python3 scripts/demo_support.py --simulated --output results/support-demo.json
+```
+
+For manual questions after the capture, keep the simulator running and start:
+
+```sh
+MATTERMOST_TOKEN=simulated-bot-token ./support-bot \
+  --config "$PWD/data/support-simulator/support.toml"
+```
+
+The dummy token is only for the simulator. Its channel maps to Week6 and the
+labeled account-directory fixture. Captures refuse overwrite and record artifact
+hashes, operations, evidence, tool calls, and checks. Refresh documentation indexes
+using `advent-agent --project PATH rag index`; confirmed-case indexes rebuild
+automatically during retrieval. Do not run the continuous bot and scripted
+capture simultaneously: a state-directory lock permits one service. Ctrl-C
+stops foreground processes.
+
+Queue/publication records survive restarts. Uncertain posts are reconciled using
+bot-authored markers before retrying; this is not an exactly-once guarantee under
+all network/server failures. Failed investigations retry three times, then post
+an operational-failure notice rather than a diagnosis. State has no retention
+policy yet; this version targets a small support channel, not production scale.
+
+Verified on October 19, 2026: `make test` (Python, Go, and race tests) and
+`make build` passed. The [verified live capture](results/task2-support-demo-verified.json)
+passed five scenarios and all eight checks, using 37 provider calls and 170,443
+provider-reported tokens. It exercised a real DeepSeek/Ollama/MCP investigation
+against simulated Mattermost transport. Source files stayed unchanged; confirmed
+case reuse and revocation, mention-only follow-ups, and ordinary reply suppression
+passed. This is a small workflow demonstration, not a quality benchmark or a
+real-Mattermost compatibility test.
+
+The [first capture](results/task2-support-demo.json) passed workflow checks but
+manual review found overconfident “not a bug” wording. Support-specific final
+synthesis now explicitly distinguishes implementation from product intent.
+The [intermediate capture](results/task2-support-demo-final.json) records a safely
+withheld answer with unused quotes. Validation remains strict; repair feedback
+now identifies each unused quote, and support retries can finalize saved evidence
+without repeating investigation. The verified capture uses the rebuilt fixes.
+
 ## Task3 — Assistant that works with project files
 
 Task3 is implemented before Task2. Give a goal in chat or with `-p`: DeepSeek

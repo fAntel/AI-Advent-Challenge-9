@@ -27,9 +27,11 @@ const maxEntries = 20000
 // Checking an absolute path and subsequently opening it would permit link swaps.
 // Directory handles are pinned until the operation completes.
 type ProjectFS struct {
-	root        *os.File
-	path, state string
-	runtime     []string
+	root             *os.File
+	path, state      string
+	runtime          []string
+	extraReadBlocked []string
+	readOnly         bool
 }
 
 func OpenProjectFS(root, state string, runtimePaths ...string) (*ProjectFS, error) {
@@ -78,6 +80,11 @@ func (f *ProjectFS) protected(parts []string) bool {
 		}
 	}
 	full := filepath.Join(append([]string{f.path}, parts...)...)
+	for _, blocked := range f.extraReadBlocked {
+		if blocked != "" && within(strings.ToLower(blocked), strings.ToLower(full)) {
+			return true
+		}
+	}
 	return f.state != "" && within(strings.ToLower(f.state), strings.ToLower(full))
 }
 func safeName(path string) error {
@@ -361,6 +368,9 @@ func unifiedDiff(path, before, after string, created bool) string {
 	return out.String()
 }
 func (f *ProjectFS) Write(ctx context.Context, path, content, expected string, create bool, beforeWrite func(Change) error) (Change, error) {
+	if f.readOnly {
+		return Change{}, fmt.Errorf("filesystem is read-only")
+	}
 	var change Change
 	if len(content) > maxFileBytes || !utf8.ValidString(content) || strings.ContainsRune(content, 0) {
 		return change, fmt.Errorf("content must be UTF-8 text within %d bytes", maxFileBytes)

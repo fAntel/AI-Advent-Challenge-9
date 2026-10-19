@@ -8,6 +8,26 @@ task and describe the resulting behavior, not individual commits. The repository
 records tasks as commits rather than folders or branches, so this file is a
 narrative summary of the work done after Task0.
 
+## Task2 — Read-only support investigation bot
+
+- Added `support-bot`, a local polling service with channel-to-project mappings,
+  automatic threaded triage, mention-only follow-ups, persistent work/publication
+  records, and read-only code inspection through the existing DeepSeek harness.
+- Added `mattermost-mcp` for bounded thread, author, and reaction context.
+  Publication remains service-controlled, outside model tools.
+- Reused Task0 documentation RAG and its SQLite embedding pipeline for a separate
+  index of reviewer-confirmed cases. Confirmations are scoped, rechecked, and
+  invalidated by removed reactions or changed/deleted content.
+- Added explicit support final-synthesis policy: code explains implementation,
+  not product intent; workarounds require evidence and are labeled untested.
+- Added actionable unused-quote diagnostics without relaxing citation validation,
+  and answer-only recovery for interrupted/failed finalization.
+- Added a lightweight Mattermost transport simulator with a browser UI and a
+  reproducible live DeepSeek demo. No Mattermost installation is required.
+- Verified Python/Go/race tests, rebuild, five live scenarios and eight acceptance
+  checks in `results/task2-support-demo-verified.json`. Transport was simulated;
+  generation, embeddings, MCP, code inspection and case retrieval were real.
+
 ## Task3 — Assistant that works with project files
 
 Implemented before Task2.
@@ -131,7 +151,7 @@ Implemented before Task2.
 
 ### Changed
 
-- The README now documents Task3, Task1, and Task0 in that order, plus build,
+- The README now documents Task2, Task3, Task1, and Task0, plus build,
   setup, configuration, and refresh instructions.
 - The Task0 historical verification section records the final live capture: all
   six questions passed, five answers passed quote/citation validation, and the
@@ -147,14 +167,14 @@ Implemented before Task2.
 
 - `make test` now runs the Python indexer tests, the skill's offline tests, Go
   tests, and Go race tests.
-- `make build` builds `advent-agent`, `advent-agentd`, and `git-mcp`, then
+- `make build` builds `advent-agent`, `advent-agentd`, `git-mcp`, `support-bot`,
+  and `mattermost-mcp`, then
   smoke-checks each binary's `--help` and the indexer's `--help`.
 - Binaries and runtime state (`/advent-agent`, `/advent-agentd`, `/git-mcp`,
   `/data/`, `/.venv/`, `__pycache__/`, `*.pyc`) are ignored by Git.
 
 ## Not yet implemented
 
-- Task2 work is planned but not implemented.
 - Task lifecycle, explicit memory commands, conversation branching,
   scheduling/pipelines, HomeBox, local/VPS generation, and benchmark commands
   are absent from this version. The daemon provides a base for a later

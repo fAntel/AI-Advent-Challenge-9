@@ -1,6 +1,10 @@
 /advent-agent
 /advent-agentd
 /git-mcp
+/support-bot
+/mattermost-mcp
+/results/*.mov
+/results/*.mp4
 /data/
 /.venv/
 __pycache__/

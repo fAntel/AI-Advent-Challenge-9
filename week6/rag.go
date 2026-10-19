@@ -44,6 +44,7 @@ func IndexCommand(ctx context.Context, c Config, root, command, query string) ([
 		return nil, err
 	}
 	defer fs.Close()
+	fs.extraReadBlocked = append(fs.extraReadBlocked, c.readBlocked...)
 	snapshot, err := indexCorpus(ctx, fs)
 	if err != nil {
 		return nil, err
@@ -55,7 +56,7 @@ func IndexCommand(ctx context.Context, c Config, root, command, query string) ([
 	cmd := exec.CommandContext(ctx, c.Python, args...)
 	cmd.Stdin = bytes.NewReader(snapshot)
 	for _, v := range os.Environ() {
-		if !strings.HasPrefix(v, "DEEPSEEK_API_KEY=") {
+		if !strings.HasPrefix(v, "DEEPSEEK_API_KEY=") && !strings.HasPrefix(v, "MATTERMOST_TOKEN=") {
 			cmd.Env = append(cmd.Env, v)
 		}
 	}
@@ -224,6 +225,11 @@ func ValidateAnswer(raw string, evidence []Evidence) (Answer, error) {
 	}
 	if len(cited) == 0 || len(cited) != len(quoted) {
 		issues = append(issues, "answer needs matching citations and quotes")
+	}
+	for n, ev := range evidence {
+		if quoted[ev.ID] && !cited[ev.ID] {
+			issues = append(issues, fmt.Sprintf("quote %s is unused: remove its quotes entry or cite [%d] in answer", ev.ID, n+1))
+		}
 	}
 	if len(issues) > 0 {
 		return a, &AnswerValidationError{Issues: issues}

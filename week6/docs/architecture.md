@@ -7,7 +7,7 @@ Tasks are represented by commits, not task folders or branches. Week0 starts
 with a DeepSeek CLI; Week1 adds a persistent daemon and context management;
 Week2 adds memory and task state; Week3 adds MCP and automation; Week4 adds RAG;
 Week5 explores local models and a private VPS model. Week6 starts with a
-documentation assistant and adds a project-scoped file assistant in Task3, before the planned Task2 work.
+documentation assistant and adds a project-scoped file assistant in Task3, followed by the Task2 support bot.
 
 Earlier weeks remain separate historical implementations. A feature described
 in a Week3 or Week5 report is not automatically part of Week6.
@@ -113,7 +113,40 @@ an explicit error instead of silently truncating it.
 Writes use private temporary files and atomic replacement. A process lock prevents
 two daemons owning the same state directory. Version-1 sessions remain readable
 but are refused for new operations: start a new explicitly scoped session. Week6
-does not register a login service. Scheduling will be added in a later task.
+does not register a login service. The separate Task2 support process polls
+Mattermost; the developer daemon itself has no scheduler.
+
+## Support service
+
+`support-bot` is a separate foreground process with its own state lock, polling
+cursors, durable work queue, publication receipts, operations, and confirmed
+cases in `support.json`. It reuses the provider, filesystem, evidence validator,
+and snapshot-based Python indexer. The provider receives an explicit support
+tool set. Dispatch independently allowlists reads, and its filesystem rejects
+writes. Project names resolve only through the originating channel's mapping.
+The existing developer session/API schema remains unchanged.
+
+`mattermost-mcp` exposes only `get_thread(channel_id, root_id)`. It verifies the
+root's channel before retrieving replies, authors, and reactions. Context is
+bounded to 100 posts and 96,000 message bytes; over-limit context fails explicitly.
+The model's `get_thread` tool can refresh only its current escalation. Mattermost
+tokens stay outside prompts; DeepSeek credentials are removed from MCP children.
+The service alone owns REST posting and publication markers.
+
+Reviewer reactions are reconciled independently of new-post timestamps and again
+before case search. A confirmation must follow the current problem and answer
+revisions. Inaccessible threads fail closed for case retrieval. Virtual case
+documents retain thread links and reviewer provenance; the existing SQLite cosine
+pipeline indexes their snapshots separately from repository Markdown. Retrieved
+chunks are verified against the currently confirmed corpus. Indexes are scoped
+by channel plus named canonical roots, so remapping cannot reuse old cases/jobs.
+
+The simulator implements only the REST subset used here, with fixed dummy
+identities and a loopback browser UI. Scripted demos use the same rebuilt service
+and stdio MCP binary as real-server configuration; no model/tool mocking occurs
+in the live capture. Offline tests independently mock provider responses and
+exercise HTTP/MCP boundaries, mutation rejection, confirmation invalidation,
+polling pagination, and publication recovery.
 
 ## Daemon API
 

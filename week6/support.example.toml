@@ -1,0 +1,19 @@
+# Run: MATTERMOST_TOKEN=... ./support-bot --config /absolute/path/support.toml
+# Token must belong to a Mattermost bot account in every configured channel.
+url = "https://mattermost.example.com"
+state = "/absolute/path/week6/data/support"
+poll_seconds = 15
+reviewers = ["cccccccccccccccccccccccccc"]
+# mattermost_mcp defaults to the sibling mattermost-mcp executable.
+
+[[channels]]
+id = "aaaaaaaaaaaaaaaaaaaaaaaaaa"
+[channels.projects]
+app = "/absolute/path/to/app"
+# backend = "/absolute/path/to/backend"
+
+# Optional overrides; remaining agent defaults match config.example.toml.
+[agent]
+# Reuse the developer assistant's Task0 documentation indexes.
+state = "/absolute/path/week6/data/state"
+timeout_seconds = 300
